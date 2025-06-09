@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue';
+import Projects from './Projects.vue';
 
 // Reactive refs for state management
 const isLoading = ref(true);
@@ -742,10 +743,7 @@ defineExpose({
         </section>
 
 
-        {/* <!--
-          - testimonials modal
-        --> */}
-
+<!-- TESTIMONIALS -->
         <div class="modal-container" data-modal-container>
 
           <div class="overlay" data-overlay></div>
@@ -787,9 +785,7 @@ defineExpose({
         </div>
 
 
-        {/* <!--
-          - clients
-        --> */}
+<!-- CLIENTS -->
 
         <section class="clients">
 
@@ -1033,7 +1029,7 @@ defineExpose({
 
         <section class="projects">
 
-          <ul class="filter-list">
+          <!-- <ul class="filter-list">
 
             <li class="filter-item">
               <button class="active" data-filter-btn>All</button>
@@ -1251,8 +1247,10 @@ defineExpose({
               </a>
             </li>
 
-          </ul>
+          </ul> -->
 
+            <Projects
+          />
         </section>
 
       </article>
