@@ -1,99 +1,142 @@
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import { client, urlFor } from '../lib/client';
+
+// Data
+const works = ref([]);
+const filterWork = ref([]);
+const activeFilter = ref('All');
+const currentPage = ref(1);
+const pageSize = ref(6); // default; will auto-update below
+
+// Categories
+const categories = ref(['All']);
+
+// Update page size responsively
+const updatePageSize = () => {
+  if (window.innerWidth >= 2000) pageSize.value = 8;
+  else if (window.innerWidth >= 850) pageSize.value = 6;
+  else if (window.innerWidth >= 450) pageSize.value = 4;
+  else pageSize.value = 3;
+};
+
+onMounted(async () => {
+  updatePageSize();
+  window.addEventListener('resize', updatePageSize);
+
+  const worksQuery = '*[_type == "works"] | order(_updatedAt desc)';
+  const filterQuery = '*[_type == "works" && "All" in tags] | order(_updatedAt desc)';
+
+  try {
+    const worksData = await client.fetch(worksQuery);
+    const filterData = await client.fetch(filterQuery);
+
+    works.value = worksData;
+    filterWork.value = filterData;
+
+    // Extract unique tags
+    const allTags = new Set(['All']);
+    worksData.forEach((work) => {
+      work.tags?.forEach((tag) => allTags.add(tag));
+    });
+    categories.value = Array.from(allTags);
+  } catch (err) {
+    console.error('Sanity fetch error:', err);
+  }
+});
+
+const handleWorkFilter = (category) => {
+  activeFilter.value = category;
+  currentPage.value = 1;
+  if (category === 'All') {
+    filterWork.value = works.value;
+  } else {
+    filterWork.value = works.value.filter((work) => work.tags?.includes(category));
+  }
+};
+
+// Pagination
+const totalPages = computed(() =>
+  Math.ceil(filterWork.value.length / pageSize.value)
+);
+
+const paginatedWorks = computed(() =>
+  filterWork.value.slice(
+    (currentPage.value - 1) * pageSize.value,
+    currentPage.value * pageSize.value
+  )
+);
+
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--;
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+};
+</script>
+
 <template>
-  <section class="projects">
+    <!-- Filter Buttons -->
     <ul class="filter-list">
-      <li v-for="(item, i) in filters" :key="i" class="filter-item">
-        <button :class="{ active: activeFilter === item }" @click="applyFilter(item)">
-          {{ item }}
+    <li
+        v-for="(cat, index) in categories"
+        :key="index"
+        class="filter-item"
+    >
+        <button
+        :class="{ active: activeFilter === cat }"
+        @click="handleWorkFilter(cat)"
+        data-filter-btn
+        >
+        {{ cat }}
         </button>
-      </li>
+    </li>
     </ul>
 
+    <!-- Project Items -->
     <ul class="project-list">
-      <li
-        v-for="(work, index) in paginatedWorks"
+    <li
+        v-for="(project, index) in paginatedWorks"
         :key="index"
         class="project-item active"
-        :data-category="work.tags[0]"
-      >
-        <a :href="work.projectLink" target="_blank">
-          <figure class="project-img">
+        data-filter-item
+        :data-category="project.tags?.[0] || 'Other'"
+    >
+        <a :href="project.projectLink || '#'">
+        <figure class="project-img">
             <div class="project-item-icon-box">
-              <ion-icon name="eye-outline" />
+            <ion-icon name="eye-outline" />
             </div>
-            <img :src="urlFor(work.imgUrl)" :alt="work.title" loading="lazy" />
-          </figure>
-          <h3 class="project-title">{{ work.title }}</h3>
-          <p class="project-category">{{ work.tags[0] }}</p>
+            <img
+            :src="urlFor(project.imgUrl)"
+            :alt="project.title"
+            loading="lazy"
+            />
+        </figure>
+
+        <h3 class="project-title">{{ project.title }}</h3>
+        <p class="project-category">{{ project.tags?.[0] || 'Other' }}</p>
         </a>
-      </li>
+    </li>
     </ul>
 
     <!-- Pagination Controls -->
-    <div class="pagination">
-      <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)">Prev</button>
-      <span>{{ currentPage }} / {{ totalPages }}</span>
-      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">Next</button>
+    <div class="app__work-btns app__flex">
+    <div
+        :class="{ disabled: currentPage === 1 }"
+        @click="prevPage"
+    >
+        <ion-icon name="chevron-back-outline" />
     </div>
-  </section>
+
+    <span>{{ currentPage }} of {{ totalPages }}</span>
+
+    <div
+        :class="{ disabled: currentPage === totalPages || totalPages === 0 }"
+        @click="nextPage"
+    >
+        <ion-icon name="chevron-forward-outline" />
+    </div>
+    </div>
 </template>
-
-<script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
-import { client, urlFor } from '../lib/client.js'
-
-const works = ref<any[]>([]);
-const filteredWorks = ref<any[]>([]);
-const currentPage = ref(1);
-const pageSize = ref(6);
-const filters = ['All', 'Web design', 'Applications', 'Web development'];
-const activeFilter = ref('All');
-
-const fetchWorks = async () => {
-  const data = await client.fetch(`*[_type == "works"] | order(_updatedAt desc)`);
-  works.value = data;
-  filteredWorks.value = data;
-};
-
-const applyFilter = (filter: string) => {
-  activeFilter.value = filter;
-  currentPage.value = 1;
-  if (filter === 'All') {
-    filteredWorks.value = works.value;
-  } else {
-    filteredWorks.value = works.value.filter((work) => work.tags.includes(filter));
-  }
-};
-
-const totalPages = computed(() => Math.ceil(filteredWorks.value.length / pageSize.value));
-
-const paginatedWorks = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredWorks.value.slice(start, end);
-});
-
-const changePage = (page: number) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-};
-
-onMounted(() => {
-  fetchWorks();
-
-  const updatePageSize = () => {
-    const width = window.innerWidth;
-    if (width >= 2000) pageSize.value = 8;
-    else if (width >= 850) pageSize.value = 6;
-    else if (width >= 450) pageSize.value = 4;
-    else pageSize.value = 3;
-  };
-
-  updatePageSize();
-  window.addEventListener('resize', updatePageSize);
-});
-</script>
-
-<style scoped>
-/* Add your existing styles here */
-</style>
