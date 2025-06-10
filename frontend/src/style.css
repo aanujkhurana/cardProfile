@@ -343,6 +343,33 @@ main {
   border-radius: 8px;
 }
 
+.info-content .link {
+  color: var(--white-2);
+  background: var(--onyx);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-300);
+  width: max-content;
+  padding: 3px 12px;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+  display: flex;
+}
+
+.info-content .link:hover {
+  color: var(--orange-yellow-crayola);
+  text-decoration: underline;
+  transition: var(--transition-1);
+}
+
+.info-content .link .git-icon {
+  padding-top: 1px;
+  margin: 2px;
+  margin-right: 6px;
+  height: 13px;
+  width: 13px;
+}
+
 .info_more-btn {
   position: absolute;
   top: -15px;
@@ -1846,6 +1873,10 @@ textarea.form-input::-webkit-resizer { display: none; }
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .contact-info :is(.contact-link):hover {
+    color: var(--orange-yellow-crayola);
   }
 
   .contact-info :is(.contact-link, time, address) {

@@ -24,10 +24,10 @@ onMounted(() => {
         :key="work.date + work.desc"
         class="timeline-item"
       >
-        <span class="timeline-year">{{ work.name }}</span>
-        <p class="timeline-text">{{ work.company }}</p>
-        <h4 class="h4 timeline-item-title">{{ work.desc }}</h4>
-        <p class="timeline-text">{{ experience.year }}</p>
+        <span class="timeline-text">{{ experience.year }}</span>
+        <h4 class="h4 timeline-item-title">{{ work.name }}</h4>
+        <p class="timeline-text">{{ work.company }} | {{ work.desc }}</p>
+        <!-- <p class="timeline-text"></p> -->
       </li>
     </template>
   </ol>
