@@ -21,7 +21,7 @@
       data-filter-item
       :data-category="project.tags?.[0] || 'Other'"
     >
-      <a :href="project.projectLink || '#'">
+      <a :href="project.projectLink || project.codeLink" target="_blank" rel="noopener noreferrer">
         <figure class="project-img">
           <div class="project-item-icon-box">
             <ion-icon name="eye-outline" />
@@ -36,16 +36,17 @@
   </ul>
 
   <!-- Pagination Controls -->
-  <div class="app__work-btns app__flex">
-    <div :class="{ disabled: currentPage === 1 }" @click="prevPage">
+  <div class="page-btns">
+    <div :class="{ disabled: currentPage === 1 }" @click="prevPage" class="btn">
       <ion-icon name="chevron-back-outline" />
     </div>
 
-    <span>{{ currentPage }} of {{ totalPages }}</span>
+    <span class="page-no">{{ currentPage }} of {{ totalPages }}</span>
 
     <div
       :class="{ disabled: currentPage === totalPages || totalPages === 0 }"
       @click="nextPage"
+      class="btn"
     >
       <ion-icon name="chevron-forward-outline" />
     </div>
