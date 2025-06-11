@@ -21,7 +21,11 @@
       data-filter-item
       :data-category="project.tags?.[0] || 'Other'"
     >
-      <a :href="project.projectLink || project.codeLink" target="_blank" rel="noopener noreferrer">
+      <a
+        :href="project.projectLink || project.codeLink"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <figure class="project-img">
           <div class="project-item-icon-box">
             <ion-icon name="eye-outline" />
