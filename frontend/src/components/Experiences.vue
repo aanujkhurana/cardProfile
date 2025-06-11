@@ -24,8 +24,8 @@ onMounted(() => {
         :key="work.date + work.desc"
         class="timeline-item"
       >
-        <span class="timeline-text">{{ experience.year }}</span>
         <h4 class="h4 timeline-item-title">{{ work.name }}</h4>
+        <span class="timeline-text">{{ experience.year }}</span>
         <p class="timeline-text">{{ work.company }} | {{ work.desc }}</p>
         <!-- <p class="timeline-text"></p> -->
       </li>
