@@ -55,9 +55,9 @@
       </div>
     </li>
   </ul>
-  <h3 class="h3 testimonials-title">Devops</h3>
+  <h3 class="h3 testimonials-title">Other</h3>
   <ul class="testimonials-list has-scrollbar">
-    <li class="testimonials-item" v-for="(skill, index) in devops" :key="index">
+    <li class="testimonials-item" v-for="(skill, index) in other" :key="index">
       <div class="content-card" data-testimonials-item>
         <figure class="testimonials-avatar-box">
           <img :src="skill.logo" :alt="skill.name" width="30" data-testimonials-avatar />
