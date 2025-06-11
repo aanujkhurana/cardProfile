@@ -223,16 +223,10 @@
         </ul>
       </section>
 
-      {/*
-      <!--
-          - testimonials
-        -->
-      */}
 
       <section class="testimonials">
-        <h3 class="h3 testimonials-title">Testimonials</h3>
-
-        <ul class="testimonials-list has-scrollbar">
+        <Skills />
+        <!-- <ul class="testimonials-list has-scrollbar">
           <li class="testimonials-item">
             <div class="content-card" data-testimonials-item>
               <figure class="testimonials-avatar-box">
@@ -340,97 +334,13 @@
               </div>
             </div>
           </li>
-        </ul>
-      </section>
-
-      <!-- TESTIMONIALS -->
-      <div class="modal-container" data-modal-container>
-        <div class="overlay" data-overlay></div>
-
-        <section class="testimonials-modal">
-          <button class="modal-close-btn" data-modal-close-btn>
-            <ion-icon name="close-outline"></ion-icon>
-          </button>
-
-          <div class="modal-img-wrapper">
-            <figure class="modal-avatar-box">
-              <img
-                src="../assets/images/avatar-1.png"
-                alt="Daniel lewis"
-                width="80"
-                data-modal-img
-              />
-            </figure>
-
-            <img src="../assets/images/icon-quote.svg" alt="quote icon" />
-          </div>
-
-          <div class="modal-content">
-            <h4 class="h3 modal-title" data-modal-title>Daniel lewis</h4>
-
-            <time datetime="2021-06-14">14 June, 2021</time>
-
-            <div data-modal-text>
-              <p>
-                Richard was hired to create a corporate identity. We were very pleased
-                with the work done. She has a lot of experience and is very concerned
-                about the needs of client. Lorem ipsum dolor sit amet, ullamcous cididt
-                consectetur adipiscing elit, seds do et eiusmod tempor incididunt ut
-                laborels dolore magnarels alia.
-              </p>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <!-- CLIENTS -->
-
-      <section class="clients">
-        <h3 class="h3 clients-title">Clients</h3>
-
-        <ul class="clients-list has-scrollbar">
-          <li class="clients-item">
-            <a href="#">
-              <img src="../assets/images/logo-1-color.png" alt="client logo" />
-            </a>
-          </li>
-
-          <li class="clients-item">
-            <a href="#">
-              <img src="../assets/images/logo-2-color.png" alt="client logo" />
-            </a>
-          </li>
-
-          <li class="clients-item">
-            <a href="#">
-              <img src="../assets/images/logo-3-color.png" alt="client logo" />
-            </a>
-          </li>
-
-          <li class="clients-item">
-            <a href="#">
-              <img src="../assets/images/logo-4-color.png" alt="client logo" />
-            </a>
-          </li>
-
-          <li class="clients-item">
-            <a href="#">
-              <img src="../assets/images/logo-5-color.png" alt="client logo" />
-            </a>
-          </li>
-
-          <li class="clients-item">
-            <a href="#">
-              <img src="../assets/images/logo-6-color.png" alt="client logo" />
-            </a>
-          </li>
-        </ul>
+        </ul> -->
       </section>
     </article>
 
     <article class="resume" data-page="experience">
       <header>
-        <h2 class="h2 article-title">Resume</h2>
+        <h2 class="h2 article-title">Experience</h2>
       </header>
 
       <section class="timeline">
@@ -454,13 +364,12 @@
 
         <ol class="timeline-list">
           <li class="timeline-item">
-            <h4 class="h4 timeline-item-title">University school of the arts</h4>
+            <h4 class="h4 timeline-item-title">Griffith University</h4>
 
             <span>2007 — 2008</span>
 
             <p class="timeline-text">
-              Nemo enims ipsam voluptatem, blanditiis praesentium voluptum delenit atque
-              corrupti, quos dolores et quas molestias exceptur.
+              Master of Information Technology in Software Development & Support.
             </p>
           </li>
         </ol>
@@ -796,6 +705,7 @@
 import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
 import Projects from "./Projects.vue";
 import Experiences from "./Experiences.vue";
+import Skills from "./Skills.vue";
 
 // Reactive refs for state management
 const isLoading = ref(true);
@@ -901,24 +811,23 @@ const navigateToPage = (pageName) => {
   const pages = safeQuerySelectorAll("[data-page]");
   const navigationLinks = safeQuerySelectorAll("[data-nav-link]");
 
-  pages.forEach((page, index) => {
-    if (!page || !page.dataset) return;
-
+  pages.forEach((page) => {
     const pageDataName = page.dataset.page;
-    const navLink = navigationLinks[index];
+    page.classList.toggle("active", pageName === pageDataName);
+  });
 
-    if (pageName === pageDataName) {
-      page.classList.add("active");
-      if (navLink) navLink.classList.add("active");
+  navigationLinks.forEach((link) => {
+    const linkText = link.textContent.trim().toLowerCase();
+    const isActive = linkText === pageName.toLowerCase();
+
+    link.classList.toggle("active", isActive);
+    if (isActive) {
       currentPage.value = pageName;
-      // Smooth scroll to top
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      page.classList.remove("active");
-      if (navLink) navLink.classList.remove("active");
     }
   });
 };
+
 
 // Setup testimonials modal
 const setupTestimonialsModal = () => {
