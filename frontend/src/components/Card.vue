@@ -138,17 +138,16 @@
 
       <section class="about-text">
         <p>
-          I'm Creative Director and UI/UX Designer from Sydney, Australia, working in web
-          development and print media. I enjoy turning complex problems into simple,
-          beautiful and intuitive designs.
+          I’m a Full Stack Developer with 2+ years of experience building web
+          applications. I’ve worked on frontend migrations, improved performance, and
+          built clean, accessible user interfaces.
         </p>
 
         <p>
-          My job is to build your website so that it is functional and user-friendly but
-          at the same time attractive. Moreover, I add personal touch to your product and
-          make sure that is eye-catching and easy to use. My aim is to bring across your
-          message and identity in the most creative way. I created web design for many
-          famous brand companies.
+          I’m comfortable working across the stack and enjoy solving real-world problems
+          with code. I have a Master’s in Software Development and a strong base in data
+          structures and system design. I’m always learning and love picking up new
+          skills.
         </p>
       </section>
       <!-- SERVICES -->
@@ -167,10 +166,11 @@
             </div>
 
             <div class="service-content-box">
-              <h4 class="h4 service-item-title">Web design</h4>
+              <h4 class="h4 service-item-title">Database Architecture</h4>
 
               <p class="service-item-text">
-                The most modern and high-quality design made at a professional level.
+                Designing agile and scalable databases, harmonizing relational and
+                non-relational paradigms for optimal performance.
               </p>
             </div>
           </li>
@@ -185,10 +185,11 @@
             </div>
 
             <div class="service-content-box">
-              <h4 class="h4 service-item-title">Web development</h4>
+              <h4 class="h4 service-item-title">Full Stack Development</h4>
 
               <p class="service-item-text">
-                High-quality development of sites at the professional level.
+                Seamlessly blending front-end finesse & back-end brilliance to engineer
+                captivating digital experiences.
               </p>
             </div>
           </li>
@@ -199,10 +200,11 @@
             </div>
 
             <div class="service-content-box">
-              <h4 class="h4 service-item-title">Mobile apps</h4>
+              <h4 class="h4 service-item-title">UI-UX Design</h4>
 
               <p class="service-item-text">
-                Professional development of applications for iOS and Android.
+                Enchanting users with interfaces that dazzle and guide, ensuring each
+                interaction is a delightful journey.
               </p>
             </div>
           </li>
@@ -213,16 +215,16 @@
             </div>
 
             <div class="service-content-box">
-              <h4 class="h4 service-item-title">Photography</h4>
+              <h4 class="h4 service-item-title">Collaborative Spirit</h4>
 
               <p class="service-item-text">
-                I make high-quality photos of any category at a professional level.
+                Fostering a culture of open communication, mutual respect, and teamwork to
+                drive innovation and excellence.
               </p>
             </div>
           </li>
         </ul>
       </section>
-
 
       <section class="testimonials">
         <Skills />
@@ -827,7 +829,6 @@ const navigateToPage = (pageName) => {
     }
   });
 };
-
 
 // Setup testimonials modal
 const setupTestimonialsModal = () => {
