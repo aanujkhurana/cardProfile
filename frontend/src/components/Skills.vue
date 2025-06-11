@@ -165,8 +165,26 @@ const devops = [
       "https://raw.githubusercontent.com/devicons/devicon/refs/tags/v2.16.0/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg",
   },
   {
+    name: "CI/CD",
+    logo:
+      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/circleci/circleci-plain.svg",
+  },
+  {
     name: "Git",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+  },
+  {
+    name: "GitHub",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
+  },
+  {
+    name: "Bitbucket",
+    logo:
+      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bitbucket/bitbucket-original.svg",
+  },
+  {
+    name: "GitLab",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gitlab/gitlab-original.svg",
   },
 ];
 
