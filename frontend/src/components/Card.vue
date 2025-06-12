@@ -17,8 +17,8 @@
           ><span class="link">
             <ion-icon class="git-icon" name="logo-github"></ion-icon>
             <p>github.com/aanujkhurana</p>
-          </span></a
-        >
+          </span>
+        </a>
       </div>
 
       <button class="info_more-btn" data-sidebar-btn>
@@ -78,7 +78,7 @@
           <div class="contact-info">
             <p class="contact-title">Location</p>
 
-            <address>Gold Coast, Qld, Au</address>
+            <address>GoldCoast, QLD, AU</address>
           </div>
         </li>
       </ul>
@@ -228,229 +228,11 @@
 
       <section class="testimonials">
         <Skills />
-        <!-- <ul class="testimonials-list has-scrollbar">
-          <li class="testimonials-item">
-            <div class="content-card" data-testimonials-item>
-              <figure class="testimonials-avatar-box">
-                <img
-                  src="../assets/images/avatar-1.png"
-                  alt="Daniel lewis"
-                  width="60"
-                  data-testimonials-avatar
-                />
-              </figure>
-
-              <h4 class="h4 testimonials-item-title" data-testimonials-title>
-                Daniel lewis
-              </h4>
-
-              <div class="testimonials-text" data-testimonials-text>
-                <p>
-                  Richard was hired to create a corporate identity. We were very pleased
-                  with the work done. She has a lot of experience and is very concerned
-                  about the needs of client. Lorem ipsum dolor sit amet, ullamcous cididt
-                  consectetur adipiscing elit, seds do et eiusmod tempor incididunt ut
-                  laborels dolore magnarels alia.
-                </p>
-              </div>
-            </div>
-          </li>
-
-          <li class="testimonials-item">
-            <div class="content-card" data-testimonials-item>
-              <figure class="testimonials-avatar-box">
-                <img
-                  src="../assets/images/avatar-2.png"
-                  alt="Jessica miller"
-                  width="60"
-                  data-testimonials-avatar
-                />
-              </figure>
-
-              <h4 class="h4 testimonials-item-title" data-testimonials-title>
-                Jessica miller
-              </h4>
-
-              <div class="testimonials-text" data-testimonials-text>
-                <p>
-                  Richard was hired to create a corporate identity. We were very pleased
-                  with the work done. She has a lot of experience and is very concerned
-                  about the needs of client. Lorem ipsum dolor sit amet, ullamcous cididt
-                  consectetur adipiscing elit, seds do et eiusmod tempor incididunt ut
-                  laborels dolore magnarels alia.
-                </p>
-              </div>
-            </div>
-          </li>
-
-          <li class="testimonials-item">
-            <div class="content-card" data-testimonials-item>
-              <figure class="testimonials-avatar-box">
-                <img
-                  src="../assets/images/avatar-3.png"
-                  alt="Emily evans"
-                  width="60"
-                  data-testimonials-avatar
-                />
-              </figure>
-
-              <h4 class="h4 testimonials-item-title" data-testimonials-title>
-                Emily evans
-              </h4>
-
-              <div class="testimonials-text" data-testimonials-text>
-                <p>
-                  Richard was hired to create a corporate identity. We were very pleased
-                  with the work done. She has a lot of experience and is very concerned
-                  about the needs of client. Lorem ipsum dolor sit amet, ullamcous cididt
-                  consectetur adipiscing elit, seds do et eiusmod tempor incididunt ut
-                  laborels dolore magnarels alia.
-                </p>
-              </div>
-            </div>
-          </li>
-
-          <li class="testimonials-item">
-            <div class="content-card" data-testimonials-item>
-              <figure class="testimonials-avatar-box">
-                <img
-                  src="../assets/images/avatar-4.png"
-                  alt="Henry william"
-                  width="60"
-                  data-testimonials-avatar
-                />
-              </figure>
-
-              <h4 class="h4 testimonials-item-title" data-testimonials-title>
-                Henry william
-              </h4>
-
-              <div class="testimonials-text" data-testimonials-text>
-                <p>
-                  Richard was hired to create a corporate identity. We were very pleased
-                  with the work done. She has a lot of experience and is very concerned
-                  about the needs of client. Lorem ipsum dolor sit amet, ullamcous cididt
-                  consectetur adipiscing elit, seds do et eiusmod tempor incididunt ut
-                  laborels dolore magnarels alia.
-                </p>
-              </div>
-            </div>
-          </li>
-        </ul> -->
       </section>
     </article>
 
     <article class="resume" data-page="experience">
-      <header>
-        <h2 class="h2 article-title">Experience</h2>
-      </header>
-
-      <section class="timeline">
-        <div class="title-wrapper">
-          <div class="icon-box">
-            <ion-icon name="book-outline"></ion-icon>
-          </div>
-          <h3 class="h3">Experience</h3>
-        </div>
-        <Experiences />
-      </section>
-
-      <section class="timeline">
-        <div class="title-wrapper">
-          <div class="icon-box">
-            <ion-icon name="book-outline"></ion-icon>
-          </div>
-
-          <h3 class="h3">Education</h3>
-        </div>
-
-        <ol class="timeline-list">
-          <li class="timeline-item">
-            <h4 class="h4 timeline-item-title">Griffith University</h4>
-
-            <span>2007 — 2008</span>
-
-            <p class="timeline-text">
-              Master of Information Technology in Software Development & Support.
-            </p>
-          </li>
-        </ol>
-      </section>
-
-      <section class="timeline">
-        <div class="title-wrapper">
-          <div class="icon-box">
-            <ion-icon name="book-outline"></ion-icon>
-          </div>
-
-          <h3 class="h3">Certificates</h3>
-        </div>
-
-        <ol class="timeline-list">
-          <li class="timeline-item">
-            <span>Python</span>
-            <p class="timeline-text">FreeCodeCamp</p>
-          </li>
-          <li class="timeline-item">
-            <span>Python</span>
-            <p class="timeline-text">FreeCodeCamp</p>
-          </li>
-          <li class="timeline-item">
-            <span>Python</span>
-            <p class="timeline-text">FreeCodeCamp</p>
-          </li>
-        </ol>
-      </section>
-
-      <!-- <section class="skill">
-        <h3 class="h3 skills-title">My skills</h3>
-
-        <ul class="skills-list content-card">
-          <li class="skills-item">
-            <div class="title-wrapper">
-              <h5 class="h5">Web design</h5>
-              <data value="80">80%</data>
-            </div>
-
-            <div class="skill-progress-bg">
-              <div class="skill-progress-fill" style="width: 80%"></div>
-            </div>
-          </li>
-
-          <li class="skills-item">
-            <div class="title-wrapper">
-              <h5 class="h5">Graphic design</h5>
-              <data value="70">70%</data>
-            </div>
-
-            <div class="skill-progress-bg">
-              <div class="skill-progress-fill" style="width: 70%"></div>
-            </div>
-          </li>
-
-          <li class="skills-item">
-            <div class="title-wrapper">
-              <h5 class="h5">Branding</h5>
-              <data value="90">90%</data>
-            </div>
-
-            <div class="skill-progress-bg">
-              <div class="skill-progress-fill" style="width: 90%"></div>
-            </div>
-          </li>
-
-          <li class="skills-item">
-            <div class="title-wrapper">
-              <h5 class="h5">WordPress</h5>
-              <data value="50">50%</data>
-            </div>
-
-            <div class="skill-progress-bg">
-              <div class="skill-progress-fill" style="width: 50%"></div>
-            </div>
-          </li>
-        </ul>
-      </section> -->
+      <Experiences />
     </article>
 
     <article class="portfolio" data-page="projects">
