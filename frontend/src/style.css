@@ -356,6 +356,13 @@ main {
   display: flex;
 }
 
+@media (max-width: 579px) {
+  .info-content .link{
+    position: absolute;
+    bottom: 20%;
+    right: 10%;
+  }
+}
 .info-content .link:hover {
   color: var(--orange-yellow-crayola);
   text-decoration: underline;
