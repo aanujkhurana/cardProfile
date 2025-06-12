@@ -55,7 +55,9 @@ onMounted(() => {
 
     <ol class="timeline-list">
       <li class="timeline-item">
-        <h4 class="h4 timeline-item-title">Griffith University</h4>
+        <h4 class="h4 timeline-item-title">
+          <a href="https://www.griffith.edu.au/" target="_blank">Griffith University</a>
+        </h4>
 
         <span>2024</span>
 
@@ -78,7 +80,9 @@ onMounted(() => {
     <ol class="timeline-list">
       <li class="timeline-item">
         <h4 class="h4 timeline-item-title">
-          <a href="https://www.hackerrank.com/certificates/fc67ad9cf98d">Python </a>
+          <a href="https://www.hackerrank.com/certificates/fc67ad9cf98d" target="_blank"
+            >Python
+          </a>
         </h4>
         <p class="timeline-text">HackerRank</p>
       </li>
@@ -86,6 +90,7 @@ onMounted(() => {
         <h4 class="h4 timeline-item-title">
           <a
             href="https://www.freecodecamp.org/certification/fcc8fef749d-61ec-4fed-95cf-dac26473a2b6/back-end-development-and-apis"
+            target="_blank"
             >Backend Development & API
           </a>
         </h4>
@@ -93,13 +98,15 @@ onMounted(() => {
       </li>
       <li class="timeline-item">
         <h4 class="h4 timeline-item-title">
-          <a href="https://www.hackerrank.com/certificates/43ae65a24b0f">SQL</a>
+          <a href="https://www.hackerrank.com/certificates/43ae65a24b0f" target="_blank"
+            >SQL</a
+          >
         </h4>
         <p class="timeline-text">HackerRank</p>
       </li>
       <li class="timeline-item">
         <h4 class="h4 timeline-item-title">
-          <a href="https://www.udemy.com/certificate/UC-KYJCWBQF/"
+          <a href="https://www.udemy.com/certificate/UC-KYJCWBQF/" target="_blank"
             >User Experience Essentials</a
           >
         </h4>
