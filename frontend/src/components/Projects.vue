@@ -32,7 +32,6 @@
           </div>
           <img :src="urlFor(project.imgUrl)" :alt="project.title" loading="lazy" />
         </figure>
-
         <h3 class="project-title">{{ project.title }}</h3>
         <p class="project-category">{{ project.tags?.[0] || "Other" }}</p>
       </a>
