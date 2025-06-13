@@ -10,10 +10,7 @@
 
         <p class="title">Full Stack developer</p>
 
-        <a
-          href="https://www.github.com/aanujkhurana"
-          target="_blank"
-          rel="noopener noreferrer"
+        <a href="https://www.github.com/aanujkhurana" target="_blank"
           ><span class="link">
             <ion-icon class="git-icon" name="logo-github"></ion-icon>
             <p>github.com/aanujkhurana</p>

@@ -325,6 +325,11 @@ main {
   /* margin-bottom: 22px; */
 }
 
+.info-content {
+  display: flex;
+  flex-direction: column;
+}
+
 .info-content .name {
   color: var(--white-2);
   font-size: var(--fs-3);
@@ -347,21 +352,19 @@ main {
   color: var(--white-2);
   background: var(--onyx);
   font-size: var(--fs-8);
-  font-weight: var(--fw-300);
+  font-weight: var(--fw-400);
   width: max-content;
-  padding: 3px 12px;
+  padding: 4px 12px;
   border-radius: 8px;
-  margin-top: 20px;
+  margin-top: 14px;
   cursor: pointer;
   display: flex;
 }
 
 @media (max-width: 579px) {
-  .info-content .link{
-    position: absolute;
-    bottom: 20%;
-    right: 10%;
-  }
+   .info-content {
+    margin-top: -22px;
+   }
 }
 .info-content .link:hover {
   color: var(--orange-yellow-crayola);
