@@ -58,17 +58,15 @@
           </div>
         </li>
 
-        <!-- <li class="contact-item">
+        <li class="contact-item">
           <div class="icon-box">
             <ion-icon name="calendar-outline"></ion-icon>
           </div>
-
           <div class="contact-info">
             <p class="contact-title">Birthday</p>
-
-            <time datetime="1982-06-23">June 23, 1982</time>
+            <time datetime="1982-06-23">March 14, 1997</time>
           </div>
-        </li> -->
+        </li>
 
         <li class="contact-item">
           <div class="icon-box">
@@ -79,18 +77,6 @@
             <p class="contact-title">Location</p>
 
             <address>GoldCoast, QLD, AU</address>
-          </div>
-        </li>
-
-        <li class="contact-item">
-          <div class="icon-box">
-            <ion-icon name="calendar-outline"></ion-icon>
-          </div>
-
-          <div class="contact-info">
-            <p class="contact-title">Birthday</p>
-
-            <time datetime="1982-06-23">June 23, 1982</time>
           </div>
         </li>
       </ul>
@@ -156,10 +142,9 @@
         </p>
 
         <p>
-          I’m comfortable working across the stack and enjoy solving real-world problems
-          with code. I have a Master’s in Software Development and a strong base in data
-          structures and system design. I’m always learning and love picking up new
-          skills.
+          I’m comfortable working across the stack and enjoy solving problems with code. I
+          have a Master’s in Software Development and a strong base in data structures and
+          system design. I’m always learning and love picking up new skills.
         </p>
       </section>
       <!-- SERVICES -->
