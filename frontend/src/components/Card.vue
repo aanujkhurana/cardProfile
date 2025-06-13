@@ -421,21 +421,7 @@
     </article> -->
 
     <article class="contact" data-page="contact">
-      <ContactForm />
-
-      <header>
-        <h2 class="h2 article-title">Location</h2>
-      </header>
-      <section class="mapbox" data-mapbox>
-        <figure>
-          <iframe
-            src="https://www.google.com/maps/embed/v1/place?q=parkwood&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
-            width="400"
-            height="300"
-            loading="lazy"
-          ></iframe>
-        </figure>
-      </section>
+      <Contact />
     </article>
   </div>
 </template>
@@ -445,7 +431,7 @@ import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
 import Projects from "./Projects.vue";
 import Experiences from "./Experiences.vue";
 import Skills from "./Skills.vue";
-import ContactForm from "./ContactForm.vue";
+import Contact from "./Contact.vue";
 
 // Reactive refs for state management
 const isLoading = ref(true);

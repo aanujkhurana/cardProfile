@@ -46,6 +46,20 @@
       <p v-if="isFormSubmitted" class="form-success">Thank you for your message!</p>
     </form>
   </section>
+
+  <header>
+    <h2 class="h2 article-title">Location</h2>
+  </header>
+  <section class="mapbox" data-mapbox>
+    <figure>
+      <iframe
+        src="https://www.google.com/maps/embed/v1/place?q=parkwood&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
+        width="400"
+        height="300"
+        loading="lazy"
+      ></iframe>
+    </figure>
+  </section>
 </template>
 
 <script setup>
