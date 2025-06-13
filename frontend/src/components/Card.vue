@@ -81,6 +81,18 @@
             <address>GoldCoast, QLD, AU</address>
           </div>
         </li>
+
+        <li class="contact-item">
+          <div class="icon-box">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </div>
+
+          <div class="contact-info">
+            <p class="contact-title">Birthday</p>
+
+            <time datetime="1982-06-23">June 23, 1982</time>
+          </div>
+        </li>
       </ul>
 
       <div class="separator"></div>
