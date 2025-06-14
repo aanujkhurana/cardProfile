@@ -1,10 +1,10 @@
 <template>
   <div class="theme-toggle-wrapper">
-    <ion-icon name="contrast-outline"></ion-icon>
     <label class="theme-toggle">
       <input type="checkbox" v-model="isLight" @change="toggleTheme" />
       <span class="slider"></span>
     </label>
+        <ion-icon name="contrast-outline"></ion-icon>
   </div>
 </template>
 
@@ -26,11 +26,8 @@ const toggleTheme = () => {
 .theme-toggle-wrapper {
   display: flex;
   align-items: center;
-  justify-content: left;
-  position: relative;
-  top: -20px;
-  right: 10px;
-  gap: 2rem;
+  right: 8px;
+  gap: 0.5rem;
 }
 ion-icon {
   color: #ffcc33;
@@ -81,4 +78,16 @@ input:checked + .slider {
 input:checked + .slider::before {
   transform: translateX(24px);
 }
+
+:host, .theme-toggle-wrapper {
+  position: fixed;
+  top: 1rem;
+  /* right: 1rem; */
+  z-index: 1000;
+  background-color: var(--eerie-black-100);
+  /* padding: 0.5rem 1rem; */
+  /* border-radius: 999px; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); */
+}
+
 </style>
