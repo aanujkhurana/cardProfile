@@ -98,8 +98,66 @@
 
 }
 
+:root.light-theme {
 
+  /**
+   * colors
+   */
 
+  /* gradient */
+
+  --bg-gradient-onyx: linear-gradient(
+    to bottom right, 
+    hsl(0, 0%, 100%) 3%, 
+    hsl(240, 4%, 95%) 97%
+  );
+  --bg-gradient-jet: linear-gradient(
+    to bottom right,
+    hsla(240, 4%, 90%, 0.3) 0%,
+    hsla(240, 4%, 95%, 0) 100%
+  ), hsl(0, 0%, 100%);
+  --bg-gradient-yellow-1: linear-gradient(
+    to bottom right,
+    hsl(45, 100%, 85%) 0%,
+    hsla(36, 100%, 85%, 0) 50%
+  );
+  --bg-gradient-yellow-2: linear-gradient(
+    135deg,
+    hsla(45, 100%, 85%, 0.3) 0%,
+    hsla(35, 100%, 85%, 0) 60%
+  ), hsl(0, 0%, 100%);
+  --border-gradient-onyx: linear-gradient(
+    to bottom right,
+    hsl(0, 0%, 80%) 0%,
+    hsla(0, 0%, 90%, 0) 50%
+  );
+  --text-gradient-yellow: linear-gradient(
+    to right,
+    hsl(45, 100%, 55%),
+    hsl(35, 100%, 50%)
+  );
+
+  /* solid */
+
+  --jet: hsl(0, 0%, 80%);
+  --onyx: hsl(240, 5%, 90%);
+  --eerie-black-1: hsl(0, 0%, 95%);
+  --eerie-black-2: hsl(0, 0%, 96%);
+  --smoky-black: hsl(0, 0%, 100%);
+  --white-1: hsl(0, 0%, 10%);
+  --white-2: hsl(0, 0%, 20%);
+  --orange-yellow-crayola: hsl(45, 100%, 60%);
+  --vegas-gold: hsl(45, 54%, 50%);
+  --light-gray: hsl(0, 0%, 65%);
+  --light-gray-70: hsla(0, 0%, 65%, 0.7);
+  --bittersweet-shimmer: hsl(0, 60%, 60%);
+
+  --shadow-1: -4px 8px 24px hsla(0, 0%, 50%, 0.15);
+  --shadow-2: 0 16px 30px hsla(0, 0%, 50%, 0.15);
+  --shadow-3: 0 16px 40px hsla(0, 0%, 50%, 0.15);
+  --shadow-4: 0 25px 50px hsla(0, 0%, 50%, 0.1);
+  --shadow-5: 0 24px 80px hsla(0, 0%, 50%, 0.2); 
+}
 
 
 /*-----------------------------------*\
@@ -485,7 +543,7 @@ main {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: hsla(240, 1%, 17%, 0.75);
+  background: var(--onyx);
   backdrop-filter: blur(10px);
   border: 1px solid var(--jet);
   border-radius: 12px 12px 0 0;

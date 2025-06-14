@@ -23,6 +23,8 @@
 
         <ion-icon name="chevron-down"></ion-icon>
       </button>
+
+      <ThemeToggle />
     </div>
 
     <div class="sidebar-info_more">
@@ -432,6 +434,7 @@ import Projects from "./Projects.vue";
 import Experiences from "./Experiences.vue";
 import Skills from "./Skills.vue";
 import Contact from "./Contact.vue";
+import ThemeToggle from "./ThemeToggle.vue";
 
 // Reactive refs for state management
 const isLoading = ref(true);
