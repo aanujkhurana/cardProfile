@@ -4,7 +4,8 @@
       <input type="checkbox" v-model="isLight" @change="toggleTheme" />
       <span class="slider"></span>
     </label>
-        <ion-icon name="contrast-outline"></ion-icon>
+        <ion-icon v-if="isIcon"  name="contrast-outline"></ion-icon>
+        <ion-icon v-else name="sunny-outline"></ion-icon>
   </div>
 </template>
 
@@ -12,12 +13,14 @@
 import { ref, onMounted } from "vue";
 
 const isLight = ref(false);
+const isIcon = ref(false);
 
 onMounted(() => {
   isLight.value = document.documentElement.classList.contains("light-theme");
 });
 
 const toggleTheme = () => {
+  isIcon.value = !isIcon.value;
   document.documentElement.classList.toggle("light-theme");
 };
 </script>
@@ -36,8 +39,8 @@ ion-icon {
 .theme-toggle {
   position: relative;
   display: inline-block;
-  width: 48px;
-  height: 24px;
+  width: 32px;
+  height: 17px;
 }
 
 .theme-toggle input {
@@ -55,14 +58,14 @@ ion-icon {
   bottom: 0;
   background-color: #424242;
   transition: background-color 0.4s;
-  border-radius: 34px;
+  border-radius: 24px;
 }
 
 .slider::before {
   position: absolute;
   content: "";
-  height: 20px;
-  width: 20px;
+  height: 13px;
+  width: 13px;
   left: 3px;
   bottom: 2px;
   background-color: white;
@@ -76,7 +79,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider::before {
-  transform: translateX(24px);
+  transform: translateX(13px);
 }
 
 :host, .theme-toggle-wrapper {
