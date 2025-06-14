@@ -140,7 +140,7 @@
   /* solid */
 
   --jet: hsl(0, 0%, 80%);
-  --onyx: hsl(240, 5%, 90%);
+  --onyx: hsl(240, 25%, 94%);
   --eerie-black-1: hsl(0, 0%, 95%);
   --eerie-black-2: hsl(0, 0%, 96%);
   --smoky-black: hsl(0, 0%, 100%);
@@ -148,12 +148,12 @@
   --white-2: hsl(0, 0%, 20%);
   --orange-yellow-crayola: hsl(45, 100%, 60%);
   --vegas-gold: hsl(45, 54%, 50%);
-  --light-gray: hsl(0, 0%, 65%);
-  --light-gray-70: hsla(0, 0%, 65%, 0.7);
+  --light-gray: hsl(0, 0%, 40%);
+  --light-gray-70: hsla(40, 50%, 65%, 1.0);
   --bittersweet-shimmer: hsl(0, 60%, 60%);
 
-  --shadow-1: -4px 8px 24px hsla(0, 0%, 50%, 0.15);
-  --shadow-2: 0 16px 30px hsla(0, 0%, 50%, 0.15);
+  --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.15);
+  --shadow-2: 0 16px 30px hsla(0, 0%, 10%, 0.1);
   --shadow-3: 0 16px 40px hsla(0, 0%, 50%, 0.15);
   --shadow-4: 0 25px 50px hsla(0, 0%, 50%, 0.1);
   --shadow-5: 0 24px 80px hsla(0, 0%, 50%, 0.2); 
