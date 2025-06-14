@@ -315,6 +315,7 @@ defineExpose({
 
 /* Chat Window */
 .chat-window {
+  border: 1px solid var(--jet);
   width: 380px;
   height: 500px;
   background: var(--white-1);
@@ -323,7 +324,6 @@ defineExpose({
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--border-gradient-onyx);
 }
 
 /* Header */
@@ -495,7 +495,7 @@ defineExpose({
 /* Input Area */
 .input-area {
   padding: 16px;
-  border-top: 1px solid var(--light-gray-70);
+  border-top: 1px solid var(--jet);
   background: var(--eerie-black-2) !important;
 }
 
