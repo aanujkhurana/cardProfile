@@ -34,11 +34,6 @@
           :key="message.id"
           :class="['message', message.type]"
         >
-          <div v-if="message.type === 'bot'" class="message-avatar">
-            <!-- <Bot :size="16" /> -->
-            <ion-icon name="contrast-outline"></ion-icon>
-          </div>
-
           <div class="message-content">
             <div
               v-if="message.type === 'bot'"
@@ -52,10 +47,6 @@
 
         <!-- Typing Indicator -->
         <div v-if="isTyping" class="message bot">
-          <div class="message-avatar">
-            <!-- <Bot :size="16" /> -->
-            <ion-icon name="contrast-outline"></ion-icon>
-          </div>
           <div class="message-content">
             <div class="typing-indicator">
               <span></span>
@@ -281,7 +272,7 @@ defineExpose({
   bottom: 20px;
   right: 20px;
   z-index: 1000;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.2px;
 }
 
 /* Toggle Button */
@@ -303,7 +294,7 @@ defineExpose({
 
 .chat-toggle-btn:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shadow-1);
 }
 
 .chat-badge {
@@ -337,8 +328,8 @@ defineExpose({
 
 /* Header */
 .chat-header {
-  background: var(--bg-gradient-onyx);
-  color: var(--white-1);
+  background: var(--bg-gradient-jet);
+  color: var(--white-2);
   padding: 16px 20px;
   display: flex;
   align-items: center;
@@ -356,15 +347,17 @@ defineExpose({
 .close-btn {
   background: none;
   border: none;
-  color: var(--white-1);
+  color: var(--light-gray);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 14px;
   transition: background-color 0.2s;
 }
 
 .close-btn:hover {
-  background: var(--eerie-black-2);
+  background: var(--border-gradient-onyx);
+  color: var(--orange-yellow-crayola);
+  box-shadow: var(--shadow-1);
 }
 
 /* Messages */
@@ -375,6 +368,7 @@ defineExpose({
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: var(--bg-gradient-jet) !important;
 }
 
 .message {
@@ -386,18 +380,6 @@ defineExpose({
 .message.user {
   align-self: flex-end;
   flex-direction: row-reverse;
-}
-
-.message-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--eerie-black-1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--vegas-gold);
 }
 
 .message-content {
@@ -414,27 +396,27 @@ defineExpose({
 }
 
 .message.bot .message-text {
-  background: var(--eerie-black-1);
-  color: var(--vegas-gold);
+  background: var(--eerie-black-2);
+  color: var(--light-gray);
 }
 
 .message.user .message-text {
   background: var(--bg-gradient-onyx);
-  color: var(--white-1);
+  color: var(--white-2);
 }
 
 .message-text :deep(a) {
-  color: #3b82f6;
+  color: var(--vegas-gold);
   text-decoration: underline;
 }
 
 .message.user .message-text :deep(a) {
-  color: #93c5fd;
+  color: var(--vegas-gold);
 }
 
 .message-time {
   font-size: 11px;
-  color: var(--light-gray);
+  color: var(--light-gray-70);
   padding: 0 4px;
 }
 
@@ -490,8 +472,8 @@ defineExpose({
 
 .quick-question-btn {
   background: var(--onyx);
-  border: 1px solid #e5e7eb;
-  color: #374151;
+  border: 1px solid var(--border-gradient-onyx);
+  color: var(--light-gray);
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 13px;
@@ -501,8 +483,8 @@ defineExpose({
 }
 
 .quick-question-btn:hover:not(:disabled) {
-  background: var(--eerie-black-1);
-  border-color: #d1d5db;
+  background: var(--bg-gradient-jet);
+  color: var(--vegas-gold);
 }
 
 .quick-question-btn:disabled {
@@ -513,8 +495,8 @@ defineExpose({
 /* Input Area */
 .input-area {
   padding: 16px;
-  border-top: 1px solid #e5e7eb;
-  background: #fafafa;
+  border-top: 1px solid var(--light-gray-70);
+  background: var(--eerie-black-2) !important;
 }
 
 .input-container {
@@ -526,15 +508,16 @@ defineExpose({
 .message-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid transparent !important;
   border-radius: 8px;
   font-size: 14px;
   outline: none;
+  color: var(--white-1);
   transition: border-color 0.2s;
 }
 
 .message-input:focus {
-  border-color: #667eea;
+  border-color: var(--vegas-gold) !important;
 }
 
 .message-input:disabled {
@@ -544,10 +527,10 @@ defineExpose({
 
 .send-btn {
   padding: 10px;
-  background: var(--bg-gradient-onyx);
-  border: none;
+  background: var(--border-gradient-onyx);
   border-radius: 8px;
-  color: var(--white-1);
+  box-shadow: var(--shadow-2);
+  color: var(--orange-yellow-crayola);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -558,6 +541,7 @@ defineExpose({
 .send-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  color: var(--light-gray-70);
 }
 
 .send-btn:hover:not(:disabled) {
@@ -589,11 +573,11 @@ defineExpose({
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(------bg-gradient-yellow-2);
   border-radius: 2px;
 }
 
 .messages-container::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--eerie-black-2);
 }
 </style>
