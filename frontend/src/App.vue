@@ -6,6 +6,7 @@ import ThemeToggle from "./components/ThemeToggle.vue";
 <template>
   <main>
     <ThemeToggle/>
+    <v-spacer></v-spacer>
     <Card></Card>
   </main>
 </template>

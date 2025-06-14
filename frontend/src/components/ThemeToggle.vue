@@ -32,6 +32,13 @@ const toggleTheme = () => {
   right: 8px;
   gap: 0.5rem;
 }
+@media (max-width: 579px) {
+   .theme-toggle-wrapper {
+    display: none;
+    opacity: 0;
+   }
+}
+
 ion-icon {
   color: #ffcc33;
 }
@@ -83,7 +90,7 @@ input:checked + .slider::before {
 }
 
 :host, .theme-toggle-wrapper {
-  position: fixed;
+  position: absolute;
   top: 1rem;
   /* right: 1rem; */
   z-index: 1000;
