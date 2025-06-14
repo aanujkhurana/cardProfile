@@ -8,7 +8,8 @@
       class="chat-toggle-btn"
       aria-label="Open chat"
     >
-      <MessageCircle :size="24" />
+      <!-- <MessageCircle :size="24" /> -->
+      <ion-icon name="contrast-outline"></ion-icon>
       <span class="chat-badge" v-if="hasUnreadWelcome">1</span>
     </button>
 
@@ -21,7 +22,8 @@
           <span>Ask about Anuj's work</span>
         </div>
         <button @click="toggleChat" class="close-btn" aria-label="Close chat">
-          <X :size="20" />
+          <!-- <X :size="20" /> -->
+          <ion-icon name="contrast-outline"></ion-icon>
         </button>
       </div>
 
@@ -33,7 +35,8 @@
           :class="['message', message.type]"
         >
           <div v-if="message.type === 'bot'" class="message-avatar">
-            <Bot :size="16" />
+            <!-- <Bot :size="16" /> -->
+            <ion-icon name="contrast-outline"></ion-icon>
           </div>
 
           <div class="message-content">
@@ -50,7 +53,8 @@
         <!-- Typing Indicator -->
         <div v-if="isTyping" class="message bot">
           <div class="message-avatar">
-            <Bot :size="16" />
+            <!-- <Bot :size="16" /> -->
+            <ion-icon name="contrast-outline"></ion-icon>
           </div>
           <div class="message-content">
             <div class="typing-indicator">
@@ -92,7 +96,8 @@
             :disabled="!currentMessage.trim() || isTyping"
             aria-label="Send message"
           >
-            <Send :size="18" />
+            <!-- <Send :size="18" /> -->
+            <ion-icon name="contrast-outline"></ion-icon>
           </button>
         </div>
       </div>
@@ -102,7 +107,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, nextTick, watch } from "vue";
-import { MessageCircle, Bot, X, Send } from "lucide-vue-next";
+// import { MessageCircle, Bot, X, Send } from "lucide-vue-next";
 
 // Props
 const props = defineProps({
@@ -284,21 +289,21 @@ defineExpose({
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-gradient-onyx);
   border: none;
-  color: white;
+  color: var(--white-1);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-1);
   transition: all 0.3s ease;
   position: relative;
 }
 
 .chat-toggle-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-2);
 }
 
 .chat-badge {
@@ -306,7 +311,7 @@ defineExpose({
   top: -5px;
   right: -5px;
   background: #ef4444;
-  color: white;
+  color: var(--white-1);
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -321,19 +326,19 @@ defineExpose({
 .chat-window {
   width: 380px;
   height: 500px;
-  background: white;
+  background: var(--white-1);
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-gradient-onyx);
 }
 
 /* Header */
 .chat-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--bg-gradient-onyx);
+  color: var(--white-1);
   padding: 16px 20px;
   display: flex;
   align-items: center;
@@ -351,7 +356,7 @@ defineExpose({
 .close-btn {
   background: none;
   border: none;
-  color: white;
+  color: var(--white-1);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -359,7 +364,7 @@ defineExpose({
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--eerie-black-2);
 }
 
 /* Messages */
@@ -387,12 +392,12 @@ defineExpose({
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #f3f4f6;
+  background: var(--eerie-black-1);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #6b7280;
+  color: var(--vegas-gold);
 }
 
 .message-content {
@@ -409,13 +414,13 @@ defineExpose({
 }
 
 .message.bot .message-text {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--eerie-black-1);
+  color: var(--vegas-gold);
 }
 
 .message.user .message-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--bg-gradient-onyx);
+  color: var(--white-1);
 }
 
 .message-text :deep(a) {
@@ -429,7 +434,7 @@ defineExpose({
 
 .message-time {
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--light-gray);
   padding: 0 4px;
 }
 
@@ -442,7 +447,7 @@ defineExpose({
   display: flex;
   gap: 4px;
   padding: 10px 14px;
-  background: #f3f4f6;
+  background: var(--eerie-black-1);
   border-radius: 12px;
 }
 
@@ -450,7 +455,7 @@ defineExpose({
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #9ca3af;
+  background: var(--light-gray);
   animation: typing 1.4s infinite ease-in-out;
 }
 
@@ -484,7 +489,7 @@ defineExpose({
 }
 
 .quick-question-btn {
-  background: #f9fafb;
+  background: var(--onyx);
   border: 1px solid #e5e7eb;
   color: #374151;
   padding: 8px 12px;
@@ -496,7 +501,7 @@ defineExpose({
 }
 
 .quick-question-btn:hover:not(:disabled) {
-  background: #f3f4f6;
+  background: var(--eerie-black-1);
   border-color: #d1d5db;
 }
 
@@ -533,16 +538,16 @@ defineExpose({
 }
 
 .message-input:disabled {
-  background: #f9fafb;
+  background: var(--onyx);
   opacity: 0.7;
 }
 
 .send-btn {
   padding: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-gradient-onyx);
   border: none;
   border-radius: 8px;
-  color: white;
+  color: var(--white-1);
   cursor: pointer;
   display: flex;
   align-items: center;

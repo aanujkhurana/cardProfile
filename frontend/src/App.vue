@@ -11,6 +11,7 @@
 import Card from "./components/Card.vue";
 import ThemeToggle from "./components/ThemeToggle.vue";
 import Chatbox from "./components/Chatbox.vue";
+import { ref } from "vue";
 
 const chatbotApiUrl = "http://localhost:3000/api/chat";
 
