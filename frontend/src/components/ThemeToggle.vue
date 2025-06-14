@@ -1,8 +1,11 @@
 <template>
-  <label class="theme-toggle">
-    <input type="checkbox" v-model="isLight" @change="toggleTheme" />
-    <span class="slider" />
-  </label>
+  <div class="theme-toggle-wrapper">
+    <ion-icon name="contrast-outline"></ion-icon>
+    <label class="theme-toggle">
+      <input type="checkbox" v-model="isLight" @change="toggleTheme" />
+      <span class="slider"></span>
+    </label>
+  </div>
 </template>
 
 <script setup>
@@ -20,11 +23,24 @@ const toggleTheme = () => {
 </script>
 
 <style scoped>
+.theme-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  position: relative;
+  top: -20px;
+  right: 10px;
+  gap: 2rem;
+}
+ion-icon {
+  color: #ffcc33;
+}
+/* iOS-style toggle */
 .theme-toggle {
   position: relative;
   display: inline-block;
-  width: 52px;
-  height: 28px;
+  width: 48px;
+  height: 24px;
 }
 
 .theme-toggle input {
@@ -40,7 +56,7 @@ const toggleTheme = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #424242; /* Dark background for toggle */
+  background-color: #424242;
   transition: background-color 0.4s;
   border-radius: 34px;
 }
@@ -48,10 +64,10 @@ const toggleTheme = () => {
 .slider::before {
   position: absolute;
   content: "";
-  height: 22px;
-  width: 22px;
+  height: 20px;
+  width: 20px;
   left: 3px;
-  bottom: 3px;
+  bottom: 2px;
   background-color: white;
   transition: transform 0.4s;
   border-radius: 50%;
@@ -59,7 +75,7 @@ const toggleTheme = () => {
 }
 
 input:checked + .slider {
-  background-color: hsl(45, 100%, 55%);
+  background-color: #ffcc33; /* Apple green */
 }
 
 input:checked + .slider::before {

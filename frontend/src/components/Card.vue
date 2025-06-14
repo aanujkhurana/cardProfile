@@ -23,8 +23,6 @@
 
         <ion-icon name="chevron-down"></ion-icon>
       </button>
-
-      <ThemeToggle />
     </div>
 
     <div class="sidebar-info_more">
