@@ -64,7 +64,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { client } from "../lib/client";
+import { client } from "../lib/sanity_client";
 
 const formData = ref({ name: "", email: "", message: "" });
 const isFormSubmitted = ref(false);

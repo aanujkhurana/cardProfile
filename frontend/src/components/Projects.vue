@@ -58,7 +58,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { client, urlFor } from "../lib/client";
+import { client, urlFor } from "../lib/sanity_client";
 
 // Data
 const works = ref([]);

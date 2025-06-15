@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { client } from "../lib/client.js";
+import { client } from "../lib/sanity_client.js";
 
 const experiences = ref([]);
 
