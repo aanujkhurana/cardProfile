@@ -25,7 +25,7 @@ export const contextData = {
       experience: "/experience",
       contact: "/contact"
     },
-    recentStack: ["Vue 3","Typescript", "Node.js", "Express.js", "LangChain", "PostgreSQL", "AWS", "D3.js", "Pinia", "Tailwind CSS"],
+    TechStack: ["Python", "Vue 3", "Typescript", "Node.js", "Express.js", "LangChain", "PostgreSQL", "AWS", "MongoDB", "Javascript", "HTML", "CSS"],
   },
 
   skills: [
@@ -103,7 +103,7 @@ export const contextData = {
       name: "OrgChart UI",
       description: "Interactive organizational chart editor built with Vue 3 and D3.js for complex data visualization.",
       url: "/projects/org-chart",
-      repo: "https://github.com/anujkhurana/orgchart-vue3",
+      repo: "https://github.com/aanujkhurana/TreeChart-Vue.js",
       tech: ["Vue 3", "D3.js", "TypeScript", "Pinia"],
       highlights: [
         "Created custom collapsible tree layouts and animated transitions",
@@ -122,8 +122,8 @@ export const contextData = {
       name: "Portfolio Chatbot",
       description: "LLM-powered chatbot integrated into portfolio site for contextual Q&A about skills and projects.",
       url: "/projects/chatbot",
-      repo: "https://github.com/anujkhurana/portfolio-chatbot",
-      tech: ["LangChain", "AstraDB", "OpenAI", "Vue.js", "Node.js"],
+      repo: "https://github.com/aanujkhurana/cardProfile",
+      tech: ["LangChain", "OpenAI", "typescript", "Node.js"],
       highlights: [
         "Implemented context-aware retrieval with AstraDB",
         "Structured prompt builder for dynamic AI responses",

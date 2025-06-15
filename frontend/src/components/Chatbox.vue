@@ -129,10 +129,9 @@ const messageInput = ref(null);
 
 // Quick question suggestions
 const quickQuestions = [
-  "What technologies do you specialize in?",
-  "Tell me about your projects",
+  "What TechStack do you specialize in?",
+  "What's your current focus?",
   "How do you made this chat box?",
-  "What's are you working on these days?",
 ];
 
 // Welcome message
