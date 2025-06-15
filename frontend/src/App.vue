@@ -1,8 +1,11 @@
 <template>
   <main>
+    <!-- LIGHT TOGGLE -->
     <ThemeToggle />
     <v-spacer></v-spacer>
-    <Chatbox :api-url="chatbotApiUrl" ref="chatbot" />
+    <!-- CHAT BOX -->
+    <Chatbox :openai-api-key="openaiApiKey" model="gpt-3.5-turbo" ref="chatbot" />
+    <!-- PORTFOLIO CARD -->
     <Card></Card>
   </main>
 </template>
@@ -13,7 +16,7 @@ import ThemeToggle from "./components/ThemeToggle.vue";
 import Chatbox from "./components/Chatbox.vue";
 import { ref } from "vue";
 
-const chatbotApiUrl = "http://localhost:3000/api/chat";
+const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
 // Optional: Access chatbot methods
 const chatbot = ref(null);

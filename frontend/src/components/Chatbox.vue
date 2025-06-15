@@ -95,13 +95,17 @@
 
 <script setup>
 import { ref, reactive, onMounted, nextTick, watch } from "vue";
-// import { MessageCircle, Bot, X, Send } from "lucide-vue-next";
+import { buildSystemPrompt } from "../lib/chatbox/systemPrompt.js";
 
 // Props
 const props = defineProps({
-  apiUrl: {
+  openaiApiKey: {
     type: String,
-    default: "http://localhost:3000/api/chat",
+    required: true,
+  },
+  model: {
+    type: String,
+    default: "gpt-3.5-turbo",
   },
 });
 
@@ -110,7 +114,7 @@ const isOpen = ref(false);
 const isTyping = ref(false);
 const currentMessage = ref("");
 const messages = reactive([]);
-const conversationId = ref(`chat_${Date.now()}`);
+const conversationHistory = ref([]);
 const hasUnreadWelcome = ref(true);
 
 // Template refs
@@ -130,7 +134,7 @@ const welcomeMessage = {
   id: "welcome",
   type: "bot",
   text:
-    "Hi! I'm Anuj's AI. I can tell you almost everything about my projects, skills, and experience and maybe some secrets.",
+    "Hi! I'm Anuj's portfolio assistant. I can tell you about his projects, skills, and experience. What would you like to know?",
   timestamp: new Date(),
 };
 
@@ -156,6 +160,36 @@ watch(isOpen, async (newValue) => {
     messageInput.value?.focus();
   }
 });
+
+// OpenAI API call function
+const callOpenAI = async (userMessage) => {
+  const messages = [
+    { role: "system", content: buildSystemPrompt() },
+    ...conversationHistory.value,
+    { role: "user", content: userMessage },
+  ];
+
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${props.openaiApiKey}`,
+    },
+    body: JSON.stringify({
+      model: props.model,
+      messages: messages,
+      max_tokens: 500,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenAI API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+};
 
 // Methods
 const toggleChat = () => {
@@ -189,31 +223,27 @@ const sendMessage = async (messageText) => {
   isTyping.value = true;
 
   try {
-    const response = await fetch(props.apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: messageText,
-        conversationId: conversationId.value,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
+    // Call OpenAI API
+    const aiResponse = await callOpenAI(messageText);
 
     // Add bot response
     const botMessage = {
       id: `bot_${Date.now()}`,
       type: "bot",
-      text: data.response,
+      text: aiResponse,
       timestamp: new Date(),
     };
     messages.push(botMessage);
+
+    // Update conversation history (keep last 10 exchanges)
+    conversationHistory.value.push(
+      { role: "user", content: messageText },
+      { role: "assistant", content: aiResponse }
+    );
+
+    if (conversationHistory.value.length > 20) {
+      conversationHistory.value = conversationHistory.value.slice(-20);
+    }
   } catch (error) {
     console.error("Chat error:", error);
 
@@ -221,8 +251,9 @@ const sendMessage = async (messageText) => {
     const errorMessage = {
       id: `error_${Date.now()}`,
       type: "bot",
-      text:
-        "Sorry, I'm having trouble connecting right now. Please try again in a moment.",
+      text: error.message.includes("API")
+        ? "I'm having trouble connecting to the AI service. Please check your API key and try again."
+        : "Sorry, I encountered an error. Please try again in a moment.",
       timestamp: new Date(),
     };
     messages.push(errorMessage);
@@ -260,6 +291,9 @@ defineExpose({
     isOpen.value = false;
   },
   sendMessage,
+  updateContext: (newContext) => {
+    Object.assign(contextData, newContext);
+  },
 });
 </script>
 
