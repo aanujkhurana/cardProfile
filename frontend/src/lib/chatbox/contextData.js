@@ -1,7 +1,7 @@
 export const contextData = {
   profile: {
     name: "Anuj Khurana",
-    title: "Software & Web Developer",
+    title: "Full Stack Developer",
     summary: "Detail-oriented and innovative Software & Web Developer proficient in Vue, React, API integrations, and scalable web applications. Skilled in crafting intuitive UIs and developing robust back-end systems, with a proven track record of performance optimization and seamless migrations.",
     location: "Queensland, Australia",
     contact: {
@@ -22,12 +22,12 @@ export const contextData = {
       experience: "/experience",
       contact: "/contact"
     },
-    recentStack: ["Vue 3", "D3.js", "Node.js", "Sanity CMS", "AstraDB", "AWS"],
+    recentStack: ["Vue 3","Typescript", "Node.js", "Express.js", "LangChain", "PostgreSQL", "AWS", "D3.js", "Pinia", "Tailwind CSS"],
   },
 
   skills: [
     {
-      name: "Vue 3 + Composition API",
+      name: "Vue.js & Composition API",
       level: "Advanced",
       description: "Led migration from Vue 2 to Vue 3, implemented modular components with Composition API in multiple projects.",
       projects: ["FindMyLease", "OrgChart UI", "GoDesta Migration"],
@@ -39,13 +39,13 @@ export const contextData = {
       level: "Intermediate",
       description: "Created dynamic tree chart visualizations for complex hierarchical data at Gilmour and OrgChart UI.",
       projects: ["Reflection Tree Chart", "OrgChart UI"],
-      contextTags: ["dataviz", "charts", "d3.js"]
+      contextTags: ["datavisual", "frontend", "dynamic", "d3.js"]
     },
     {
       name: "Node.js & Express",
       level: "Advanced",
       description: "Built back-end APIs, microservices, and lambda functions for multiple applications, including FindMyLease and personal tools.",
-      projects: ["FindMyLease", "Express Microservices", "Portfolio backend", "TreeChart API"],
+      projects: ["Express Microservices", "Portfolio backend", "TreeChart API"],
       contextTags: ["backend", "api", "node.js", "express"]
     },
     {
@@ -58,6 +58,25 @@ export const contextData = {
   ],
 
   projects: {
+    WebsiteSummarizer: {
+      name: "Website Summarizer Open AI Web App",
+      description: "Web application integrated Open AI model via, facilitating effortless website summarization with a single click. Implemented advanced features of Redux Toolkit to optimize data fetching and management.",
+      url: "/projects/website-summarizer",
+      repo: "https://github.com/aanujkhurana/AI_ArticleSummary-React",
+      tech: ["React", "Typescript", "Node.js", "Rapid API"],
+      highlights: [
+        "Integrated OpenAI API for content summarization",
+        "Used Redux Toolkit for scalable state management",
+        "Built sleek one-click interface for summarizing URLs"
+      ],
+      challenges: [
+        "Managing rate limits from external APIs",
+        "Maintaining consistent formatting across varying webpage structures"
+      ],
+      role: "Fullstack Developer",
+      collaboration: "Solo project",
+      contextTags: ["ai", "openai", "summarizer"]
+    },
     FindMyLease: {
       name: "FindMyLease",
       description: "Enterprise-grade rental management platform with secure auth, map-based search, and Prisma ORM.",
@@ -93,8 +112,8 @@ export const contextData = {
         "Maintaining performance with large node counts"
       ],
       role: "Frontend Developer",
-      collaboration: "Worked with UX designer",
-      contextTags: ["dataviz", "vue", "typescript"]
+      collaboration: "Solo project",
+      contextTags: ["d3.js", "vue", "typescript"]
     },
     "Portfolio Chatbot": {
       name: "Portfolio Chatbot",
@@ -128,7 +147,7 @@ export const contextData = {
         "Optimized state management with Pinia and real-time updates via WebSockets",
         "Implemented comprehensive QA and UAT processes"
       ],
-      contextTags: ["vue", "migration", "performance"]
+      contextTags: ["vue","Typescript", "migration", "websockets", "pinia", "frontend development"]
     },
     {
       role: "Software Developer Intern",
@@ -139,7 +158,7 @@ export const contextData = {
         "Built dynamic Tree chart for satellite assembly data using D3 and Vue",
         "Enhanced UX and reduced errors by 2%"
       ],
-      contextTags: ["internship", "d3", "dataviz"]
+      contextTags: ["internship", "vue.js", "typescript", "d3.js", "tailwind css", "datavisual"]
     }
   ],
 
