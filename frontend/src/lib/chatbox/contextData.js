@@ -1,98 +1,176 @@
 export const contextData = {
   profile: {
-    summary: `Anuj Khurana is a fullstack developer focused on AI and real-time systems.`,
+    name: "Anuj Khurana",
+    title: "Software & Web Developer",
+    summary: "Detail-oriented and innovative Software & Web Developer proficient in Vue, React, API integrations, and scalable web applications. Skilled in crafting intuitive UIs and developing robust back-end systems, with a proven track record of performance optimization and seamless migrations.",
     location: "Queensland, Australia",
+    contact: {
+      phone: "+61 48 12 50 988",
+      email: "aanujkhurana@gmail.com",
+      website: "/",
+      linkedin: "https://linkedin.com/in/aanujkhurana",
+      github: "https://github.com/anujkhurana"
+    },
+    currentFocus: [
+      "AI & LLM App Engineering",
+      "Vue 3 + TypeScript",
+      "Real-time Systems (WebRTC)"
+    ],
+    pages: {
+      home: "/",
+      projects: "/projects",
+      experience: "/experience",
+      contact: "/contact"
+    },
     recentStack: ["Vue 3", "D3.js", "Node.js", "Sanity CMS", "AstraDB", "AWS"],
-    currentFocus: "Building AI-powered applications and real-time systems"
   },
+
   skills: [
     {
-      name: "Vue 3",
-      description: "Modern JS framework for building reactive user interfaces",
-      projects: ["FindMyLease", "OrgChart UI"],
-      learned: "Migrated legacy Vue 2 apps and built complex component systems with composition API. Mastered reactive patterns and state management.",
-      level: "Advanced"
+      name: "Vue 3 + Composition API",
+      level: "Advanced",
+      description: "Led migration from Vue 2 to Vue 3, implemented modular components with Composition API in multiple projects.",
+      projects: ["FindMyLease", "OrgChart UI", "GoDesta Migration"],
+      contextTags: ["frontend", "vue", "composition api"],
+      learned: "2+ years building SPAs with scalable state management (Pinia) and performance tuning."
     },
     {
-      name: "D3.js",
-      description: "Data visualization library for creating interactive charts and graphs",
-      projects: ["OrgChart UI"],
-      learned: "Created dynamic organizational chart visualizations with custom animations and interactions.",
-      level: "Intermediate"
+      name: "Data Visualization",
+      level: "Intermediate",
+      description: "Created dynamic tree chart visualizations for complex hierarchical data at Gilmour and OrgChart UI.",
+      projects: ["Reflection Tree Chart", "OrgChart UI"],
+      contextTags: ["dataviz", "charts", "d3.js"]
     },
     {
-      name: "Node.js",
-      description: "JavaScript runtime for building scalable backend services",
-      projects: ["FindMyLease", "Portfolio Chatbot"],
-      learned: "Built RESTful APIs, implemented authentication systems, and integrated with various databases.",
-      level: "Advanced"
+      name: "Node.js & Express",
+      level: "Advanced",
+      description: "Built back-end APIs, microservices, and lambda functions for multiple applications, including FindMyLease and personal tools.",
+      projects: ["FindMyLease", "Express Microservices", "Portfolio backend", "TreeChart API"],
+      contextTags: ["backend", "api", "node.js", "express"]
     },
     {
-      name: "AWS",
-      description: "Cloud platform for scalable application deployment",
-      projects: ["FindMyLease"],
-      learned: "Deployed fullstack applications using EC2, S3, RDS, and Cognito for authentication.",
-      level: "Intermediate"
-    },
-    {
-      name: "AstraDB",
-      description: "Vector database for AI and ML applications",
+      name: "LangChain & AI Chatbots",
+      level: "Intermediate",
+      description: "Developed AI-powered portfolio chatbot using LangChain vector store for context-aware Q&A.",
       projects: ["Portfolio Chatbot"],
-      learned: "Implemented vector storage for semantic search and AI-powered chat functionality.",
-      level: "Beginner"
+      contextTags: ["ai", "langchain", "vector retrieval", "astradb"]
     }
   ],
+
   projects: {
-    "FindMyLease": {
-      description: "A comprehensive real-estate platform connecting tenants and landlords with advanced search capabilities.",
-      tech: ["Vue 3", "Node.js", "AWS", "PostgreSQL", "Cognito", "Prisma", "Mapbox"],
+    FindMyLease: {
+      name: "FindMyLease",
+      description: "Enterprise-grade rental management platform with secure auth, map-based search, and Prisma ORM.",
       url: "/projects/find-my-lease",
-      status: "Completed",
+      repo: "https://github.com/anujkhurana/findmylease",
+      tech: ["Vue 3", "Node.js", "AWS Cognito", "Mapbox", "PostgreSQL", "Prisma", "API Gateway"],
       highlights: [
-        "Implemented secure tenant/landlord workflows with role-based authentication",
-        "Used Prisma for database modeling and migrations",
-        "Integrated Mapbox for location-based property search",
-        "Deployed on AWS with auto-scaling and load balancing"
+        "Implemented role-based authentication with AWS Cognito",
+        "Integrated map-based filtering and search using Mapbox",
+        "Optimized data models with Prisma and RDS"
       ],
       challenges: [
-        "Handling complex property search filters and geolocation queries",
-        "Managing user authentication across multiple user types",
-        "Optimizing database queries for large property datasets"
-      ]
+        "Ensuring real-time filtering performance with large datasets",
+        "Managing secure multi-role workflows in Cognito"
+      ],
+      role: "Fullstack Developer",
+      collaboration: "Solo project",
+      contextTags: ["real estate", "mapbox", "auth"]
     },
     "OrgChart UI": {
-      description: "Interactive organizational chart visualization with Vue 3 and D3.js integration.",
-      tech: ["Vue 3", "D3.js", "TypeScript", "CSS3"],
+      name: "OrgChart UI",
+      description: "Interactive organizational chart editor built with Vue 3 and D3.js for complex data visualization.",
       url: "/projects/org-chart",
-      status: "Completed",
+      repo: "https://github.com/anujkhurana/orgchart-vue3",
+      tech: ["Vue 3", "D3.js", "TypeScript", "Pinia"],
       highlights: [
-        "Custom collapsible tree structures with smooth animations",
-        "Real-time node search and filtering capabilities",
-        "Responsive design that works on mobile and desktop",
-        "Converted from JavaScript to TypeScript using script setup syntax"
+        "Created custom collapsible tree layouts and animated transitions",
+        "Built search and node interaction features",
+        "Migrated codebase from JavaScript to TypeScript"
       ],
       challenges: [
-        "Integrating D3.js with Vue's reactive system",
-        "Performance optimization for large organizational structures",
-        "Creating intuitive user interactions for complex data"
-      ]
+        "Designing efficient tree-splitting algorithms",
+        "Maintaining performance with large node counts"
+      ],
+      role: "Frontend Developer",
+      collaboration: "Worked with UX designer",
+      contextTags: ["dataviz", "vue", "typescript"]
     },
     "Portfolio Chatbot": {
-      description: "AI-powered chatbot that answers questions about Anuj's experience and projects.",
-      tech: ["Node.js", "AstraDB", "OpenAI API", "Express"],
-      url: "/projects/portfolio-chatbot",
-      status: "In Development",
+      name: "Portfolio Chatbot",
+      description: "LLM-powered chatbot integrated into portfolio site for contextual Q&A about skills and projects.",
+      url: "/projects/chatbot",
+      repo: "https://github.com/anujkhurana/portfolio-chatbot",
+      tech: ["LangChain", "AstraDB", "OpenAI", "Vue.js", "Node.js"],
       highlights: [
-        "Semantic search using vector embeddings",
-        "Context-aware responses about projects and skills",
-        "Integration with portfolio website",
-        "Structured context system for accurate responses"
+        "Implemented context-aware retrieval with AstraDB",
+        "Structured prompt builder for dynamic AI responses",
+        "Streaming chat UX in Vue component"
       ],
       challenges: [
-        "Maintaining context accuracy without hallucinations",
-        "Optimizing response time for real-time chat",
-        "Balancing detailed information with concise answers"
-      ]
+        "Balancing prompt size and relevance",
+        "Ensuring consistent conversational context"
+      ],
+      role: "Fullstack Developer",
+      collaboration: "Solo project",
+      contextTags: ["ai", "chatbot", "contextual"]
     }
+  },
+
+  experience: [
+    {
+      role: "Front-End Developer",
+      company: "GoDesta",
+      location: "Brisbane, Australia",
+      period: "May 2024 – Present",
+      responsibilities: [
+        "Led migration from Vue 2 to Vue 3, improving performance by 15%",
+        "Optimized state management with Pinia and real-time updates via WebSockets",
+        "Implemented comprehensive QA and UAT processes"
+      ],
+      contextTags: ["vue", "migration", "performance"]
+    },
+    {
+      role: "Software Developer Intern",
+      company: "Gilmour Space Technologies",
+      location: "Gold Coast, Australia",
+      period: "Jul 2023 – Oct 2023",
+      responsibilities: [
+        "Built dynamic Tree chart for satellite assembly data using D3 and Vue",
+        "Enhanced UX and reduced errors by 2%"
+      ],
+      contextTags: ["internship", "d3", "dataviz"]
+    }
+  ],
+
+  education: [
+    {
+      degree: "Master of Information Technology",
+      specialization: "Software Development and Support",
+      institution: "Griffith University",
+      location: "Gold Coast, Australia",
+      year: 2024
+    },
+    {
+      degree: "Bachelor of Arts",
+      institution: "GGSIP University",
+      location: "Delhi, India",
+      year: 2019
+    }
+  ],
+
+  certifications: [
+    { name: "Back End Development and API", issuer: "FreeCodeCamp", year: 2024 },
+    { name: "Python", issuer: "HackerRank", year: 2024 },
+    { name: "SQL", issuer: "HackerRank", year: 2023 },
+    { name: "User Experience Essentials", issuer: "Udemy", year: 2019 }
+  ],
+
+  technicalSkills: {
+    programming: ["Python", "Swift", "JavaScript", "TypeScript", "PHP", "SQL", "HTML", "CSS"],
+    frameworks: ["Vue", "React", "Laravel", "Express.js", "Node.js", "Flutter", "React Native", "Tailwind"],
+    databases: ["PostgreSQL", "MySQL", "MongoDB"],
+    devOps: ["Docker", "Kubernetes", "AWS", "GitHub", "GitLab", "Jira", "CI/CD", "Postman"],
+    other: ["RESTful APIs", "GraphQL", "Mapbox", "Figma", "Linux CLI"]
   }
 };
