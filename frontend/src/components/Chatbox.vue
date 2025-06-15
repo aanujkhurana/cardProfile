@@ -24,7 +24,7 @@
       <div class="chat-header">
         <div class="chat-title">
           <Bot :size="20" />
-          <span>Ask about Anuj's work</span>
+          <span>Anuj's AI assistant</span>
         </div>
         <button @click="toggleChat" class="close-btn" aria-label="Close chat">
           <ion-icon name="remove-outline"></ion-icon>
@@ -350,6 +350,10 @@ defineExpose({
   font-weight: 600;
 }
 
+ion-icon {
+  color: var(--orange-yellow-crayola);
+}
+
 /* Chat Window */
 .chat-window {
   border: 1px solid var(--jet);
@@ -365,9 +369,9 @@ defineExpose({
 
 /* Header */
 .chat-header {
-  background: var(--bg-gradient-jet);
+  background: var(--bg-gradient-onyx);
   color: var(--white-2);
-  padding: 16px 20px;
+  padding: 6px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -376,9 +380,8 @@ defineExpose({
 .chat-title {
   display: flex;
   align-items: center;
-  gap: 8px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .close-btn {
@@ -404,8 +407,8 @@ defineExpose({
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: var(--bg-gradient-jet) !important;
+  gap: 4px;
+  background: var(--eerie-black-2) !important;
 }
 
 .message {
@@ -426,20 +429,22 @@ defineExpose({
 }
 
 .message-text {
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.4;
 }
 
 .message.bot .message-text {
-  background: var(--eerie-black-2);
+  background: var(--bg-gradient-jet);
   color: var(--light-gray);
+  box-shadow: var(--shadow-1);
 }
 
 .message.user .message-text {
   background: var(--bg-gradient-onyx);
   color: var(--white-2);
+  box-shadow: var(--shadow-2);
 }
 
 .message-text :deep(a) {
@@ -509,7 +514,6 @@ defineExpose({
 
 .quick-question-btn {
   background: var(--onyx);
-  border: 1px solid var(--border-gradient-onyx);
   color: var(--light-gray);
   padding: 8px 12px;
   border-radius: 8px;
@@ -532,8 +536,9 @@ defineExpose({
 /* Input Area */
 .input-area {
   padding: 16px;
-  border-top: 1px solid var(--jet);
+  border-top: 1px solid var(--onyx);
   background: var(--eerie-black-2) !important;
+  box-shadow: var(--shadow-1);
 }
 
 .input-container {
@@ -545,7 +550,7 @@ defineExpose({
 .message-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid transparent !important;
+  border: 1px solid var(--onyx) !important;
   border-radius: 8px;
   font-size: 14px;
   outline: none;
@@ -598,23 +603,5 @@ defineExpose({
     bottom: 20px;
     right: 20px;
   }
-}
-
-/* Scrollbar Styling */
-.messages-container::-webkit-scrollbar {
-  width: 4px;
-}
-
-.messages-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.messages-container::-webkit-scrollbar-thumb {
-  background: var(------bg-gradient-yellow-2);
-  border-radius: 2px;
-}
-
-.messages-container::-webkit-scrollbar-thumb:hover {
-  background: var(--eerie-black-2);
 }
 </style>
