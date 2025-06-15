@@ -8,8 +8,14 @@
       class="chat-toggle-btn"
       aria-label="Open chat"
     >
-      <ion-icon name="chatbubbles-outline"></ion-icon>
-      <span class="chat-badge" v-if="hasUnreadWelcome"></span>
+      <img
+        v-if="hasUnreadWelcome"
+        src="../assets/images/wave.gif"
+        alt="Web development icon"
+        width="40"
+      />
+      <ion-icon v-else name="chatbubbles-outline"></ion-icon>
+      <span class="chat-badge" v-if="hasUnreadWelcome">Hi!</span>
     </button>
 
     <!-- Chat Window -->
@@ -335,9 +341,9 @@ defineExpose({
   background: #ef4444;
   color: var(--white-1);
   border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  font-size: 12px;
+  width: 20px;
+  height: 20px;
+  font-size: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
