@@ -129,10 +129,10 @@ const messageInput = ref(null);
 
 // Quick question suggestions
 const quickQuestions = [
-  "What are your main skills?",
-  "Tell me about your latest project",
-  "How do you use Vue 3?",
-  "What's your experience with AWS?",
+  "What technologies do you specialize in?",
+  "Tell me about your projects",
+  "How do you made this chat box?",
+  "What's are you working on these days?",
 ];
 
 // Welcome message
@@ -140,7 +140,7 @@ const welcomeMessage = {
   id: "welcome",
   type: "bot",
   text:
-    "Hi! I'm Anuj's portfolio assistant. I can tell you about his projects, skills, and experience. What would you like to know?",
+    "Hi! I'm Anuj's portfolio AI. I can tell you about his projects, skills, and experience. What would you like to know?",
   timestamp: new Date(),
 };
 
