@@ -8,9 +8,8 @@
       class="chat-toggle-btn"
       aria-label="Open chat"
     >
-      <!-- <MessageCircle :size="24" /> -->
-      <ion-icon name="contrast-outline"></ion-icon>
-      <span class="chat-badge" v-if="hasUnreadWelcome">1</span>
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <span class="chat-badge" v-if="hasUnreadWelcome"></span>
     </button>
 
     <!-- Chat Window -->
@@ -22,8 +21,7 @@
           <span>Ask about Anuj's work</span>
         </div>
         <button @click="toggleChat" class="close-btn" aria-label="Close chat">
-          <!-- <X :size="20" /> -->
-          <ion-icon name="contrast-outline"></ion-icon>
+          <ion-icon name="remove-outline"></ion-icon>
         </button>
       </div>
 
@@ -87,8 +85,7 @@
             :disabled="!currentMessage.trim() || isTyping"
             aria-label="Send message"
           >
-            <!-- <Send :size="18" /> -->
-            <ion-icon name="contrast-outline"></ion-icon>
+            <ion-icon name="send-outline"></ion-icon>
           </button>
         </div>
       </div>
@@ -133,7 +130,7 @@ const welcomeMessage = {
   id: "welcome",
   type: "bot",
   text:
-    "Hi! I'm Anuj's portfolio assistant. I can tell you about his projects, skills, and experience. What would you like to know?",
+    "Hi! I'm Anuj's AI. I can tell you almost everything about my projects, skills, and experience and maybe some secrets.",
   timestamp: new Date(),
 };
 
@@ -299,13 +296,13 @@ defineExpose({
 
 .chat-badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -4px;
+  right: 4px;
   background: #ef4444;
   color: var(--white-1);
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   font-size: 12px;
   display: flex;
   align-items: center;
