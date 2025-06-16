@@ -257,7 +257,7 @@ const sendMessage = async (messageText) => {
       id: `error_${Date.now()}`,
       type: "bot",
       text: error.message.includes("API")
-        ? "I'm having trouble connecting to the AI service. Please check your API key and try again."
+        ? "I'm having trouble connecting to the AI service. Please try again."
         : "Sorry, I encountered an error. Please try again in a moment.",
       timestamp: new Date(),
     };
@@ -309,6 +309,13 @@ defineExpose({
   right: 20px;
   z-index: 1000;
   letter-spacing: 0.2px;
+}
+
+@media screen and (max-width: 579px) {
+  .chatbot-container {
+    display: none;
+  }
+  
 }
 
 /* Toggle Button */
