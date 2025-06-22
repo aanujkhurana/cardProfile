@@ -174,22 +174,24 @@ const callOpenAI = async (userMessage) => {
     { role: "user", content: userMessage },
   ];
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${props.openaiApiKey}`,
-    },
-    body: JSON.stringify({
-      model: props.model,
-      messages: messages,
-      max_tokens: 500,
-      temperature: 0.7,
-    }),
-  });
+  const response = await fetch(
+    "https://openai-proxy-egkw4bgr0-anuj-khuranas-projects.vercel.app/api/chat",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: props.model,
+        messages: messages,
+        max_tokens: 500,
+        temperature: 0.7,
+      }),
+    }
+  );
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`);
+    throw new Error(`Proxy API error: ${response.status}`);
   }
 
   const data = await response.json();
@@ -315,7 +317,6 @@ defineExpose({
   .chatbot-container {
     display: none;
   }
-  
 }
 
 /* Toggle Button */
