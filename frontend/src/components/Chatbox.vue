@@ -174,21 +174,25 @@ const callOpenAI = async (userMessage) => {
     { role: "user", content: userMessage },
   ];
 
-  const response = await fetch(
-    "https://openai-proxy-egkw4bgr0-anuj-khuranas-projects.vercel.app/api/chat",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: props.model,
-        messages: messages,
-        max_tokens: 500,
-        temperature: 0.7,
-      }),
-    }
-  );
+  // Use environment variable if available, otherwise use relative URL for development or full URL for production
+  const apiUrl =
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.DEV
+      ? "/api/chat"
+      : "https://openai-proxy-mujovdlo3-anuj-khuranas-projects.vercel.app/api/chat");
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: messages,
+      max_tokens: 500,
+      temperature: 0.7,
+    }),
+  });
 
   if (!response.ok) {
     throw new Error(`Proxy API error: ${response.status}`);
