@@ -222,24 +222,3 @@ Make sure to set the following environment variables in your deployment:
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👤 About Anuj Khurana
-
-Anuj is a passionate software engineer with expertise in:
-- **Frontend Development**: Vue.js, React, JavaScript, TypeScript
-- **Backend Development**: Node.js, Python, APIs
-- **AI/ML**: OpenAI integration, LLM applications
-- **Cloud Services**: AWS, Vercel, serverless architecture
-
-## 📞 Contact
-
-- **Email**: [Your Email]
-- **LinkedIn**: [Your LinkedIn]
-- **GitHub**: [Your GitHub]
-- **Website**: [Your Website]
-
----
-
-⭐ **Star this repository if you found it helpful!**
-
-Made with ❤️ by Anuj Khurana
