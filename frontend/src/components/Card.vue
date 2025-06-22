@@ -134,17 +134,17 @@
       <section class="about-text">
         <p>
           Hi, I’m Anuj Khurana — a Full Stack Developer based in Queensland, Australia.
-          With 2+ years of experience building modern web apps, I specialize in fast, responsive UIs and seamless fullstack integration.
+          With 2+ years of experience building modern web apps, I specialize in fast,
+          responsive UIs and seamless fullstack integration.
         </p>
 
         <p>
-          I’ve led frontend migrations (hello Vue 3!), boosted performance, and crafted interfaces that feel as good as they look.
-          I hold a Master’s in Software Development, love system design and clean architecture, and I’m always up for a new challenge — especially if it means learning something cool along the way.
-
+          I’ve led frontend migrations, boosted performance, and crafted interfaces that
+          feel as good as they look. I hold a Master’s in Software Development, love
+          system design and clean architecture, and I’m always up for a new challenge —
+          especially if it means learning something cool along the way.
         </p>
-        <p>
-          🚀 Let’s build something amazing.
-        </p>
+        <p>🚀 Let’s build something amazing.</p>
       </section>
       <!-- SERVICES -->
       <section class="service">
