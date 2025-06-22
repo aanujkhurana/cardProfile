@@ -56,13 +56,13 @@ onMounted(() => {
     <ol class="timeline-list">
       <li class="timeline-item">
         <h4 class="h4 timeline-item-title">
-          <a href="https://www.griffith.edu.au/" target="_blank">Griffith University</a>
+         Master of Information Technology in Software Development & Support
         </h4>
 
         <span>2024</span>
 
         <p class="timeline-text">
-          Master of Information Technology in Software Development & Support.
+          Griffith University
         </p>
       </li>
     </ol>
