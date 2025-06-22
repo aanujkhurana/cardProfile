@@ -1,21 +1,31 @@
 export const config = {
-  runtime: 'edge'
+  runtime: 'edge',
+};
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Max-Age": "86400",
 };
 
 export default async function handler(req) {
+  // ✅ Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    // Handle preflight
-    const allowedOrigins = ["http://localhost:5173", "https://your-username.github.io"];
-    const origin = req.headers.get("origin");
-
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
-    };
     return new Response(null, {
       status: 204,
-      headers: corsHeaders,
+      headers: corsHeaders
+    });
+  }
+
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json"
+      }
     });
   }
 
@@ -40,17 +50,18 @@ export default async function handler(req) {
     const data = await openaiRes.json();
 
     return new Response(JSON.stringify(data), {
+      status: 200,
       headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*", // <-- Allow all origins (or specify just your dev/prod origin)
+        ...corsHeaders,
+        "Content-Type": "application/json"
       }
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+        ...corsHeaders,
+        "Content-Type": "application/json"
       }
     });
   }
