@@ -233,7 +233,7 @@
 
     <article class="portfolio" data-page="projects">
       <header>
-        <h2 class="h2 article-title">Portfolio</h2>
+        <h2 class="h2 article-title">Project</h2>
       </header>
       <section class="projects">
         <Projects />
