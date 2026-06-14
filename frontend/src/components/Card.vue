@@ -2,11 +2,11 @@
   <aside class="sidebar" data-sidebar>
     <div class="sidebar-info">
       <figure class="avatar-box">
-        <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" width="100" />
+        <img src="../assets/images/my-avatar.png" alt="AnujKhurana" width="100" />
       </figure>
 
       <div class="info-content">
-        <h1 class="name" title="Anuj Khurana">Anuj Khurana</h1>
+        <h1 class="name" title="AnujKhurana">Anuj Khurana</h1>
 
         <p class="title">Full Stack developer</p>
 
