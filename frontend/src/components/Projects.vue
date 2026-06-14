@@ -16,7 +16,7 @@
   <ul class="project-list">
     <li
       v-for="(project, index) in paginatedWorks"
-      :key="index"
+      :key="project._id || project.title || index"
       class="project-item active"
       data-filter-item
       :data-category="project.tags?.[0] || 'Other'"
@@ -30,7 +30,16 @@
           <div class="project-item-icon-box">
             <ion-icon name="eye-outline" />
           </div>
-          <img :src="urlFor(project.imgUrl)" :alt="project.title" loading="lazy" />
+          <img
+            v-if="project.imgUrl"
+            :src="getProjectImageUrl(project)"
+            :alt="project.title"
+            width="640"
+            height="360"
+            loading="eager"
+            decoding="async"
+            :fetchpriority="index === 0 ? 'high' : 'auto'"
+          />
         </figure>
         <h3 class="project-title">{{ project.title }}</h3>
         <p class="project-category">{{ project.tags?.[0] || "Other" }}</p>
@@ -57,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import { client, urlFor } from "../lib/sanity_client";
 
 // Data
@@ -66,6 +75,7 @@ const filterWork = ref([]);
 const activeFilter = ref("All");
 const currentPage = ref(1);
 const pageSize = ref(6); // default; will auto-update below
+const preloadedImages = new Set();
 
 // Categories
 const categories = ref(["All"]);
@@ -76,6 +86,36 @@ const updatePageSize = () => {
   else if (window.innerWidth >= 850) pageSize.value = 6;
   else if (window.innerWidth >= 450) pageSize.value = 4;
   else pageSize.value = 3;
+};
+
+const getProjectImageUrl = (project) => {
+  if (!project?.imgUrl) return "";
+
+  return urlFor(project.imgUrl)
+    .width(640)
+    .height(360)
+    .fit("crop")
+    .auto("format")
+    .quality(80)
+    .url();
+};
+
+const preloadProjectImages = (projects) => {
+  projects.forEach((project) => {
+    const imageUrl = getProjectImageUrl(project);
+
+    if (!imageUrl || preloadedImages.has(imageUrl)) return;
+
+    const image = new Image();
+    image.decoding = "async";
+    image.src = imageUrl;
+    preloadedImages.add(imageUrl);
+  });
+};
+
+const getNextPageProjects = () => {
+  const nextPageStart = currentPage.value * pageSize.value;
+  return filterWork.value.slice(nextPageStart, nextPageStart + pageSize.value);
 };
 
 onMounted(async () => {
@@ -91,6 +131,7 @@ onMounted(async () => {
 
     works.value = worksData;
     filterWork.value = filterData;
+    preloadProjectImages(worksData);
 
     // Extract unique tags
     const allTags = new Set(["All"]);
@@ -101,6 +142,10 @@ onMounted(async () => {
   } catch (err) {
     console.error("Sanity fetch error:", err);
   }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updatePageSize);
 });
 
 const handleWorkFilter = (category) => {
@@ -121,6 +166,14 @@ const paginatedWorks = computed(() =>
     (currentPage.value - 1) * pageSize.value,
     currentPage.value * pageSize.value
   )
+);
+
+watch(
+  [paginatedWorks, pageSize],
+  () => {
+    preloadProjectImages([...paginatedWorks.value, ...getNextPageProjects()]);
+  },
+  { immediate: true }
 );
 
 const prevPage = () => {
