@@ -488,9 +488,11 @@ main {
   border: 1px solid var(--surface-border-strong);
   font-size: var(--fs-8);
   font-weight: var(--fw-600);
-  width: max-content;
+  width: fit-content;
+  max-width: 100%;
   padding: 5px 12px;
   border-radius: 999px;
+  line-height: 1.35;
 }
 
 .info-content .link {
@@ -499,12 +501,14 @@ main {
   border: 1px solid var(--surface-border);
   font-size: var(--fs-8);
   font-weight: var(--fw-500);
-  width: max-content;
+  width: fit-content;
+  max-width: 100%;
   padding: 6px 12px;
   border-radius: 999px;
   margin-top: 14px;
   cursor: pointer;
   display: flex;
+  align-items: center;
   transition: color var(--transition-1), border-color var(--transition-1), transform var(--transition-1);
 }
 
@@ -703,13 +707,52 @@ main {
 .about .article-title { margin-bottom: 15px; }
 
 .about-text {
-  color: var(--light-gray);
+  color: var(--text-muted);
   font-size: var(--fs-6);
-  font-weight: var(--fw-300);
-  line-height: 1.6;
+  font-weight: var(--fw-400);
+  line-height: 1.78;
 }
 
 .about-text p { margin-bottom: 15px; }
+
+.about-kicker {
+  width: max-content;
+  max-width: 100%;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--surface-border-strong);
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: var(--fs-8);
+  font-weight: var(--fw-700);
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.about-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.about-highlights li {
+  color: var(--text-main);
+  background: var(--surface-2);
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  padding: 9px 13px;
+  font-size: var(--fs-7);
+  font-weight: var(--fw-600);
+  transition: transform var(--transition-1), border-color var(--transition-1), color var(--transition-1);
+}
+
+.about-highlights li:hover {
+  color: var(--accent);
+  border-color: var(--surface-border-strong);
+  transform: translateY(-2px);
+}
 
 
 
@@ -717,7 +760,7 @@ main {
  * #service 
  */
 
-.service { margin-bottom: 35px; }
+.service { margin-bottom: 42px; }
 
 .service-title { margin-bottom: 20px; }
 
@@ -729,10 +772,13 @@ main {
 
 .service-item {
   position: relative;
-  background: var(--border-gradient-onyx);
+  background: var(--surface-2);
   padding: 20px;
-  border-radius: 14px;
-  box-shadow: var(--shadow-2);
+  border: 1px solid var(--surface-border);
+  border-radius: 18px;
+  box-shadow: none;
+  overflow: hidden;
+  transition: transform var(--transition-1), border-color var(--transition-1), box-shadow var(--transition-1);
   z-index: 1;
 }
 
@@ -740,24 +786,63 @@ main {
   content: "";
   position: absolute;
   inset: 1px;
-  background: var(--bg-gradient-jet);
+  background:
+    linear-gradient(145deg, hsla(0, 0%, 100%, 0.04), transparent 58%),
+    var(--bg-gradient-jet);
   border-radius: inherit;
   z-index: -1;
 }
 
+.service-item:hover {
+  border-color: var(--surface-border-strong);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-4px);
+}
+
+.service-item::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--surface-border-strong), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-1);
+}
+
+.service-item:hover::after { opacity: 1; }
+
 .service-icon-box { margin-bottom: 10px; }
 
-.service-icon-box img { margin: auto; }
+.service-icon-box {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  background: var(--accent-soft);
+  border: 1px solid var(--surface-border-strong);
+  border-radius: 16px;
+}
+
+.service-icon-box img {
+  margin: auto;
+  width: 30px;
+  height: 30px;
+}
 
 .service-content-box { text-align: center; }
 
-.service-item-title { margin-bottom: 7px; }
+.service-item-title {
+  margin-bottom: 8px;
+  font-weight: 700;
+}
 
 .service-item-text {
-  color: var(--light-gray);
+  color: var(--text-muted);
   font-size: var(--fs-6);
-  font-weight: var(--fw-3);
-  line-height: 1.6;
+  font-weight: var(--fw-400);
+  line-height: 1.7;
 }
 
 
