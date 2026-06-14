@@ -1,11 +1,12 @@
 <template>
   <div class="theme-toggle-wrapper">
-    <label class="theme-toggle">
+    <label class="theme-toggle" aria-label="Toggle theme">
       <input type="checkbox" v-model="isLight" @change="toggleTheme" />
-      <span class="slider"></span>
+      <span class="slider">
+        <ion-icon class="moon-icon" name="moon-outline"></ion-icon>
+        <ion-icon class="sun-icon" name="sunny-outline"></ion-icon>
+      </span>
     </label>
-        <ion-icon v-if="isIcon"  name="contrast-outline"></ion-icon>
-        <ion-icon v-else name="sunny-outline"></ion-icon>
   </div>
 </template>
 
@@ -13,15 +14,13 @@
 import { ref, onMounted } from "vue";
 
 const isLight = ref(false);
-const isIcon = ref(false);
 
 onMounted(() => {
   isLight.value = document.documentElement.classList.contains("light-theme");
 });
 
 const toggleTheme = () => {
-  isIcon.value = !isIcon.value;
-  document.documentElement.classList.toggle("light-theme");
+  document.documentElement.classList.toggle("light-theme", isLight.value);
 };
 </script>
 
@@ -29,9 +28,9 @@ const toggleTheme = () => {
 .theme-toggle-wrapper {
   display: flex;
   align-items: center;
-  right: 8px;
-  gap: 0.5rem;
+  right: 10px;
 }
+
 @media (max-width: 579px) {
    .theme-toggle-wrapper {
     display: none;
@@ -39,15 +38,11 @@ const toggleTheme = () => {
    }
 }
 
-ion-icon {
-  color: #ffcc33;
-}
-/* iOS-style toggle */
 .theme-toggle {
   position: relative;
   display: inline-block;
-  width: 32px;
-  height: 17px;
+  width: 58px;
+  height: 32px;
 }
 
 .theme-toggle input {
@@ -63,41 +58,54 @@ ion-icon {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #424242;
-  transition: background-color 0.4s;
-  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  color: var(--accent);
+  background: var(--surface-2);
+  border: 1px solid var(--surface-border);
+  transition: background var(--transition-2), border-color var(--transition-1), box-shadow var(--transition-1);
+  border-radius: 999px;
+  box-shadow: var(--shadow-1);
 }
 
 .slider::before {
   position: absolute;
   content: "";
-  height: 13px;
-  width: 13px;
-  left: 3px;
-  bottom: 2px;
-  background-color: white;
-  transition: transform 0.4s;
+  height: 24px;
+  width: 24px;
+  left: 4px;
+  top: 3px;
+  background: var(--text-gradient-yellow);
+  transition: transform var(--transition-2);
   border-radius: 50%;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px hsla(0, 0%, 0%, 0.22);
+  z-index: 0;
+}
+
+.slider ion-icon {
+  position: relative;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  color: var(--text-main);
+  opacity: 0.76;
 }
 
 input:checked + .slider {
-  background-color: #ffcc33; /* Apple green */
+  border-color: var(--surface-border-strong);
+  background: var(--bg-gradient-jet);
 }
 
 input:checked + .slider::before {
-  transform: translateX(13px);
+  transform: translateX(26px);
 }
 
 :host, .theme-toggle-wrapper {
   position: absolute;
   top: 1rem;
-  /* right: 1rem; */
   z-index: 1000;
-  background-color: var(--eerie-black-100);
-  /* padding: 0.5rem 1rem; */
-  /* border-radius: 999px; */
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); */
 }
 
 </style>
