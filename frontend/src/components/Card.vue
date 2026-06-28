@@ -8,7 +8,7 @@
       <div class="info-content">
         <h1 class="name" title="AnujKhurana">Anuj Khurana</h1>
 
-        <p class="title">Frontend-focused full stack developer</p>
+        <p class="title">Full Stack developer</p>
 
         <a href="https://www.github.com/aanujkhurana" target="_blank"
           ><span class="link">
@@ -132,30 +132,23 @@
       </header>
 
       <section class="about-text">
-        <p class="about-kicker">Frontend engineering, SaaS products, and AI workflows</p>
         <p>
-          I’m a frontend-focused full stack developer building polished, scalable, and
-          AI-enhanced web experiences from Queensland, Australia.
+          Hi, I’m Anuj Khurana — a Full Stack Developer based in Queensland, Australia.
+          With 2+ years of experience building modern web apps, I specialize in fast,
+          responsive UIs and seamless fullstack integration.
         </p>
 
         <p>
-          I specialise in Vue 3, React, TypeScript, Node.js, and AWS, with hands-on
-          experience improving SaaS products, modernising legacy interfaces, and creating
-          fast, accessible, user-friendly workflows. I care about the details that make
-          software feel premium: clean UI systems, responsive layouts, smooth interactions,
-          performance, and thoughtful product design.
+          I’ve led frontend migrations, boosted performance, and crafted interfaces that
+          feel as good as they look. I hold a Master’s in Software Development, love
+          system design and clean architecture, and I’m always up for a new challenge —
+          especially if it means learning something cool along the way.
         </p>
-
-        <ul class="about-highlights" aria-label="Core strengths">
-          <li>Frontend systems</li>
-          <li>AI automation</li>
-          <li>SaaS workflows</li>
-          <li>UX performance</li>
-        </ul>
+        <p>🚀 Let’s build something amazing.</p>
       </section>
       <!-- SERVICES -->
       <section class="service">
-        <h3 class="h3 service-title">What I build</h3>
+        <h3 class="h3 service-title">What i'm doing</h3>
 
         <ul class="service-list">
           <li class="service-item">
@@ -169,11 +162,11 @@
             </div>
 
             <div class="service-content-box">
-              <h4 class="h4 service-item-title">Interface Systems</h4>
+              <h4 class="h4 service-item-title">Database Architecture</h4>
 
               <p class="service-item-text">
-                Designing clean, responsive UI foundations with reusable components,
-                accessible states, and polished interaction details.
+                Designing agile and scalable databases, harmonizing relational and
+                non-relational paradigms for optimal performance.
               </p>
             </div>
           </li>
@@ -188,11 +181,11 @@
             </div>
 
             <div class="service-content-box">
-              <h4 class="h4 service-item-title">SaaS Product Features</h4>
+              <h4 class="h4 service-item-title">Full Stack Development</h4>
 
               <p class="service-item-text">
-                Building practical product workflows across Vue, React, TypeScript,
-                Node.js, APIs, and cloud services.
+                Seamlessly blending front-end finesse & back-end brilliance to engineer
+                captivating digital experiences.
               </p>
             </div>
           </li>
@@ -203,11 +196,11 @@
             </div>
 
             <div class="service-content-box">
-              <h4 class="h4 service-item-title">AI Workflow Engineering</h4>
+              <h4 class="h4 service-item-title">UI-UX Design</h4>
 
               <p class="service-item-text">
-                Turning LLMs and automation into useful product experiences, from
-                contextual assistants to faster internal workflows.
+                Enchanting users with interfaces that dazzle and guide, ensuring each
+                interaction is a delightful journey.
               </p>
             </div>
           </li>
@@ -218,11 +211,11 @@
             </div>
 
             <div class="service-content-box">
-              <h4 class="h4 service-item-title">Performance & UX Polish</h4>
+              <h4 class="h4 service-item-title">Collaborative Spirit</h4>
 
               <p class="service-item-text">
-                Improving speed, clarity, and usability so interfaces feel sharp,
-                reliable, and business-ready.
+                Fostering a culture of open communication, mutual respect, and teamwork to
+                drive innovation and excellence.
               </p>
             </div>
           </li>
