@@ -2,10 +2,10 @@ export const contextData = {
   profile: {
     name: "Anuj Khurana",
     title: "Full Stack Developer",
-    summary: `I’m a Full Stack Developer with 2+ years of experience building web applications with a strong focus on frontend performance
+    summary: `I’m a Full Stack Developer with 3+ years of experience building web applications with a strong focus on frontend performance
               and user experience. I’ve led frontend migrations, optimized applications for speed and accessibility, and built clean,
               responsive interfaces. I’m comfortable working across the stack, with a solid foundation in data structures and system design.
-              I enjoy solving real-world problems with code and am always learning and love picking up new skills`,
+              I enjoy solving real-world problems with code and am always learning and love picking up new skills. I build products, not just features. As a Full Stack Software Engineer, I combine modern web technologies, cloud infrastructure, and AI to rapidly transform ideas into production-ready applications. I enjoy solving difficult engineering challenges, improving developer workflows, and building software that is fast, scalable, and genuinely useful`,
     location: "Queensland, Australia",
     contact: {
       phone: "+61 48 12 50 988",
