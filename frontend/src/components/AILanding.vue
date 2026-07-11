@@ -3,11 +3,7 @@
     <!-- Top bar -->
     <header class="ai-topbar">
       <div class="ai-topbar-brand">
-        <img
-          src="../assets/images/my-avatar.png"
-          alt="Anuj Khurana"
-          class="ai-topbar-avatar"
-        />
+        <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" class="ai-topbar-avatar" />
         <span class="ai-topbar-name">Anuj Khurana</span>
       </div>
       <button class="ai-browse-btn" @click="$emit('browse-website')">
@@ -38,12 +34,20 @@
             <img src="../assets/images/my-avatar.png" alt="AI" />
           </div>
           <div class="ai-msg-content">
-            <div
-              v-if="message.type === 'bot'"
-              class="ai-msg-text"
-              v-html="formatMessage(message.text)"
-            ></div>
-            <div v-else class="ai-msg-text">{{ message.text }}</div>
+            <!-- Rich card response -->
+            <template v-if="message.card">
+              <div class="ai-msg-text ai-msg-text--card-intro">{{ message.text }}</div>
+              <component :is="message.cardComponent" :data="message.cardData" />
+            </template>
+            <!-- Plain text response -->
+            <template v-else>
+              <div
+                v-if="message.type === 'bot'"
+                class="ai-msg-text"
+                v-html="formatMessage(message.text)"
+              ></div>
+              <div v-else class="ai-msg-text">{{ message.text }}</div>
+            </template>
             <div class="ai-msg-time">{{ formatTime(message.timestamp) }}</div>
           </div>
         </div>
@@ -62,18 +66,17 @@
       </div>
     </div>
 
-    <!-- Input area — primary focal point -->
+    <!-- Input area -->
     <div class="ai-input-area">
-      <!-- Suggestion chips above input when no messages yet -->
       <div v-if="messages.length <= 1" class="ai-chips">
         <button
-          v-for="suggestion in suggestions"
-          :key="suggestion"
+          v-for="q in defaultQuestions"
+          :key="q.label"
           class="ai-chip"
-          @click="sendMessage(suggestion)"
+          @click="sendMessage(q.label)"
           :disabled="isTyping"
         >
-          {{ suggestion }}
+          {{ q.label }}
         </button>
       </div>
 
@@ -103,7 +106,10 @@
 
 <script setup>
 import { ref, reactive, onMounted, nextTick, watch } from "vue";
-import { buildSystemPrompt } from "../lib/chatbox/systemPrompt.js";
+import { routeQuery } from "../lib/knowledge/router.js";
+import { sendToGemini, getGeminiErrorMessage } from "../lib/gemini/service.js";
+import { defaultQuestions } from "../lib/config/defaultQuestions.js";
+import { resolveComponent } from "./ai/index.js";
 
 const emit = defineEmits(["browse-website"]);
 
@@ -115,18 +121,12 @@ const conversationHistory = ref([]);
 const messagesContainer = ref(null);
 const messageInput = ref(null);
 
-const suggestions = [
-  "Tell me about your skills",
-  "What projects have you built?",
-  "What's your work experience?",
-  "How can I contact you?",
-];
+const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 const welcomeMessage = {
   id: "welcome",
   type: "bot",
-  text:
-    "Hi! I'm Anuj's portfolio AI. I can tell you about his projects, skills, and experience. What would you like to know?",
+  text: "Hi! I'm Anuj's portfolio AI. I can tell you about his projects, skills, and experience. What would you like to know?",
   timestamp: new Date(),
 };
 
@@ -142,35 +142,6 @@ watch(
     scrollToBottom();
   }
 );
-
-const callOpenAI = async (userMessage) => {
-  const apiMessages = [
-    { role: "system", content: buildSystemPrompt() },
-    ...conversationHistory.value,
-    { role: "user", content: userMessage },
-  ];
-
-  const apiUrl =
-    import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV
-      ? "/api/chat"
-      : "https://openai-proxy-mujovdlo3-anuj-khuranas-projects.vercel.app/api/chat");
-
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: apiMessages,
-      max_tokens: 500,
-      temperature: 0.7,
-    }),
-  });
-
-  if (!response.ok) throw new Error(`Proxy API error: ${response.status}`);
-  const data = await response.json();
-  return data.choices[0].message.content;
-};
 
 const scrollToBottom = () => {
   if (messagesContainer.value) {
@@ -196,18 +167,51 @@ const sendMessage = async (messageText) => {
   isTyping.value = true;
 
   try {
-    const aiResponse = await callOpenAI(messageText);
-    messages.push({
-      id: `bot_${Date.now()}`,
-      type: "bot",
-      text: aiResponse,
-      timestamp: new Date(),
-    });
+    // Step 1: Try local knowledge first
+    const localResponse = routeQuery(messageText);
 
-    conversationHistory.value.push(
-      { role: "user", content: messageText },
-      { role: "assistant", content: aiResponse }
-    );
+    if (localResponse) {
+      const cardComponent = localResponse.component !== "text"
+        ? resolveComponent(localResponse.component)
+        : null;
+
+      messages.push({
+        id: `bot_${Date.now()}`,
+        type: "bot",
+        text: localResponse.text,
+        timestamp: new Date(),
+        card: !!cardComponent,
+        cardComponent: cardComponent,
+        cardData: localResponse.data || null,
+        source: "local",
+      });
+
+      conversationHistory.value.push(
+        { role: "user", content: messageText },
+        { role: "assistant", content: localResponse.text }
+      );
+    } else {
+      // Step 2: Route to Gemini for reasoning queries
+      const apiMessages = [
+        ...conversationHistory.value,
+        { role: "user", content: messageText },
+      ];
+
+      const result = await sendToGemini(apiMessages, geminiApiKey);
+
+      messages.push({
+        id: `bot_${Date.now()}`,
+        type: "bot",
+        text: result.text,
+        timestamp: new Date(),
+        source: result.source,
+      });
+
+      conversationHistory.value.push(
+        { role: "user", content: messageText },
+        { role: "assistant", content: result.text }
+      );
+    }
 
     if (conversationHistory.value.length > 20) {
       conversationHistory.value = conversationHistory.value.slice(-20);
@@ -217,9 +221,7 @@ const sendMessage = async (messageText) => {
     messages.push({
       id: `error_${Date.now()}`,
       type: "bot",
-      text: error.message.includes("API")
-        ? "I'm having trouble connecting to the AI service. Please try again."
-        : "Sorry, I encountered an error. Please try again in a moment.",
+      text: getGeminiErrorMessage(error),
       timestamp: new Date(),
     });
   } finally {
@@ -249,9 +251,6 @@ const formatTime = (timestamp) => {
 </script>
 
 <style scoped>
-/* ==========================================================
-   Design tokens — 8px grid, restrained palette
-   ========================================================== */
 .ai-landing {
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -267,9 +266,7 @@ const formatTime = (timestamp) => {
   font-family: var(--ff-poppins);
 }
 
-/* ==========================================================
-   Top bar
-   ========================================================== */
+/* Top bar */
 .ai-topbar {
   display: flex;
   align-items: center;
@@ -323,9 +320,7 @@ const formatTime = (timestamp) => {
   display: inline;
 }
 
-/* ==========================================================
-   Main content
-   ========================================================== */
+/* Main */
 .ai-main {
   flex: 1;
   display: flex;
@@ -333,9 +328,7 @@ const formatTime = (timestamp) => {
   overflow-y: auto;
 }
 
-/* ==========================================================
-   Welcome — calm, centered, input-focused
-   ========================================================== */
+/* Welcome */
 .ai-welcome {
   flex: 1;
   display: flex;
@@ -374,9 +367,7 @@ const formatTime = (timestamp) => {
   line-height: 1.5;
 }
 
-/* ==========================================================
-   Messages
-   ========================================================== */
+/* Messages */
 .ai-messages {
   flex: 1;
   padding: 24px;
@@ -420,7 +411,14 @@ const formatTime = (timestamp) => {
   word-wrap: break-word;
 }
 
-.ai-msg.bot .ai-msg-text {
+.ai-msg-text--card-intro {
+  padding: 0 0 4px;
+  background: transparent;
+  border: none;
+  color: var(--light-gray);
+}
+
+.ai-msg.bot .ai-msg-text:not(.ai-msg-text--card-intro) {
   background: var(--eerie-black-2);
   color: var(--light-gray);
   border: 1px solid var(--onyx);
@@ -451,7 +449,7 @@ const formatTime = (timestamp) => {
   text-align: right;
 }
 
-/* Typing indicator */
+/* Typing */
 .ai-typing {
   display: flex;
   gap: 4px;
@@ -483,9 +481,7 @@ const formatTime = (timestamp) => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==========================================================
-   Input area — the hero
-   ========================================================== */
+/* Input */
 .ai-input-area {
   padding: 12px 24px 20px;
   flex-shrink: 0;
@@ -607,9 +603,7 @@ const formatTime = (timestamp) => {
   opacity: 0.5;
 }
 
-/* ==========================================================
-   Responsive
-   ========================================================== */
+/* Responsive */
 @media (max-width: 580px) {
   .ai-topbar {
     padding: 12px 16px;
