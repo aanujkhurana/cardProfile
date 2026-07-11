@@ -1,10 +1,11 @@
 <template>
-  <div class="ai-landing">
+  <div class="ai-landing" @mousemove="handleMouseMove">
     <!-- Background layers -->
     <div class="ai-bg">
       <div class="ai-bg-glow ai-bg-glow--1"></div>
       <div class="ai-bg-glow ai-bg-glow--2"></div>
       <div class="ai-bg-glow ai-bg-glow--3"></div>
+      <div class="ai-bg-spotlight" ref="spotlightRef"></div>
       <div class="ai-bg-grid"></div>
       <div class="ai-bg-grain"></div>
     </div>
@@ -25,12 +26,12 @@
     <div class="ai-main">
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">
-        <span class="ai-welcome-label">AI-Powered Portfolio</span>
-        <div class="ai-welcome-avatar">
+        <span class="ai-welcome-label ai-stagger" data-delay="1">AI-Powered Portfolio</span>
+        <div class="ai-welcome-avatar ai-stagger" data-delay="2">
           <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" />
         </div>
-        <h1 class="ai-welcome-title">Meet Anuj through conversation.</h1>
-        <p class="ai-welcome-subtitle">Learn about my software engineering experience, projects, technical skills, and the products I've built through a natural conversation instead of browsing a traditional portfolio.</p>
+        <h1 class="ai-welcome-title ai-stagger" data-delay="3">Meet Anuj through conversation.</h1>
+        <p class="ai-welcome-subtitle ai-stagger" data-delay="4">Learn about my software engineering experience, projects, technical skills, and the products I've built through a natural conversation instead of browsing a traditional portfolio.</p>
       </div>
 
       <!-- Chat messages -->
@@ -93,7 +94,7 @@
 
     <!-- Input area -->
     <div class="ai-input-area">
-      <div v-if="messages.length <= 1" class="ai-chips">
+      <div v-if="messages.length <= 1" class="ai-chips ai-stagger" data-delay="6">
         <button
           v-for="q in defaultQuestions"
           :key="q.label"
@@ -105,7 +106,7 @@
         </button>
       </div>
 
-      <div class="ai-input-row">
+      <div class="ai-input-row ai-stagger" data-delay="5">
         <input
           ref="messageInput"
           v-model="currentMessage"
@@ -145,6 +146,7 @@ const conversationHistory = ref([]);
 
 const messagesContainer = ref(null);
 const messageInput = ref(null);
+const spotlightRef = ref(null);
 
 const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -159,6 +161,15 @@ onMounted(() => {
   messages.push(welcomeMessage);
   nextTick(() => messageInput.value?.focus());
 });
+
+const handleMouseMove = (e) => {
+  if (!spotlightRef.value) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  spotlightRef.value.style.transform = `translate(${x - 200}px, ${y - 200}px)`;
+  spotlightRef.value.style.opacity = "1";
+};
 
 watch(
   () => messages.length,
@@ -374,6 +385,18 @@ const formatTime = (timestamp) => {
   opacity: 0.4;
 }
 
+.ai-bg-spotlight {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsla(45, 54%, 58%, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.15s ease-out;
+  will-change: transform;
+}
+
 /* Top bar */
 .ai-topbar {
   display: flex;
@@ -419,12 +442,14 @@ const formatTime = (timestamp) => {
   color: var(--light-gray-70);
   font-size: 13px;
   border: 1px solid var(--onyx);
-  transition: color 150ms ease, border-color 150ms ease;
+  transition: color 150ms ease, border-color 150ms ease, transform 200ms var(--ease), box-shadow 180ms ease;
 }
 
 .ai-browse-btn:hover {
   color: var(--white-2);
-  border-color: var(--light-gray-70);
+  border-color: hsla(45, 54%, 58%, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px hsla(0, 0%, 0%, 0.15);
 }
 
 .ai-browse-btn ion-icon {
@@ -494,6 +519,31 @@ const formatTime = (timestamp) => {
   color: var(--light-gray-70);
   font-size: 14px;
   line-height: 1.5;
+}
+
+/* Staggered entrance animations */
+.ai-stagger {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: stagger-in 0.5s var(--ease) forwards;
+}
+
+.ai-stagger[data-delay="1"] { animation-delay: 0.1s; }
+.ai-stagger[data-delay="2"] { animation-delay: 0.2s; }
+.ai-stagger[data-delay="3"] { animation-delay: 0.35s; }
+.ai-stagger[data-delay="4"] { animation-delay: 0.5s; }
+.ai-stagger[data-delay="5"] { animation-delay: 0.65s; }
+.ai-stagger[data-delay="6"] { animation-delay: 0.75s; }
+
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Messages */
@@ -626,19 +676,20 @@ const formatTime = (timestamp) => {
   color: var(--light-gray);
   font-size: 12px;
   border: 1px solid var(--onyx);
-  transition: color 150ms ease, border-color 150ms ease, transform 150ms var(--ease);
+  transition: color 150ms ease, border-color 150ms ease, transform 180ms var(--ease), box-shadow 180ms ease;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .ai-followup-chip:hover:not(:disabled) {
   color: var(--white-2);
-  border-color: var(--light-gray-70);
-  transform: scale(1.03);
+  border-color: hsla(45, 54%, 58%, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px hsla(0, 0%, 0%, 0.15);
 }
 
 .ai-followup-chip:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: translateY(0) scale(0.97);
 }
 
 .ai-followup-chip:disabled {
@@ -672,19 +723,21 @@ const formatTime = (timestamp) => {
   color: var(--light-gray);
   font-size: 13px;
   border: 1px solid var(--onyx);
-  transition: color 150ms ease, border-color 150ms ease, transform 150ms var(--ease);
+  transition: color 150ms ease, border-color 150ms ease, transform 180ms var(--ease), box-shadow 180ms ease, background 150ms ease;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .ai-chip:hover:not(:disabled) {
   color: var(--white-2);
-  border-color: var(--light-gray-70);
-  transform: scale(1.03);
+  border-color: hsla(45, 54%, 58%, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px hsla(0, 0%, 0%, 0.2);
+  background: hsla(45, 54%, 58%, 0.06);
 }
 
 .ai-chip:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: translateY(0) scale(0.97);
 }
 
 .ai-chip:disabled {
@@ -702,11 +755,13 @@ const formatTime = (timestamp) => {
   border: 1px solid var(--onyx);
   border-radius: var(--radius-md);
   padding: 4px 4px 4px 16px;
-  transition: border-color 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms var(--ease);
 }
 
 .ai-input-row:focus-within {
-  border-color: var(--light-gray-70);
+  border-color: var(--vegas-gold);
+  box-shadow: 0 0 0 3px hsla(45, 54%, 58%, 0.1), 0 4px 16px hsla(0, 0%, 0%, 0.15);
+  transform: translateY(-1px);
 }
 
 .ai-input {
@@ -738,17 +793,18 @@ const formatTime = (timestamp) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 150ms ease, transform 150ms var(--ease);
+  transition: opacity 150ms ease, transform 200ms var(--ease), box-shadow 180ms ease;
   flex-shrink: 0;
 }
 
 .ai-send:hover:not(:disabled) {
-  opacity: 0.85;
-  transform: scale(1.05);
+  opacity: 0.9;
+  transform: scale(1.08);
+  box-shadow: 0 2px 12px hsla(0, 0%, 100%, 0.15);
 }
 
 .ai-send:active:not(:disabled) {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .ai-send:disabled {
@@ -768,6 +824,41 @@ const formatTime = (timestamp) => {
   color: var(--light-gray-70);
   margin-top: 10px;
   opacity: 0.5;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ai-stagger {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .ai-bg-glow {
+    animation: none;
+    opacity: 1;
+  }
+
+  .ai-bg-spotlight {
+    display: none;
+  }
+
+  .ai-msg {
+    animation: none;
+  }
+
+  .ai-typing span {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  .ai-chip,
+  .ai-followup-chip,
+  .ai-send,
+  .ai-browse-btn,
+  .ai-input-row {
+    transition-duration: 0.01ms;
+  }
 }
 
 /* Responsive */
