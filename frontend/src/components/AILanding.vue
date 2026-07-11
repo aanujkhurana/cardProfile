@@ -476,28 +476,31 @@ const formatTime = (timestamp) => {
   align-items: center;
   justify-content: center;
   padding: 32px 24px 0;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
 .ai-welcome-label {
   display: inline-block;
   font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--vegas-gold);
   background: hsla(45, 54%, 58%, 0.1);
-  padding: 5px 14px;
+  padding: 6px 16px;
   border-radius: 20px;
   border: 1px solid hsla(45, 54%, 58%, 0.15);
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .ai-welcome-avatar {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  border: 2px solid hsla(45, 54%, 58%, 0.2);
 }
 
 .ai-welcome-avatar img {
@@ -508,17 +511,21 @@ const formatTime = (timestamp) => {
 
 .ai-welcome-title {
   color: var(--white-2);
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  margin-bottom: 8px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin-bottom: 14px;
+  text-align: center;
 }
 
 .ai-welcome-subtitle {
   color: var(--light-gray-70);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.65;
+  text-align: center;
+  max-width: 520px;
+  letter-spacing: -0.005em;
 }
 
 /* Staggered entrance animations */
@@ -586,8 +593,9 @@ const formatTime = (timestamp) => {
   padding: 10px 14px;
   border-radius: var(--radius-md);
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.65;
   word-wrap: break-word;
+  letter-spacing: -0.005em;
 }
 
 .ai-msg-text--card-intro {
@@ -880,7 +888,7 @@ const formatTime = (timestamp) => {
   }
 
   .ai-welcome-title {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .ai-messages {
