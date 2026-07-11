@@ -79,6 +79,12 @@ const showAI = ref(true);
   display: inline;
 }
 
+@media (min-width: 1250px) {
+  .website-wrapper {
+    display: contents;
+  }
+}
+
 @media (max-width: 580px) {
   .back-to-ai-btn {
     bottom: 80px;
