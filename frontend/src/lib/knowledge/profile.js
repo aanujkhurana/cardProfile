@@ -23,17 +23,25 @@
  */
 
 export const profile = {
+  // Keep `title` as the conventional job title (recruiter search filters
+  // typically exact-match on "Full Stack Developer"). AI/LLM focus is
+  // carried by `headline`, `narrative`, and `currentFocus` below —
+  // surfacing it in `title` overstates the current scope.
   name: "Anuj Khurana",
-  title: "Full Stack Developer · AI/LLM Engineering",
+  title: "Full Stack Developer",
   headline:
     "Three years shipping production web and AI applications across Vue 3, TypeScript, and Node.js.",
   narrative:
     "Started as an intern at Gilmour Space Technologies, building a D3 + Vue tree chart for satellite-assembly data and learning that great UI is half correctness, half empathy. Three years on, I'm at GoDesta leading a Vue 2 → Vue 3 migration that produced a measured 15% performance gain against Lighthouse and Core Web Vitals. Currently deepening AI/LLM engineering and real-time systems (WebRTC) — and shipping this conversational portfolio assistant as a working demonstration of the work.",
   summary: `I started as a frontend engineer building data-viz tools for satellite-assembly data at Gilmour Space Technologies, and I've spent the three years since shipping production web and AI applications across Vue 3, TypeScript, and Node.js. At GoDesta I led the Vue 2 → Vue 3 migration end-to-end — hardening the build, fixing reactivity regressions, and validating a 15% performance improvement against Lighthouse and Core Web Vitals.
 
-Most of my work sits at the intersection of frontend performance, product thinking, and AI. I've shipped FindMyLease (Vue 3, AWS Cognito, Prisma, Mapbox) end-to-end, an interactive D3 OrgChart UI, a one-click URL summarizer built on the OpenAI API, and this very portfolio — a server-side Gemini proxy that holds the API key off the client and a local-knowledge intent router that answers most queries in under a second.
+Most of my work sits at the intersection of frontend performance, product thinking, and AI. I've shipped FindMyLease (Vue 3, AWS Cognito, Prisma, Mapbox) end-to-end, an interactive D3 OrgChart UI, a one-click URL summarizer built on the OpenAI API, and this very portfolio — a server-side Gemini proxy that holds the API key off the client and a local-knowledge intent router that handles most queries without a Gemini round-trip.
 
 Comfortable across the stack — frontend, API design, Postgres, serverless — and equally comfortable on the product side. I'd rather ship a smaller thing that someone uses than a larger thing that ships late. Currently deepening real-time systems (WebRTC) and AI/LLM engineering, and looking for a team that values craft and shipping measured impact.`,
+  // Note: Card.vue (static portfolio) and the AI ProfileCard share the
+  // intent and metrics of this copy. Card.vue keeps its own text for
+  // layout reasons — if you edit `narrative` or `summary` here, mirror
+  // the change in src/components/Card.vue's <section class="about-text">.
   location: "Queensland, Australia",
   currentFocus: [
     "AI & LLM App Engineering",

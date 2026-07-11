@@ -131,6 +131,9 @@
         <h2 class="h2 article-title">About me</h2>
       </header>
 
+      <!-- ⚠️  Keep this <section class="about-text"> in sync with
+           src/lib/knowledge/profile.js (narrative + summary). They are
+           intentionally separate text sources for layout reasons. -->
       <section class="about-text">
         <p>
           Three years of shipping production web and AI applications across Vue 3,
@@ -140,8 +143,8 @@
           Web Vitals. I’ve shipped FindMyLease end-to-end, an interactive D3 OrgChart
           UI, a one-click URL summarizer built on the OpenAI API, and this very
           portfolio — a server-side Gemini proxy that keeps the API key off the
-          browser and a local-knowledge intent router that answers most queries in
-          under a second.
+          browser and a local-knowledge intent router that handles most queries
+          without a Gemini round-trip.
         </p>
 
         <p>
