@@ -133,20 +133,26 @@
 
       <section class="about-text">
         <p>
-          Hi, I’m Anuj Khurana — I build products, not just features. As a Full Stack
-          Software Engineer, I combine modern web technologies, cloud infrastructure, and
-          AI to rapidly transform ideas into production-ready applications. I enjoy
-          solving difficult engineering challenges, improving developer workflows, and
-          building software that is fast, scalable, and genuinely useful
+          Three years of shipping production web and AI applications across Vue 3,
+          TypeScript, and Node.js. At GoDesta I led the Vue 2 → Vue 3 migration
+          end-to-end — hardening the build, fixing reactivity regressions, and
+          validating a measured 15% performance gain against Lighthouse and Core
+          Web Vitals. I’ve shipped FindMyLease end-to-end, an interactive D3 OrgChart
+          UI, a one-click URL summarizer built on the OpenAI API, and this very
+          portfolio — a server-side Gemini proxy that keeps the API key off the
+          browser and a local-knowledge intent router that answers most queries in
+          under a second.
         </p>
 
-        <!-- <p>
-          I’ve led frontend migrations, boosted performance, and crafted interfaces that
-          feel as good as they look. I hold a Master’s in Software Development, love
-          system design and clean architecture, and I’m always up for a new challenge —
-          especially if it means learning something cool along the way.
-        </p> -->
-        <p>🚀 Let’s build something amazing.</p>
+        <p>
+          I’m comfortable across the stack — frontend, API design, Postgres,
+          serverless — and equally comfortable on the product side. I’d rather
+          ship a smaller thing that someone uses than a larger thing that ships late.
+          Currently deepening real-time systems (WebRTC) and AI/LLM engineering,
+          and looking for a team that values craft and shipping measured impact.
+        </p>
+
+        <p>🚀 Let’s build something measurable.</p>
       </section>
       <!-- SERVICES -->
       <section class="service">

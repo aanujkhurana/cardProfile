@@ -378,10 +378,12 @@ function buildProfileResponse() {
   return {
     type: "local",
     component: "profile-card",
-    text: profile.summary,
+    text: profile.narrative,
     data: {
       name: profile.name,
       title: profile.title,
+      headline: profile.headline,
+      narrative: profile.narrative,
       location: profile.location,
       currentFocus: profile.currentFocus,
       techStack: profile.techStack,
