@@ -16,11 +16,12 @@
     <div class="ai-main">
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">
+        <span class="ai-welcome-label">AI-Powered Portfolio</span>
         <div class="ai-welcome-avatar">
-          <img src="../assets/images/my-avatar.png" alt="AI Assistant" />
+          <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" />
         </div>
-        <h1 class="ai-welcome-title">How can I help you?</h1>
-        <p class="ai-welcome-subtitle">Ask about Anuj's skills, projects, or experience.</p>
+        <h1 class="ai-welcome-title">Meet Anuj through conversation.</h1>
+        <p class="ai-welcome-subtitle">Learn about my software engineering experience, projects, technical skills, and the products I've built through a natural conversation instead of browsing a traditional portfolio.</p>
       </div>
 
       <!-- Chat messages -->
@@ -100,7 +101,7 @@
           ref="messageInput"
           v-model="currentMessage"
           @keydown.enter="handleSendMessage"
-          placeholder="Ask anything..."
+          placeholder="Ask anything about my work..."
           class="ai-input"
           :disabled="isTyping"
           autofocus
@@ -114,7 +115,7 @@
           <ion-icon name="arrow-up-outline"></ion-icon>
         </button>
       </div>
-      <p class="ai-footnote">AI can make mistakes. Check important info.</p>
+      <p class="ai-footnote">AI-generated responses. Verify critical details independently.</p>
     </div>
   </div>
 </template>
@@ -141,7 +142,7 @@ const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const welcomeMessage = {
   id: "welcome",
   type: "bot",
-  text: "Hi! I'm Anuj's portfolio AI. I can tell you about his projects, skills, and experience. What would you like to know?",
+  text: "Welcome! I'm an AI-powered guide to Anuj's work. Ask me about his experience, projects, skills, or anything else you'd like to know.",
   timestamp: new Date(),
 };
 
@@ -222,9 +223,9 @@ const sendMessage = async (messageText) => {
         timestamp: new Date(),
         source: result.source,
         followUp: [
-          "Tell me about your skills",
-          "Show me your projects",
-          "What's your work experience?",
+          "Tell me about your experience",
+          "What projects are you most proud of?",
+          "What technologies do you specialize in?",
         ],
       });
 
@@ -245,8 +246,8 @@ const sendMessage = async (messageText) => {
       text: getGeminiErrorMessage(error),
       timestamp: new Date(),
       followUp: [
-        "Tell me about your skills",
-        "Show me your projects",
+        "Tell me about your experience",
+        "What projects are you most proud of?",
         "How can I contact you?",
       ],
     });
@@ -362,6 +363,20 @@ const formatTime = (timestamp) => {
   align-items: center;
   justify-content: center;
   padding: 32px 24px 0;
+}
+
+.ai-welcome-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vegas-gold);
+  background: hsla(45, 54%, 58%, 0.1);
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid hsla(45, 54%, 58%, 0.15);
+  margin-bottom: 24px;
 }
 
 .ai-welcome-avatar {
