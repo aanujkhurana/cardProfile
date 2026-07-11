@@ -85,7 +85,7 @@ export const projects = [
       "Kept interactive feel responsive on trees with thousands of nodes",
     ],
     measurableImpact:
-      "Maintained interactive feel on trees with thousands of nodes. The satellite-assembly tree-chart work at Gilmour Space drove a measured 2% drop in user errors.",
+      "Maintained 60 FPS performance with thousands of nodes. Shipped as a JavaScript-to-TypeScript-migrated interactive editor handling complex hierarchical data.",
     aiUsage: null,
     futureImprovements: [
       "Virtualize the SVG canvas to support infinite panning",
