@@ -43,6 +43,28 @@
       Key Achievements
     </h4>
 
+    <section
+      v-if="data.highlights?.length"
+      class="ai-highlights-hero"
+      aria-labelledby="achievements-highlights-title"
+    >
+      <h5 id="achievements-highlights-title" class="ai-highlights-title">
+        <ion-icon name="trending-up-outline" aria-hidden="true"></ion-icon>
+        Highlights at a glance
+      </h5>
+      <div class="ai-highlights-grid">
+        <div
+          v-for="h in data.highlights"
+          :key="h.id"
+          class="ai-highlight-tile"
+        >
+          <span class="ai-highlight-tile-metric">{{ h.metric }}</span>
+          <span class="ai-highlight-tile-title">{{ h.title }}</span>
+          <span v-if="h.period" class="ai-highlight-tile-period">{{ h.period }}</span>
+        </div>
+      </div>
+    </section>
+
     <div class="ai-achievement-grid">
       <article
         v-for="item in data.achievements"
@@ -356,6 +378,88 @@ function hasCaseStudyContent(item) {
 .ai-source-link ion-icon {
   font-size: 12px;
   display: inline;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Phase 6.6 — Highlights at a glance hero tiles                      */
+/* ------------------------------------------------------------------ */
+
+.ai-highlights-hero {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: hsla(45, 100%, 72%, 0.04);
+  border: 1px solid hsla(45, 100%, 72%, 0.12);
+  border-radius: 10px;
+}
+
+.ai-highlights-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  color: var(--white-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.ai-highlights-title ion-icon {
+  color: var(--orange-yellow-crayola);
+  font-size: 14px;
+  display: inline;
+}
+
+.ai-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.ai-highlight-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--eerie-black-1);
+  border: 1px solid var(--onyx);
+  border-radius: 8px;
+  transition: border-color 150ms ease, transform 180ms var(--ease, ease);
+}
+
+.ai-highlight-tile:hover {
+  border-color: hsla(45, 100%, 72%, 0.35);
+  transform: translateY(-1px);
+}
+
+.ai-highlight-tile-metric {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--vegas-gold);
+  background: linear-gradient(45deg, var(--vegas-gold), var(--orange-yellow-crayola));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ai-highlight-tile-title {
+  color: var(--white-2);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.ai-highlight-tile-period {
+  color: var(--light-gray-70);
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+@media (max-width: 480px) {
+  .ai-highlights-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ------------------------------------------------------------------ */

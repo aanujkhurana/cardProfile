@@ -20,6 +20,13 @@
  *     data envelope so AchievementCard can deep-link to the driving
  *     case study. `null` for work that isn't a portfolio project
  *     (e.g. GoDesta production work, internship, education, certs).
+ *   - highlight: optional. When `true`, the router surfaces the entry
+ *     in a separate `highlights` array so AchievementCard can render
+ *     a "Highlights at a glance" hero tile at the top of the card.
+ *     Only the 3 work wins (Vue 3 migration, FindMyLease ship, AI
+ *     Portfolio Assistant) are flagged; the 2% Gilmour internship,
+ *     the Griffith Master's, and the FCC cert stay off so the hero
+ *     stays tight on portfolio-grade numbers.
  */
 
 export const achievements = [
@@ -31,6 +38,7 @@ export const achievements = [
       "Owned the migration end-to-end across a production storefront, hardening the build, fixing reactivity gotchas, and validating the 15% speed-up against Lighthouse and Core Web Vitals.",
     period: "May 2024 – Present",
     sourceProject: null, // GoDesta production work — not a portfolio project.
+    highlight: true, // Surface in the "Highlights at a glance" hero tiles.
     tags: ["frontend", "vue", "performance", "leadership"],
   },
   {
@@ -51,6 +59,7 @@ export const achievements = [
       "Vue 3 + Node.js + PostgreSQL + AWS Cognito + Mapbox. Real-time map filtering, multi-role auth, and Prisma ORM over RDS.",
     period: "Independent build",
     sourceProject: "FindMyLease",
+    highlight: true,
     tags: ["fullstack", "vue", "aws", "shipping"],
   },
   {
@@ -61,6 +70,7 @@ export const achievements = [
       "Vercel serverless function holding the Gemini API key server-side, with input sanitization, role allowlist, and a graceful local-knowledge fallback.",
     period: "2026",
     sourceProject: "AI Portfolio Assistant (this site)",
+    highlight: true,
     tags: ["ai", "security", "shipping", "leadership"],
   },
   {

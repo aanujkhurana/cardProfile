@@ -442,6 +442,18 @@ function buildAchievementsResponse() {
     component: "achievements-card",
     text: `Here are ${achievements.length} quantified wins, awards, and milestones from Anuj's work so far.`,
     data: {
+      // Phase 6.6: surface the `highlight: true` entries as a separate
+      // hero array so AchievementCard can render a "Highlights at a
+      // glance" tile grid at the top. Only the 3 work wins are flagged
+      // so the hero stays tight on portfolio-grade numbers.
+      highlights: achievements
+        .filter((a) => a.highlight === true)
+        .map((a) => ({
+          id: a.id,
+          title: a.title,
+          metric: a.metric,
+          period: a.period,
+        })),
       achievements: achievements.map((a) => {
         // Look up the optional sourceProject (exact match on projects.js
         // name). When absent (GoDesta work, internship, education, certs)
