@@ -359,8 +359,7 @@ function buildContactResponse() {
     data: {
       ...contact,
       visaStatus: profile.visaStatus,
-      availabilityNote:
-        "Anuj is currently open to opportunities and responds within 24 hours.",
+      availabilityNote: profile.availabilityNote,
     },
     followUp: [
       "Show me your projects",
@@ -374,8 +373,12 @@ function buildAvailabilityResponse() {
   return {
     type: "local",
     component: "contact-card",
-    text: `Anuj is currently open to opportunities. ${profile.visaStatus}. Feel free to reach out!`,
-    data: { ...contact },
+    text: `${profile.availabilityNote}. ${profile.visaStatus}. Feel free to reach out!`,
+    data: {
+      ...contact,
+      visaStatus: profile.visaStatus,
+      availabilityNote: profile.availabilityNote,
+    },
     followUp: [
       "Tell me about your skills",
       "Show me your projects",

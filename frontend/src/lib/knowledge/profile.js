@@ -49,6 +49,20 @@ Comfortable across the stack — frontend, API design, Postgres, serverless — 
     "Real-time Systems (WebRTC)",
   ],
   visaStatus: "VISA 485 with full working rights in Australia, valid until 2029",
+  /**
+   * Human-readable availability statement surfaced in:
+   *   - the ContactCard badge (Phase 7, with a live pulse dot)
+   *   - the persona prompt so Gemini can answer "are you open to
+   *     opportunities?" directly
+   *   - the buildContactResponse and buildAvailabilityResponse
+   *     data envelopes in src/lib/knowledge/router.js
+   *
+   * ⚠️  When you change this string, mirror the change in any card
+   *     that renders the full note (ContactCard's badge) so the
+   *     visible copy matches the persona prompt.
+   */
+  availabilityNote:
+    "Currently open to opportunities · Responds within 24 hours",
   contact: {
     phone: "+61 48 12 50 988",
     email: "aanujkhurana@gmail.com",

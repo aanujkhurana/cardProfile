@@ -1,9 +1,36 @@
+<!--
+  ContactCard — renders the structured contact data delivered by
+  the `contact` and `availability` intents in
+  src/lib/knowledge/router.js.
+
+  Phase 7 update: surfaces `availabilityNote` as a prominent green
+  badge at the top of the card, right under the section title, with
+  a live pulse dot. A pre-existing v-if="data.availability" bug
+  (router sends `availabilityNote`, not `availability`) meant the
+  badge never actually showed before — this commit fixes that
+  field name, renames the class to `ai-availability-badge`, and
+  elevates the visual treatment.
+
+  The pulse animation is disabled via prefers-reduced-motion so
+  motion-sensitive users see a static dot.
+-->
+
 <template>
   <div class="ai-section">
     <h4 class="ai-section-title">
       <ion-icon name="mail-outline"></ion-icon>
       Contact
     </h4>
+
+    <div
+      v-if="data.availabilityNote"
+      class="ai-availability-badge"
+      role="status"
+      aria-live="polite"
+    >
+      <span class="ai-availability-dot" aria-hidden="true"></span>
+      <span class="ai-availability-text">{{ data.availabilityNote }}</span>
+    </div>
 
     <div class="ai-contact-grid">
       <a :href="`mailto:${data.email}`" class="ai-contact-item">
@@ -38,11 +65,6 @@
         </div>
       </div>
     </div>
-
-    <div v-if="data.availability" class="ai-availability">
-      <ion-icon name="checkmark-circle-outline"></ion-icon>
-      {{ data.availability }}
-    </div>
   </div>
 </template>
 
@@ -74,6 +96,61 @@ defineProps({ data: { type: Object, required: true } });
   font-size: 16px;
   display: inline;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Phase 7 — Currently open to opportunities badge                    */
+/* ------------------------------------------------------------------ */
+
+.ai-availability-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  border-radius: 8px;
+  color: #4ade80;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.ai-availability-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+  animation: ai-pulse-dot 2s ease-out infinite;
+}
+
+.ai-availability-text {
+  flex: 1;
+}
+
+@keyframes ai-pulse-dot {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(74, 222, 128, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-availability-dot {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Contact grid                                                       */
+/* ------------------------------------------------------------------ */
 
 .ai-contact-grid {
   display: grid;
@@ -107,6 +184,7 @@ a.ai-contact-item:hover {
 .ai-contact-item div {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .ai-contact-label {
@@ -119,25 +197,9 @@ a.ai-contact-item:hover {
 .ai-contact-value {
   font-size: 12px;
   color: var(--white-2);
-}
-
-.ai-availability {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  padding: 8px 12px;
-  background: rgba(74, 222, 128, 0.08);
-  border: 1px solid rgba(74, 222, 128, 0.2);
-  border-radius: 8px;
-  color: #4ade80;
-  font-size: 12px;
-}
-
-.ai-availability ion-icon {
-  font-size: 14px;
-  color: inherit;
-  display: inline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 400px) {
