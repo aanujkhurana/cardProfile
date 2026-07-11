@@ -5,12 +5,13 @@ import vue from '@vitejs/plugin-vue'
 //
 // Dev proxy notes:
 //  - `/api/gemini` is proxied to a local Vercel dev server on port 3000.
-//    Run `npx vercel dev` in another terminal to bring the serverless
+//    Run `npm run dev` (which boots both `vite` and `vercel dev` via
+//    `concurrently --kill-others-on-fail`) to bring the serverless
 //    function online. Without Vercel dev running, frontend calls will
-//    return 504 and the assistant will gracefully degrade to local-only.
-//  - `/api/chat` is kept as a fallback for the legacy Chatbox surface
-//    but Chatbox.vue is being phased out; this proxy entry will be
-//    dropped in a later milestone.
+//    return a friendly "running in local-only mode" message.
+//  - The legacy `/api/chat` proxy to the external openai-proxy Vercel
+//    deployment was removed in this branch — Chatbox.vue is gone and
+//    nothing else calls /api/chat.
 export default defineConfig({
   base: '/',
   plugins: [vue()],
@@ -21,11 +22,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
-      '/api/chat': {
-        target: 'https://openai-proxy-mujovdlo3-anuj-khuranas-projects.vercel.app',
-        changeOrigin: true,
-        secure: true,
-      },
     },
   },
 })
+

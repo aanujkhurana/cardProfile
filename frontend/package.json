@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n web,api -c cyan,magenta \"vite\" \"vercel dev --listen 3000\"",
+    "dev": "concurrently --kill-others-on-fail -n web,api -c cyan,magenta \"vite\" \"vercel dev --listen 3000\"",
     "dev:web": "vite",
     "dev:api": "vercel dev --listen 3000",
     "build": "vite build",

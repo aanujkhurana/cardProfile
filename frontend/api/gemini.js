@@ -136,10 +136,13 @@ export default async function handler(req, res) {
     typeof body.systemInstruction === "string" ? body.systemInstruction : "";
   const payload = buildPayload(messages, systemInstruction);
 
-  // The URL stays server-only, so `?key=` is safe as a defense-in-depth
-  // fallback for endpoints where header auth is rejected. We continue to
-  // send the header as the primary form so the key never reaches logs/CDNs.
-  const url = `${GEMINI_API_BASE}/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  // Header-only auth: the API key rides in `x-goog-api-key` and never
+  // appears in the URL. The URL stays server-only anyway, but keeping
+  // the key out of it prevents accidental log leakage if a future
+  // deployment pipes request URLs into observability tooling.
+  // (Earlier draft added `?key=` as defense-in-depth; removed because the
+  // public Generative Language API rejects duplicate auth on some models.)
+  const url = `${GEMINI_API_BASE}/${encodeURIComponent(model)}:generateContent`;
 
   // Single attempt here. The frontend already retries 3 times with
   // exponential backoff; duplicating retries server-side would just
