@@ -3,7 +3,11 @@
     <!-- Top bar -->
     <header class="ai-topbar">
       <div class="ai-topbar-brand">
-        <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" class="ai-topbar-avatar" />
+        <img
+          src="../assets/images/my-avatar.png"
+          alt="Anuj Khurana"
+          class="ai-topbar-avatar"
+        />
         <span class="ai-topbar-name">Anuj Khurana</span>
       </div>
       <button class="ai-browse-btn" @click="$emit('browse-website')">
@@ -14,26 +18,13 @@
 
     <!-- Main content -->
     <div class="ai-main">
-      <!-- Empty state / welcome -->
+      <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">
-        <div class="ai-avatar">
+        <div class="ai-welcome-avatar">
           <img src="../assets/images/my-avatar.png" alt="AI Assistant" />
         </div>
-        <h1 class="ai-welcome-title">Hi, I'm Anuj's AI Assistant</h1>
-        <p class="ai-welcome-subtitle">Ask me anything about Anuj's skills, projects, or experience.</p>
-
-        <!-- Suggestion chips -->
-        <div class="ai-suggestions">
-          <button
-            v-for="suggestion in suggestions"
-            :key="suggestion"
-            class="ai-suggestion-chip"
-            @click="sendMessage(suggestion)"
-            :disabled="isTyping"
-          >
-            {{ suggestion }}
-          </button>
-        </div>
+        <h1 class="ai-welcome-title">How can I help you?</h1>
+        <p class="ai-welcome-subtitle">Ask about Anuj's skills, projects, or experience.</p>
       </div>
 
       <!-- Chat messages -->
@@ -63,38 +54,49 @@
             <img src="../assets/images/my-avatar.png" alt="AI" />
           </div>
           <div class="ai-msg-content">
-            <div class="ai-typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
+            <div class="ai-typing">
+              <span></span><span></span><span></span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Input area -->
+    <!-- Input area — primary focal point -->
     <div class="ai-input-area">
-      <div class="ai-input-wrapper">
+      <!-- Suggestion chips above input when no messages yet -->
+      <div v-if="messages.length <= 1" class="ai-chips">
+        <button
+          v-for="suggestion in suggestions"
+          :key="suggestion"
+          class="ai-chip"
+          @click="sendMessage(suggestion)"
+          :disabled="isTyping"
+        >
+          {{ suggestion }}
+        </button>
+      </div>
+
+      <div class="ai-input-row">
         <input
           ref="messageInput"
           v-model="currentMessage"
           @keydown.enter="handleSendMessage"
-          placeholder="Ask about projects, skills, or experience..."
-          class="ai-message-input"
+          placeholder="Ask anything..."
+          class="ai-input"
           :disabled="isTyping"
           autofocus
         />
         <button
           @click="handleSendMessage"
-          class="ai-send-btn"
+          class="ai-send"
           :disabled="!currentMessage.trim() || isTyping"
-          aria-label="Send message"
+          aria-label="Send"
         >
           <ion-icon name="arrow-up-outline"></ion-icon>
         </button>
       </div>
-      <p class="ai-input-hint">AI can make mistakes. Check important info.</p>
+      <p class="ai-footnote">AI can make mistakes. Check important info.</p>
     </div>
   </div>
 </template>
@@ -105,17 +107,14 @@ import { buildSystemPrompt } from "../lib/chatbox/systemPrompt.js";
 
 const emit = defineEmits(["browse-website"]);
 
-// Reactive state
 const isTyping = ref(false);
 const currentMessage = ref("");
 const messages = reactive([]);
 const conversationHistory = ref([]);
 
-// Template refs
 const messagesContainer = ref(null);
 const messageInput = ref(null);
 
-// Suggestion chips
 const suggestions = [
   "Tell me about your skills",
   "What projects have you built?",
@@ -123,23 +122,19 @@ const suggestions = [
   "How can I contact you?",
 ];
 
-// Welcome message
 const welcomeMessage = {
   id: "welcome",
   type: "bot",
-  text: "Hi! I'm Anuj's portfolio AI. I can tell you about his projects, skills, and experience. What would you like to know?",
+  text:
+    "Hi! I'm Anuj's portfolio AI. I can tell you about his projects, skills, and experience. What would you like to know?",
   timestamp: new Date(),
 };
 
-// Initialize chat
 onMounted(() => {
   messages.push(welcomeMessage);
-  nextTick(() => {
-    messageInput.value?.focus();
-  });
+  nextTick(() => messageInput.value?.focus());
 });
 
-// Auto-scroll to bottom when new messages arrive
 watch(
   () => messages.length,
   async () => {
@@ -148,7 +143,6 @@ watch(
   }
 );
 
-// OpenAI API call function
 const callOpenAI = async (userMessage) => {
   const apiMessages = [
     { role: "system", content: buildSystemPrompt() },
@@ -164,9 +158,7 @@ const callOpenAI = async (userMessage) => {
 
   const response = await fetch(apiUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "gpt-3.5-turbo",
       messages: apiMessages,
@@ -175,15 +167,11 @@ const callOpenAI = async (userMessage) => {
     }),
   });
 
-  if (!response.ok) {
-    throw new Error(`Proxy API error: ${response.status}`);
-  }
-
+  if (!response.ok) throw new Error(`Proxy API error: ${response.status}`);
   const data = await response.json();
   return data.choices[0].message.content;
 };
 
-// Methods
 const scrollToBottom = () => {
   if (messagesContainer.value) {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
@@ -198,26 +186,23 @@ const handleSendMessage = () => {
 };
 
 const sendMessage = async (messageText) => {
-  const userMessage = {
+  messages.push({
     id: `user_${Date.now()}`,
     type: "user",
     text: messageText,
     timestamp: new Date(),
-  };
-  messages.push(userMessage);
+  });
 
   isTyping.value = true;
 
   try {
     const aiResponse = await callOpenAI(messageText);
-
-    const botMessage = {
+    messages.push({
       id: `bot_${Date.now()}`,
       type: "bot",
       text: aiResponse,
       timestamp: new Date(),
-    };
-    messages.push(botMessage);
+    });
 
     conversationHistory.value.push(
       { role: "user", content: messageText },
@@ -229,21 +214,17 @@ const sendMessage = async (messageText) => {
     }
   } catch (error) {
     console.error("Chat error:", error);
-
-    const errorMessage = {
+    messages.push({
       id: `error_${Date.now()}`,
       type: "bot",
       text: error.message.includes("API")
         ? "I'm having trouble connecting to the AI service. Please try again."
         : "Sorry, I encountered an error. Please try again in a moment.",
       timestamp: new Date(),
-    };
-    messages.push(errorMessage);
+    });
   } finally {
     isTyping.value = false;
-    nextTick(() => {
-      messageInput.value?.focus();
-    });
+    nextTick(() => messageInput.value?.focus());
   }
 };
 
@@ -268,7 +249,15 @@ const formatTime = (timestamp) => {
 </script>
 
 <style scoped>
+/* ==========================================================
+   Design tokens — 8px grid, restrained palette
+   ========================================================== */
 .ai-landing {
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
   position: fixed;
   inset: 0;
   z-index: 900;
@@ -278,21 +267,22 @@ const formatTime = (timestamp) => {
   font-family: var(--ff-poppins);
 }
 
-/* Top bar */
+/* ==========================================================
+   Top bar
+   ========================================================== */
 .ai-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 16px 24px;
   border-bottom: 1px solid var(--onyx);
-  background: var(--eerie-black-2);
   flex-shrink: 0;
 }
 
 .ai-topbar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .ai-topbar-avatar {
@@ -304,64 +294,66 @@ const formatTime = (timestamp) => {
 
 .ai-topbar-name {
   color: var(--white-2);
-  font-size: var(--fs-6);
-  font-weight: var(--fw-500);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .ai-browse-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: var(--bg-gradient-jet);
-  color: var(--light-gray);
-  font-size: var(--fs-7);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--light-gray-70);
+  font-size: 13px;
   border: 1px solid var(--onyx);
-  transition: all var(--transition-1);
+  transition: color 150ms ease, border-color 150ms ease;
 }
 
 .ai-browse-btn:hover {
-  color: var(--orange-yellow-crayola);
-  border-color: var(--vegas-gold);
+  color: var(--white-2);
+  border-color: var(--light-gray-70);
 }
 
 .ai-browse-btn ion-icon {
-  font-size: 16px;
+  font-size: 15px;
   color: inherit;
   display: inline;
 }
 
-/* Main content */
+/* ==========================================================
+   Main content
+   ========================================================== */
 .ai-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding: 0;
 }
 
-/* Welcome screen */
+/* ==========================================================
+   Welcome — calm, centered, input-focused
+   ========================================================== */
 .ai-welcome {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 24px;
-  gap: 16px;
+  padding: 32px 24px 0;
 }
 
-.ai-avatar {
-  width: 80px;
-  height: 80px;
+.ai-welcome-avatar {
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 8px;
-  box-shadow: 0 8px 32px rgba(255, 204, 51, 0.15);
+  margin-bottom: 24px;
 }
 
-.ai-avatar img {
+.ai-welcome-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -369,80 +361,46 @@ const formatTime = (timestamp) => {
 
 .ai-welcome-title {
   color: var(--white-2);
-  font-size: var(--fs-2);
-  font-weight: var(--fw-600);
-  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 8px;
 }
 
 .ai-welcome-subtitle {
   color: var(--light-gray-70);
-  font-size: var(--fs-6);
-  text-align: center;
-  max-width: 400px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.ai-suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 24px;
-  max-width: 600px;
-}
-
-.ai-suggestion-chip {
-  padding: 10px 18px;
-  border-radius: 20px;
-  background: var(--bg-gradient-jet);
-  color: var(--light-gray);
-  font-size: var(--fs-7);
-  border: 1px solid var(--onyx);
-  transition: all var(--transition-1);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.ai-suggestion-chip:hover:not(:disabled) {
-  color: var(--orange-yellow-crayola);
-  border-color: var(--vegas-gold);
-  background: var(--eerie-black-2);
-}
-
-.ai-suggestion-chip:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Messages area */
+/* ==========================================================
+   Messages
+   ========================================================== */
 .ai-messages {
   flex: 1;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 768px;
+  max-width: 720px;
   margin: 0 auto;
   width: 100%;
 }
 
 .ai-msg {
   display: flex;
-  gap: 12px;
-  max-width: 100%;
-  animation: ai-msg-in 0.3s ease-out;
+  gap: 10px;
+  animation: msg-in 180ms var(--ease);
 }
 
 .ai-msg.user {
   flex-direction: row-reverse;
 }
 
-.ai-msg-avatar {
-  flex-shrink: 0;
-}
-
 .ai-msg-avatar img {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -455,21 +413,22 @@ const formatTime = (timestamp) => {
 }
 
 .ai-msg-text {
-  padding: 12px 16px;
-  border-radius: 16px;
-  font-size: var(--fs-6);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
   line-height: 1.6;
   word-wrap: break-word;
 }
 
 .ai-msg.bot .ai-msg-text {
-  background: var(--bg-gradient-jet);
+  background: var(--eerie-black-2);
   color: var(--light-gray);
+  border: 1px solid var(--onyx);
   border-top-left-radius: 4px;
 }
 
 .ai-msg.user .ai-msg-text {
-  background: var(--bg-gradient-onyx);
+  background: var(--onyx);
   color: var(--white-2);
   border-top-right-radius: 4px;
   max-width: 80%;
@@ -485,6 +444,7 @@ const formatTime = (timestamp) => {
   font-size: 11px;
   color: var(--light-gray-70);
   padding: 0 4px;
+  opacity: 0.6;
 }
 
 .ai-msg.user .ai-msg-time {
@@ -492,138 +452,167 @@ const formatTime = (timestamp) => {
 }
 
 /* Typing indicator */
-.ai-typing-indicator {
+.ai-typing {
   display: flex;
-  gap: 5px;
-  padding: 14px 18px;
-  background: var(--bg-gradient-jet);
-  border-radius: 16px;
+  gap: 4px;
+  padding: 12px 16px;
+  background: var(--eerie-black-2);
+  border: 1px solid var(--onyx);
+  border-radius: var(--radius-md);
   border-top-left-radius: 4px;
 }
 
-.ai-typing-indicator span {
-  width: 7px;
-  height: 7px;
+.ai-typing span {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: var(--light-gray);
-  animation: ai-typing 1.4s infinite ease-in-out;
+  background: var(--light-gray-70);
+  animation: typing-bounce 1.2s ease-in-out infinite;
 }
 
-.ai-typing-indicator span:nth-child(2) {
-  animation-delay: 0.2s;
+.ai-typing span:nth-child(2) { animation-delay: 0.15s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+  30% { transform: translateY(-6px); opacity: 1; }
 }
 
-.ai-typing-indicator span:nth-child(3) {
-  animation-delay: 0.4s;
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes ai-typing {
-  0%, 60%, 100% {
-    transform: translateY(0);
-    opacity: 0.4;
-  }
-  30% {
-    transform: translateY(-8px);
-    opacity: 1;
-  }
-}
-
-@keyframes ai-msg-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Input area */
+/* ==========================================================
+   Input area — the hero
+   ========================================================== */
 .ai-input-area {
-  padding: 16px 24px 20px;
-  border-top: 1px solid var(--onyx);
-  background: var(--eerie-black-2);
+  padding: 12px 24px 20px;
   flex-shrink: 0;
 }
 
-.ai-input-wrapper {
+.ai-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ai-chip {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--eerie-black-2);
+  color: var(--light-gray);
+  font-size: 13px;
+  border: 1px solid var(--onyx);
+  transition: color 150ms ease, border-color 150ms ease, transform 150ms var(--ease);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ai-chip:hover:not(:disabled) {
+  color: var(--white-2);
+  border-color: var(--light-gray-70);
+  transform: scale(1.03);
+}
+
+.ai-chip:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.ai-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ai-input-row {
   display: flex;
   gap: 8px;
   align-items: center;
-  max-width: 768px;
+  max-width: 720px;
   margin: 0 auto;
-  background: var(--eerie-black-1);
+  background: var(--eerie-black-2);
   border: 1px solid var(--onyx);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 4px 4px 4px 16px;
-  transition: border-color var(--transition-1);
+  transition: border-color 180ms ease;
 }
 
-.ai-input-wrapper:focus-within {
-  border-color: var(--vegas-gold);
+.ai-input-row:focus-within {
+  border-color: var(--light-gray-70);
 }
 
-.ai-message-input {
+.ai-input {
   flex: 1;
-  padding: 10px 0;
+  padding: 12px 0;
   border: none;
   background: transparent;
-  font-size: var(--fs-6);
+  font-size: 15px;
   color: var(--white-1);
   outline: none;
   font-family: var(--ff-poppins);
 }
 
-.ai-message-input::placeholder {
+.ai-input::placeholder {
   color: var(--light-gray-70);
+  opacity: 0.7;
 }
 
-.ai-message-input:disabled {
-  opacity: 0.6;
+.ai-input:disabled {
+  opacity: 0.5;
 }
 
-.ai-send-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--bg-gradient-onyx);
-  color: var(--orange-yellow-crayola);
+.ai-send {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--white-1);
+  color: var(--eerie-black-1);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-1);
+  transition: opacity 150ms ease, transform 150ms var(--ease);
   flex-shrink: 0;
 }
 
-.ai-send-btn:hover:not(:disabled) {
-  box-shadow: var(--shadow-1);
+.ai-send:hover:not(:disabled) {
+  opacity: 0.85;
+  transform: scale(1.05);
 }
 
-.ai-send-btn:disabled {
-  opacity: 0.4;
+.ai-send:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.ai-send:disabled {
+  opacity: 0.2;
   cursor: not-allowed;
-  color: var(--light-gray-70);
 }
 
-.ai-send-btn ion-icon {
-  font-size: 18px;
+.ai-send ion-icon {
+  font-size: 20px;
   color: inherit;
   display: inline;
 }
 
-.ai-input-hint {
+.ai-footnote {
   text-align: center;
   font-size: 11px;
   color: var(--light-gray-70);
-  margin-top: 8px;
-  opacity: 0.6;
+  margin-top: 10px;
+  opacity: 0.5;
 }
 
-/* Responsive */
+/* ==========================================================
+   Responsive
+   ========================================================== */
 @media (max-width: 580px) {
   .ai-topbar {
-    padding: 10px 16px;
+    padding: 12px 16px;
   }
 
   .ai-browse-btn span {
@@ -635,20 +624,11 @@ const formatTime = (timestamp) => {
   }
 
   .ai-welcome {
-    padding: 24px 16px;
+    padding: 24px 16px 0;
   }
 
   .ai-welcome-title {
-    font-size: var(--fs-3);
-  }
-
-  .ai-suggestions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .ai-suggestion-chip {
-    text-align: center;
+    font-size: 24px;
   }
 
   .ai-messages {
@@ -662,11 +642,14 @@ const formatTime = (timestamp) => {
   .ai-input-area {
     padding: 12px 16px 16px;
   }
-}
 
-@media (min-width: 581px) and (max-width: 1024px) {
-  .ai-welcome-title {
-    font-size: 22px;
+  .ai-chips {
+    gap: 6px;
+  }
+
+  .ai-chip {
+    padding: 6px 12px;
+    font-size: 12px;
   }
 }
 </style>
