@@ -18,8 +18,11 @@
  *
  *  ⚠️  Do NOT flip `fileExists` to `true` until you have:
  *      1. Dropped Anuj_Khurana_Resume.pdf into frontend/public/resume/
- *      2. Confirmed `curl -I /resume/Anuj_Khurana_Resume.pdf` returns 200
- *         on the deployed site (or `npm run dev` then visit the URL)
+ *      2. Confirmed the route returns 200 by running one of:
+ *           curl -I https://<your-domain>/resume/Anuj_Khurana_Resume.pdf
+ *               (expect: HTTP/1.1 200 OK)
+ *           curl -I http://localhost:3000/resume/Anuj_Khurana_Resume.pdf
+ *               (after `npm run dev`)
  *
  *  Flipping the flag without the asset re-introduces the original 404
  *  for every recruiter who clicks the AI's primary CTA — the exact
