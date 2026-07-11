@@ -1,0 +1,271 @@
+import {
+  profile,
+  skills,
+  technicalSkills,
+  getSkillsByCategory,
+  projects,
+  experience,
+  education,
+  certifications,
+  contact,
+  faq,
+} from "../knowledge/index.js";
+
+/* ------------------------------------------------------------------ */
+/*  Intent detection — lightweight keyword matching, no AI needed      */
+/* ------------------------------------------------------------------ */
+
+const INTENT_RULES = [
+  {
+    intent: "skills",
+    keywords: ["skill", "technology", "technologies", "tech stack", "techstack", "stack", "proficient", "good at", "know"],
+  },
+  {
+    intent: "projects",
+    keywords: ["project", "built", "work", "portfolio", "app", "application", "product"],
+  },
+  {
+    intent: "experience",
+    keywords: ["experience", "work history", "resume", "career", "job", "employed", "company", "worked at"],
+  },
+  {
+    intent: "education",
+    keywords: ["education", "degree", "university", "college", "studied", "graduated", "school", "master", "bachelor"],
+  },
+  {
+    intent: "certifications",
+    keywords: ["certification", "certificate", "certified", "credential", "course"],
+  },
+  {
+    intent: "contact",
+    keywords: ["contact", "email", "phone", "reach", "linkedin", "github", "get in touch", "call"],
+  },
+  {
+    intent: "availability",
+    keywords: ["available", "hire", "opportunity", "work", "freelance", "contract", "visa", "right to work"],
+  },
+  {
+    intent: "profile",
+    keywords: ["who are you", "about", "tell me about", "introduce", "summary", "who is anuj", "background"],
+  },
+  {
+    intent: "ai_projects",
+    keywords: ["ai project", "ai", "llm", "chatbot", "langchain", "openai", "machine learning", "artificial intelligence"],
+  },
+];
+
+function detectIntent(query) {
+  const lower = query.toLowerCase().trim();
+
+  for (const rule of INTENT_RULES) {
+    for (const kw of rule.keywords) {
+      if (lower.includes(kw)) return rule.intent;
+    }
+  }
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Local response builders — return structured data for UI cards      */
+/* ------------------------------------------------------------------ */
+
+function buildSkillsResponse() {
+  const grouped = getSkillsByCategory();
+  return {
+    type: "local",
+    component: "skills-card",
+    text: `Anuj has expertise across ${skills.length} core areas. Here's a breakdown by category.`,
+    data: {
+      groups: Object.entries(grouped).map(([category, items]) => ({
+        category,
+        skills: items.map((s) => ({
+          name: s.name,
+          level: s.level,
+          description: s.description,
+          projects: s.projects,
+        })),
+      })),
+      technicalSkills,
+    },
+  };
+}
+
+function buildProjectsResponse(query) {
+  const lower = query.toLowerCase();
+  const isAi = lower.includes("ai") || lower.includes("llm") || lower.includes("chatbot");
+  const list = isAi
+    ? projects.filter((p) =>
+        p.tech.some((t) => ["langchain", "openai"].includes(t.toLowerCase())) ||
+        p.name.toLowerCase().includes("chatbot") ||
+        p.name.toLowerCase().includes("summarizer")
+      )
+    : projects;
+
+  return {
+    type: "local",
+    component: "projects-card",
+    text: isAi
+      ? "Here are Anuj's AI-focused projects."
+      : `Here are ${list.length} projects Anuj has built.`,
+    data: {
+      projects: list.map((p) => ({
+        name: p.name,
+        description: p.description,
+        tech: p.tech,
+        highlights: p.highlights,
+        repo: p.repo,
+        role: p.role,
+        collaboration: p.collaboration,
+      })),
+    },
+  };
+}
+
+function buildExperienceResponse() {
+  return {
+    type: "local",
+    component: "experience-card",
+    text: `Anuj has ${experience.length} professional roles. Here's the timeline.`,
+    data: {
+      timeline: experience.map((e) => ({
+        role: e.role,
+        company: e.company,
+        location: e.location,
+        period: e.period,
+        description: e.description,
+        tech: e.tech,
+      })),
+    },
+  };
+}
+
+function buildEducationResponse() {
+  return {
+    type: "local",
+    component: "education-card",
+    text: "Anuj's educational background and certifications.",
+    data: {
+      education: education.map((e) => ({
+        degree: e.degree,
+        specialization: e.specialization,
+        institution: e.institution,
+        location: e.location,
+        year: e.year,
+      })),
+      certifications: certifications.map((c) => ({
+        name: c.name,
+        issuer: c.issuer,
+        year: c.year,
+      })),
+    },
+  };
+}
+
+function buildCertificationsResponse() {
+  return {
+    type: "local",
+    component: "certifications-card",
+    text: "Anuj's professional certifications.",
+    data: {
+      certifications: certifications.map((c) => ({
+        name: c.name,
+        issuer: c.issuer,
+        year: c.year,
+      })),
+    },
+  };
+}
+
+function buildContactResponse() {
+  return {
+    type: "local",
+    component: "contact-card",
+    text: "Here's how to reach Anuj.",
+    data: { ...contact },
+  };
+}
+
+function buildAvailabilityResponse() {
+  return {
+    type: "local",
+    component: "contact-card",
+    text: `Anuj is currently open to opportunities. ${profile.visaStatus}. Feel free to reach out!`,
+    data: { ...contact },
+  };
+}
+
+function buildProfileResponse() {
+  return {
+    type: "local",
+    component: "profile-card",
+    text: profile.summary,
+    data: {
+      name: profile.name,
+      title: profile.title,
+      location: profile.location,
+      currentFocus: profile.currentFocus,
+      techStack: profile.techStack,
+    },
+  };
+}
+
+function buildAiProjectsResponse() {
+  return buildProjectsResponse("ai projects");
+}
+
+function buildFaqResponse(query) {
+  const lower = query.toLowerCase();
+  for (const item of faq) {
+    for (const kw of item.keywords) {
+      if (lower.includes(kw)) {
+        return {
+          type: "local",
+          component: "text",
+          text: item.answer,
+        };
+      }
+    }
+  }
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main router                                                        */
+/* ------------------------------------------------------------------ */
+
+const BUILDERS = {
+  skills: buildSkillsResponse,
+  projects: buildProjectsResponse,
+  experience: buildExperienceResponse,
+  education: buildEducationResponse,
+  certifications: buildCertificationsResponse,
+  contact: buildContactResponse,
+  availability: buildAvailabilityResponse,
+  profile: buildProfileResponse,
+  ai_projects: buildAiProjectsResponse,
+};
+
+/**
+ * Attempts to answer the query from local knowledge.
+ * Returns a structured response object if answerable locally, or null
+ * if the query requires Gemini reasoning.
+ */
+export function routeQuery(query) {
+  const intent = detectIntent(query);
+
+  if (intent && BUILDERS[intent]) {
+    return BUILDERS[intent](query);
+  }
+
+  const faqMatch = buildFaqResponse(query);
+  if (faqMatch) return faqMatch;
+
+  return null;
+}
+
+/**
+ * Check if a query can be handled locally (for quick-response UX).
+ */
+export function isLocalQuery(query) {
+  return routeQuery(query) !== null;
+}
