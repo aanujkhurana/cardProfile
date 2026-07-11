@@ -241,6 +241,17 @@ function openAndScrollTo(id) {
       behavior: reducedMotion ? "auto" : "smooth",
       block: "center",
     });
+    // Move accessible focus to the matching drilldown toggle so
+    // screen-reader users land on the same expanded state sighted
+    // users see. preventScroll: true keeps the smooth scroll we
+    // just started from being reset by the focus call. Gracefully
+    // no-ops if the card has no drilldown toggle (e.g. the
+    // GoDesta achievement, which has sourceProject: null and
+    // therefore no caseStudy content).
+    const toggle = el.querySelector(".ai-drilldown-toggle");
+    if (toggle && typeof toggle.focus === "function") {
+      toggle.focus({ preventScroll: true });
+    }
   });
 }
 
