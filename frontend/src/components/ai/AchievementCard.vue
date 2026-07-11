@@ -53,15 +53,19 @@
         Highlights at a glance
       </h5>
       <div class="ai-highlights-grid">
-        <div
+        <button
           v-for="h in data.highlights"
           :key="h.id"
+          type="button"
           class="ai-highlight-tile"
+          :class="{ 'is-active': isOpen(h.id) }"
+          :aria-label="`Open case study for ${h.title} (${h.metric})`"
+          @click="openAndScrollTo(h.id)"
         >
           <span class="ai-highlight-tile-metric">{{ h.metric }}</span>
           <span class="ai-highlight-tile-title">{{ h.title }}</span>
           <span v-if="h.period" class="ai-highlight-tile-period">{{ h.period }}</span>
-        </div>
+        </button>
       </div>
     </section>
 
@@ -69,6 +73,7 @@
       <article
         v-for="item in data.achievements"
         :key="item.id"
+        :id="cardId(item.id)"
         class="ai-achievement-card"
       >
         <div class="ai-achievement-hero">
@@ -177,7 +182,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 
 const props = defineProps({
   data: { type: Object, required: true },
@@ -201,6 +206,42 @@ function toggle(id) {
 
 function panelId(id) {
   return `achievement-panel-${id}`;
+}
+
+/**
+ * Stable DOM id for the achievement <article>. Used as the scroll
+ * target by `openAndScrollTo` and the find-by-id path for keyboard /
+ * screen-reader deep linking.
+ */
+function cardId(id) {
+  return `achievement-card-${id}`;
+}
+
+/**
+ * Click handler for the highlight tiles (Phase 6.7). Opens the
+ * matching achievement's drilldown via `openId`, then waits one
+ * tick for Vue to render the panel and scrolls the card into view
+ * so the user lands on the expanded content. The tile also gets
+ * an `is-active` visual cue (driven by `isOpen(h.id)`) so the
+ * cause-and-effect is obvious without reading the screen.
+ *
+ * prefers-reduced-motion users get an instant scroll (no smooth
+ * animation) — matching the drilldown transition's reduced-motion
+ * fallback.
+ */
+function openAndScrollTo(id) {
+  openId.value = id;
+  nextTick(() => {
+    const el = document.getElementById(cardId(id));
+    if (!el || typeof el.scrollIntoView !== "function") return;
+    const reducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({
+      behavior: reducedMotion ? "auto" : "smooth",
+      block: "center",
+    });
+  });
 }
 
 /**
@@ -423,12 +464,35 @@ function hasCaseStudyContent(item) {
   background: var(--eerie-black-1);
   border: 1px solid var(--onyx);
   border-radius: 8px;
-  transition: border-color 150ms ease, transform 180ms var(--ease, ease);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease,
+    transform 180ms var(--ease, ease);
 }
 
 .ai-highlight-tile:hover {
   border-color: hsla(45, 100%, 72%, 0.35);
+  background: hsla(45, 100%, 72%, 0.05);
   transform: translateY(-1px);
+}
+
+.ai-highlight-tile:active {
+  transform: translateY(0);
+}
+
+.ai-highlight-tile:focus-visible {
+  outline: 2px solid var(--orange-yellow-crayola);
+  outline-offset: 2px;
+}
+
+/* Phase 6.7: the tile's matching drilldown is currently open.
+   Tints the border + background so the cause-and-effect is
+   visible without reading the screen. */
+.ai-highlight-tile.is-active {
+  border-color: var(--vegas-gold);
+  background: hsla(45, 100%, 72%, 0.1);
 }
 
 .ai-highlight-tile-metric {
