@@ -1,0 +1,33 @@
+export const profile = {
+  name: "Anuj Khurana",
+  title: "Full Stack Developer",
+  summary: `I'm a Full Stack Developer with 3+ years of experience building web applications with a strong focus on frontend performance and user experience. I've led frontend migrations, optimized applications for speed and accessibility, and built clean, responsive interfaces. I'm comfortable working across the stack, with a solid foundation in data structures and system design. I enjoy solving real-world problems with code and am always learning. I build products, not just features.`,
+  location: "Queensland, Australia",
+  currentFocus: [
+    "AI & LLM App Engineering",
+    "Vue 3 + TypeScript",
+    "Real-time Systems (WebRTC)",
+  ],
+  visaStatus: "VISA 485 with full working rights in Australia, valid until 2029",
+  contact: {
+    phone: "+61 48 12 50 988",
+    email: "aanujkhurana@gmail.com",
+    website: "/",
+    linkedin: "https://linkedin.com/in/aanujkhurana",
+    github: "https://github.com/anujkhurana",
+  },
+  techStack: [
+    "Python",
+    "Vue 3",
+    "TypeScript",
+    "Node.js",
+    "Express.js",
+    "LangChain",
+    "PostgreSQL",
+    "AWS",
+    "MongoDB",
+    "JavaScript",
+    "HTML",
+    "CSS",
+  ],
+};
