@@ -151,6 +151,8 @@ const messageInput = ref(null);
 
 const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const welcomeMessage = {
   id: "welcome",
   type: "bot",
@@ -202,6 +204,8 @@ const sendMessage = async (messageText) => {
       const cardComponent = localResponse.component !== "text"
         ? resolveComponent(localResponse.component)
         : null;
+
+      await wait(800 + Math.random() * 600);
 
       messages.push({
         id: `bot_${Date.now()}`,
