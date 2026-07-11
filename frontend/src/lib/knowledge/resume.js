@@ -7,13 +7,23 @@
  *     produce a ResumeCard (Phase 6 component, registered later).
  *   - a "Download Resume" CTA in the ContactCard once Phase 7 lands.
  *
- * Asset note:
- *   `fileUrl` resolves under /public so the PDF should be dropped at
- *   `frontend/public/resume/Anuj_Khurana_Resume.pdf`. Until the asset
- *   is uploaded, set `fileExists: false` — the ResumeCard then hides
- *   the broken download link and offers a mailto CTA instead. Flip
- *   this flag to true the moment the file lands in /public/resume/
- *   and the download button reappears automatically.
+ * ⚠️  FILE-EXISTS WORKFLOW — READ BEFORE FLIPPING fileExists
+ * ─────────────────────────────────────────────────────────────
+ *  `fileUrl` resolves under /public, so the PDF must exist at:
+ *      frontend/public/resume/Anuj_Khurana_Resume.pdf
+ *
+ *  Until the asset is uploaded, KEEP `fileExists: false` — the
+ *  ResumeCard will then hide the download link and offer a mailto
+ *  fallback ("PDF being refreshed — ping me for the latest copy").
+ *
+ *  ⚠️  Do NOT flip `fileExists` to `true` until you have:
+ *      1. Dropped Anuj_Khurana_Resume.pdf into frontend/public/resume/
+ *      2. Confirmed `curl -I /resume/Anuj_Khurana_Resume.pdf` returns 200
+ *         on the deployed site (or `npm run dev` then visit the URL)
+ *
+ *  Flipping the flag without the asset re-introduces the original 404
+ *  for every recruiter who clicks the AI's primary CTA — the exact
+ *  first-impression failure the production audit was trying to fix.
  */
 
 export const resume = {

@@ -47,7 +47,7 @@
       <a
         v-if="data.contact?.email"
         class="ai-resume-email"
-        :href="`mailto:${data.contact.email}?subject=Requesting%20your%20latest%20resume`"
+        :href="`mailto:${data.contact.email}?subject=Requesting%20${encodeURIComponent(data.fileName)}`"
         :aria-label="`Email ${data.fullName} to request the latest resume`"
         rel="noopener"
       >
