@@ -8,8 +8,6 @@
     <!-- EXISTING WEBSITE (always mounted, just hidden) -->
     <div v-show="!showAI" class="website-wrapper">
       <ThemeToggle />
-      <v-spacer></v-spacer>
-      <Chatbox openai-api-key="" model="gpt-3.5-turbo" />
       <Card></Card>
 
       <!-- Back to AI floating button -->
@@ -23,7 +21,6 @@
 <script setup>
 import Card from "./components/Card.vue";
 import ThemeToggle from "./components/ThemeToggle.vue";
-import Chatbox from "./components/Chatbox.vue";
 import AILanding from "./components/AILanding.vue";
 import { ref } from "vue";
 

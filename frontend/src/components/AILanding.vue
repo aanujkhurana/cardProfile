@@ -149,8 +149,6 @@ const conversationHistory = ref([]);
 const messagesContainer = ref(null);
 const messageInput = ref(null);
 
-const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const welcomeMessage = {
@@ -230,7 +228,7 @@ const sendMessage = async (messageText) => {
         { role: "user", content: messageText },
       ];
 
-      const result = await sendToGemini(apiMessages, geminiApiKey);
+      const result = await sendToGemini(apiMessages);
 
       messages.push({
         id: `bot_${Date.now()}`,
