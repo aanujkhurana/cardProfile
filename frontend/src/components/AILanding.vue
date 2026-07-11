@@ -26,9 +26,11 @@
     <div class="ai-main">
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">
-        <span class="ai-welcome-label ai-stagger" data-delay="1">AI-Powered Portfolio</span>
-        <div class="ai-welcome-avatar ai-stagger" data-delay="2">
-          <img src="../assets/images/wave.gif" alt="Hello" />
+        <div class="ai-welcome-avatar-wrap ai-stagger" data-delay="2">
+          <div class="ai-welcome-avatar">
+            <img src="../assets/images/wave.gif" alt="Hello" />
+          </div>
+          <span class="ai-hey-badge">hey</span>
         </div>
         <h1 class="ai-welcome-title ai-stagger" data-delay="3">Meet Anuj through conversation.</h1>
         <p class="ai-welcome-subtitle ai-stagger" data-delay="4">Learn about my software engineering experience, projects, technical skills, and the products I've built through a natural conversation instead of browsing a traditional portfolio.</p>
@@ -299,7 +301,7 @@ const formatTime = (timestamp) => {
   z-index: 900;
   display: flex;
   flex-direction: column;
-  background: var(--eerie-black-1);
+  background: linear-gradient(160deg, hsl(240, 3%, 10%) 0%, hsl(240, 2%, 13%) 40%, hsl(240, 4%, 8%) 100%);
   font-family: var(--ff-poppins);
   overflow: hidden;
 }
@@ -357,14 +359,14 @@ const formatTime = (timestamp) => {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(hsla(0, 0%, 100%, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, hsla(0, 0%, 100%, 0.04) 1px, transparent 1px);
+    linear-gradient(hsla(0, 0%, 100%, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(0, 0%, 100%, 0.07) 1px, transparent 1px);
   background-size: 80px 80px;
   transform: perspective(500px) rotateX(45deg);
   transform-origin: center 80%;
-  mask-image: linear-gradient(to top, black 0%, transparent 60%);
-  -webkit-mask-image: linear-gradient(to top, black 0%, transparent 60%);
-  opacity: 0.6;
+  mask-image: linear-gradient(to top, black 0%, transparent 55%);
+  -webkit-mask-image: linear-gradient(to top, black 0%, transparent 55%);
+  opacity: 0.8;
 }
 
 .ai-bg-grain {
@@ -372,16 +374,16 @@ const formatTime = (timestamp) => {
   inset: -50%;
   width: 200%;
   height: 200%;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 256px 256px;
-  opacity: 0.4;
+  opacity: 0.6;
 }
 
 .ai-bg-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 40%, hsla(240, 2%, 13%, 0.7) 100%);
+  background: radial-gradient(ellipse at center, transparent 30%, hsla(240, 4%, 6%, 0.8) 100%);
 }
 
 /* Top bar */
@@ -467,17 +469,8 @@ const formatTime = (timestamp) => {
   margin: 0 auto;
 }
 
-.ai-welcome-label {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--vegas-gold);
-  background: hsla(45, 54%, 58%, 0.1);
-  padding: 6px 16px;
-  border-radius: 20px;
-  border: 1px solid hsla(45, 54%, 58%, 0.15);
+.ai-welcome-avatar-wrap {
+  position: relative;
   margin-bottom: 28px;
 }
 
@@ -486,15 +479,26 @@ const formatTime = (timestamp) => {
   height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 28px;
-  border: 2px solid hsla(45, 54%, 58%, 0.2);
 }
 
 .ai-welcome-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
+}
+
+.ai-hey-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: hsl(0, 65%, 55%);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  line-height: 1;
+  box-shadow: 0 2px 8px hsla(0, 65%, 55%, 0.4);
 }
 
 .ai-welcome-title {
