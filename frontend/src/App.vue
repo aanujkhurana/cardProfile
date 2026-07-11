@@ -1,24 +1,22 @@
 <template>
   <main>
     <!-- AI LANDING (default view) -->
-    <Transition name="ai-fade">
-      <AILanding v-if="showAI" @browse-website="showAI = false" />
-    </Transition>
+    <div v-show="showAI" class="ai-landing-wrapper">
+      <AILanding @browse-website="showAI = false" />
+    </div>
 
-    <!-- EXISTING WEBSITE -->
-    <Transition name="website-fade">
-      <div v-if="!showAI" class="website-wrapper">
-        <ThemeToggle />
-        <v-spacer></v-spacer>
-        <Chatbox :openai-api-key="openaiApiKey" model="gpt-3.5-turbo" ref="chatbot" />
-        <Card></Card>
+    <!-- EXISTING WEBSITE (always mounted, just hidden) -->
+    <div v-show="!showAI" class="website-wrapper">
+      <ThemeToggle />
+      <v-spacer></v-spacer>
+      <Chatbox :openai-api-key="openaiApiKey" model="gpt-3.5-turbo" ref="chatbot" />
+      <Card></Card>
 
-        <!-- Back to AI floating button -->
-        <button class="back-to-ai-btn" @click="showAI = true" aria-label="Back to AI assistant">
-          <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-        </button>
-      </div>
-    </Transition>
+      <!-- Back to AI floating button -->
+      <button class="back-to-ai-btn" @click="showAI = true" aria-label="Back to AI assistant">
+        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      </button>
+    </div>
   </main>
 </template>
 
@@ -37,34 +35,11 @@ const showAI = ref(true);
 </script>
 
 <style>
-/* Global transition styles */
-
-/* AI landing fade in/out */
-.ai-fade-enter-active,
-.ai-fade-leave-active {
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.ai-fade-enter-from {
-  opacity: 0;
-  transform: scale(0.98);
-}
-.ai-fade-leave-to {
-  opacity: 0;
-  transform: scale(1.02);
-}
-
-/* Website fade in/out */
-.website-fade-enter-active,
-.website-fade-leave-active {
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.website-fade-enter-from {
-  opacity: 0;
-  transform: scale(1.02);
-}
-.website-fade-leave-to {
-  opacity: 0;
-  transform: scale(0.98);
+/* AI landing wrapper - fullscreen overlay */
+.ai-landing-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
 }
 
 /* Website wrapper */
