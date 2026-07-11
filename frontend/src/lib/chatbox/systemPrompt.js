@@ -97,13 +97,15 @@ ${(exp.description || [])
     .join("\n");
 
   const achievementsSummary = achievements
-    .map(
-      (a) =>
-        `**${a.title}** — ${a.metric}
+    .map((a) => {
+      const sourceLine = a.sourceProject
+        ? `Source Project: ${a.sourceProject}\n`
+        : "";
+      return `**${a.title}** — ${a.metric}
 ${a.context}
 Period: ${a.period}
-Tags: ${a.tags.join(", ")}`
-    )
+${sourceLine}Tags: ${a.tags.join(", ")}`;
+    })
     .join("\n\n");
 
   const resumeSection = `**Resume**: ${resume.summary}
@@ -174,8 +176,8 @@ ${resumeSection}
 
 INSTRUCTIONS:
 1. Always refer back to Anuj's profile, skills, projects, or achievements when answering.
-2. When talking about impact, lead with the metric from the ACHIEVEMENTS section.
-3. If asked for the resume, point to /resume/${resume.fileName} (a PDF); summarize the resume section in plain text.
+2. When talking about impact, lead with the metric from the ACHIEVEMENTS section and mention the associated project (from the Source Project line) when one is present.
+3. If asked for the resume, mention it was last updated on ${resume.lastUpdated}, point to ${resume.fileUrl} (a PDF named ${resume.fileName}), and summarize the resume section in plain text.
 4. Redirect politely if a question falls outside the context.
 5. Be accurate, specific, and confident — you represent Anuj's professional brand.
 6. Use the provided context to answer questions about Anuj's work, skills, and projects.

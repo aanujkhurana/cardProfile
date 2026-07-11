@@ -1,81 +1,145 @@
 <!--
-  ResumeCard — minimal stub.
+  ResumeCard — premium polish (Phase 6).
 
   Renders the structured resume data delivered by the `resume` intent in
-  src/lib/knowledge/router.js. Visual treatment is intentionally basic;
-  Phase 8 will replace this with the premium card the audit calls for.
+  src/lib/knowledge/router.js. Layout:
+    1. Section header + name/title block
+    2. Summary paragraph
+    3. Quick-highlights checklist
+    4. File metadata row (format / size / last-updated)
+    5. Pending badge when !fileExists
+    6. CTA row (primary download + secondary mailto)
 
-  The download link points at data.fileUrl. Until the actual PDF is
-  uploaded under frontend/public/resume/ this 404s — see PRODUCTION_AUDIT.md
-  Phase 6 follow-up. We do not silently mask the 404 here.
+  The download button is the primary CTA and only renders when
+  `data.fileExists` is true. Until the PDF is uploaded under
+  frontend/public/resume/, the card hides the broken download link
+  and surfaces a "PDF being refreshed" badge alongside a mailto
+  fallback so the recruiter never hits the original 404.
+
+  File metadata (fileSize) is nullable on purpose — the fileSize field
+  is set to null in resume.js until the asset is uploaded. The card
+  hides that metadata bullet when null so we never show fake numbers.
 -->
 
 <template>
-  <div v-if="data" class="ai-resume-card">
-    <header class="ai-resume-header">
-      <div>
-        <h3 class="ai-resume-name">{{ data.fullName }}</h3>
-        <p class="ai-resume-title">{{ data.title }}</p>
+  <div v-if="data" class="ai-section">
+    <h4 class="ai-section-title">
+      <ion-icon name="document-text-outline"></ion-icon>
+      Resume
+    </h4>
+
+    <div class="ai-resume-content">
+      <header class="ai-resume-header">
+        <div>
+          <h3 class="ai-resume-name">{{ data.fullName }}</h3>
+          <p class="ai-resume-title">{{ data.title }}</p>
+        </div>
+      </header>
+
+      <p v-if="data.summary" class="ai-resume-summary">{{ data.summary }}</p>
+
+      <div v-if="data.highlights?.length" class="ai-resume-highlights-block">
+        <h6 class="ai-label">Quick highlights</h6>
+        <ul class="ai-resume-highlights">
+          <li v-for="(h, i) in data.highlights" :key="i">
+            <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+            <span>{{ h }}</span>
+          </li>
+        </ul>
       </div>
-      <span class="ai-resume-updated">Updated {{ data.lastUpdated }}</span>
-    </header>
 
-    <p class="ai-resume-summary">{{ data.summary }}</p>
+      <div class="ai-resume-action-area">
+        <div class="ai-resume-meta">
+          <span class="ai-meta-item">PDF format</span>
+          <span v-if="data.fileSize" class="ai-meta-item">&middot; {{ data.fileSize }}</span>
+          <span class="ai-meta-item">&middot; {{ displayDate }}</span>
+        </div>
 
-    <ul v-if="data.highlights?.length" class="ai-resume-highlights">
-      <li v-for="(h, i) in data.highlights" :key="i">{{ h }}</li>
-    </ul>
+        <div v-if="!data.fileExists" class="ai-resume-pending-badge">
+          <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+          PDF is being refreshed
+        </div>
 
-    <p v-if="!data.fileExists" class="ai-resume-pending">
-      The PDF is being refreshed — ping me by email and I'll send the
-      latest version directly.
-    </p>
+        <div class="ai-resume-cta-row">
+          <a
+            v-if="data.fileExists"
+            class="ai-resume-download primary-cta"
+            :href="data.fileUrl"
+            :download="data.fileName"
+            :aria-label="`Download ${data.fullName}'s resume as PDF`"
+            rel="noopener"
+          >
+            <ion-icon name="download-outline" aria-hidden="true"></ion-icon>
+            Download resume
+          </a>
 
-    <div class="ai-resume-cta-row">
-      <a
-        v-if="data.fileExists"
-        class="ai-resume-download"
-        :href="data.fileUrl"
-        :download="data.fileName"
-        :aria-label="`Download ${data.fullName}'s resume as PDF`"
-        rel="noopener"
-      >
-        <ion-icon name="download-outline"></ion-icon>
-        <span>Download {{ data.fileName }}</span>
-      </a>
-
-      <a
-        v-if="data.contact?.email"
-        class="ai-resume-email"
-        :href="`mailto:${data.contact.email}?subject=Requesting%20${encodeURIComponent(data.fileName)}`"
-        :aria-label="`Email ${data.fullName} to request the latest resume`"
-        rel="noopener"
-      >
-        <ion-icon name="mail-outline"></ion-icon>
-        <span>{{ data.fileExists ? "Email me instead" : "Email me for the latest PDF" }}</span>
-      </a>
+          <a
+            v-if="data.contact?.email"
+            class="ai-resume-email secondary-cta"
+            :href="`mailto:${data.contact.email}?subject=Requesting%20${encodeURIComponent(data.fileName)}`"
+            :aria-label="`Email ${data.fullName} to request the latest resume`"
+            rel="noopener"
+          >
+            <ion-icon name="mail-outline" aria-hidden="true"></ion-icon>
+            {{ data.fileExists ? "Email me instead" : "Email me for the latest PDF" }}
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from "vue";
+
+const props = defineProps({
   data: { type: Object, required: true },
+});
+
+const displayDate = computed(() => {
+  if (!props.data.lastUpdated) return "Updated —";
+  const date = new Date(props.data.lastUpdated);
+  if (isNaN(date.getTime())) return `Updated ${props.data.lastUpdated}`;
+  return (
+    "Updated " +
+    date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  );
 });
 </script>
 
 <style scoped>
-.ai-resume-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
+.ai-section {
   background: var(--eerie-black-2);
   border: 1px solid var(--onyx);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.ai-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--white-2);
   font-size: 14px;
-  line-height: 1.6;
-  color: var(--light-gray);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.ai-section-title ion-icon {
+  color: var(--orange-yellow-crayola);
+  font-size: 16px;
+  display: inline;
+}
+
+.ai-resume-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .ai-resume-header {
@@ -98,90 +162,153 @@ defineProps({
   color: var(--light-gray-70);
 }
 
-.ai-resume-updated {
-  font-size: 11px;
-  color: var(--light-gray-70);
-  padding: 3px 8px;
-  border-radius: 10px;
-  background: var(--onyx);
-  white-space: nowrap;
-}
-
 .ai-resume-summary {
   margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
   color: var(--light-gray);
+  border-bottom: 1px solid var(--onyx);
+  padding-bottom: 12px;
+}
+
+.ai-label {
+  color: var(--light-gray-70);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
 }
 
 .ai-resume-highlights {
   margin: 0;
-  padding-left: 20px;
+  padding: 0;
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .ai-resume-highlights li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--light-gray);
 }
 
-.ai-resume-pending {
-  margin: 0;
-  padding: 8px 12px;
+.ai-resume-highlights li ion-icon {
+  color: var(--vegas-gold);
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: inline;
+}
+
+.ai-resume-action-area {
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--onyx);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-resume-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--light-gray-70);
+}
+
+.ai-resume-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
   border-radius: 8px;
-  background: var(--onyx);
-  color: var(--light-gray);
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.22);
+  color: #fbbf24;
   font-size: 12px;
-  line-height: 1.5;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.ai-resume-pending-badge ion-icon {
+  font-size: 14px;
+  display: inline;
 }
 
 .ai-resume-cta-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 10px;
 }
 
-.ai-resume-download,
-.ai-resume-email {
+.primary-cta {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 600;
   text-decoration: none;
-  border: 1px solid var(--onyx);
-  background: var(--eerie-black-1);
-  color: var(--white-2);
-  transition: color 150ms ease, border-color 150ms ease, transform 180ms var(--ease, ease);
-}
-
-.ai-resume-download {
   background: var(--vegas-gold);
   color: var(--eerie-black-1);
-  border-color: var(--vegas-gold);
+  border: 1px solid var(--vegas-gold);
+  transition: transform 180ms ease, opacity 180ms ease, box-shadow 180ms ease;
 }
 
-.ai-resume-download ion-icon,
-.ai-resume-email ion-icon {
-  font-size: 15px;
-  color: inherit;
+.primary-cta:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+  box-shadow: 0 4px 14px hsla(45, 100%, 72%, 0.18);
+}
+
+.primary-cta ion-icon {
+  font-size: 16px;
   display: inline;
 }
 
-.ai-resume-download:hover,
-.ai-resume-email:hover {
-  transform: translateY(-1px);
+.secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  background: transparent;
+  color: var(--light-gray);
+  border: 1px solid var(--onyx);
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
 }
 
-.ai-resume-email {
-  color: var(--light-gray);
+.secondary-cta:hover {
+  background: var(--eerie-black-1);
+  color: var(--white-2);
+  border-color: var(--light-gray-70);
+}
+
+.secondary-cta ion-icon {
+  font-size: 15px;
+  display: inline;
 }
 
 @media (max-width: 480px) {
-  .ai-resume-header {
+  .ai-resume-cta-row {
     flex-direction: column;
-    gap: 6px;
+  }
+  .primary-cta,
+  .secondary-cta {
+    width: 100%;
   }
 }
 </style>

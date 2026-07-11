@@ -419,6 +419,8 @@ function buildResumeResponse() {
     data: {
       fileName: resume.fileName,
       fileUrl: resume.fileUrl,
+      fileSize: resume.fileSize,
+      fileExists: resume.fileExists,
       lastUpdated: resume.lastUpdated,
       summary: resume.summary,
       highlights: resume.highlights,
@@ -440,14 +442,25 @@ function buildAchievementsResponse() {
     component: "achievements-card",
     text: `Here are ${achievements.length} quantified wins, awards, and milestones from Anuj's work so far.`,
     data: {
-      achievements: achievements.map((a) => ({
-        id: a.id,
-        title: a.title,
-        metric: a.metric,
-        context: a.context,
-        period: a.period,
-        tags: a.tags,
-      })),
+      achievements: achievements.map((a) => {
+        // Look up the optional sourceProject (exact match on projects.js
+        // name). When absent (GoDesta work, internship, education, certs)
+        // we still ship the achievement but with null cross-link fields
+        // so the card hides the "View Project" link.
+        const matchedProject = a.sourceProject
+          ? projects.find((p) => p.name === a.sourceProject)
+          : null;
+        return {
+          id: a.id,
+          title: a.title,
+          metric: a.metric,
+          context: a.context,
+          period: a.period,
+          tags: a.tags,
+          sourceProjectName: matchedProject ? matchedProject.name : null,
+          sourceProjectUrl: matchedProject ? matchedProject.url : null,
+        };
+      }),
     },
     followUp: [
       "Tell me about your skills",

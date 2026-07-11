@@ -14,6 +14,12 @@
  *   - context: where / why (1–2 lines)
  *   - period: 'May 2024 – Present' style
  *   - tags: typed so the router can filter ("performance", "ai", etc.)
+ *   - sourceProject: optional exact-match reference to a project name
+ *     in src/lib/knowledge/projects.js. When set, the router resolves
+ *     it and passes `sourceProjectName` + `sourceProjectUrl` in the
+ *     data envelope so AchievementCard can deep-link to the driving
+ *     case study. `null` for work that isn't a portfolio project
+ *     (e.g. GoDesta production work, internship, education, certs).
  */
 
 export const achievements = [
@@ -24,6 +30,7 @@ export const achievements = [
     context:
       "Owned the migration end-to-end across a production storefront, hardening the build, fixing reactivity gotchas, and validating the 15% speed-up against Lighthouse and Core Web Vitals.",
     period: "May 2024 – Present",
+    sourceProject: null, // GoDesta production work — not a portfolio project.
     tags: ["frontend", "vue", "performance", "leadership"],
   },
   {
@@ -33,6 +40,7 @@ export const achievements = [
     context:
       "Owned UX edge cases in the satellite-assembly tree chart during internship; ship-tested fixes for ambiguous label rendering and out-of-order expansion.",
     period: "Jul 2023 – Oct 2023",
+    sourceProject: null, // Internship at Gilmour Space — not a portfolio project.
     tags: ["frontend", "ux", "datavisual", "internship"],
   },
   {
@@ -42,6 +50,7 @@ export const achievements = [
     context:
       "Vue 3 + Node.js + PostgreSQL + AWS Cognito + Mapbox. Real-time map filtering, multi-role auth, and Prisma ORM over RDS.",
     period: "Independent build",
+    sourceProject: "FindMyLease",
     tags: ["fullstack", "vue", "aws", "shipping"],
   },
   {
@@ -51,6 +60,7 @@ export const achievements = [
     context:
       "Vercel serverless function holding the Gemini API key server-side, with input sanitization, role allowlist, and a graceful local-knowledge fallback.",
     period: "2026",
+    sourceProject: "AI Portfolio Assistant (this site)",
     tags: ["ai", "security", "shipping", "leadership"],
   },
   {
@@ -60,6 +70,7 @@ export const achievements = [
     context:
       "Master's-level coursework in distributed systems, software engineering practice, and applied AI.",
     period: "Graduated 2024",
+    sourceProject: null,
     tags: ["education"],
   },
   {
@@ -69,6 +80,7 @@ export const achievements = [
     context:
       "Project-based certification covering Node.js, Express, MongoDB, and REST API design patterns.",
     period: "2024",
+    sourceProject: null,
     tags: ["certification", "backend"],
   },
 ];

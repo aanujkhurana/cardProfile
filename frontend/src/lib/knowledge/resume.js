@@ -34,6 +34,13 @@ export const resume = {
   title: "Full Stack Developer",
   fileName: "Anuj_Khurana_Resume.pdf",
   fileUrl: "/resume/Anuj_Khurana_Resume.pdf",
+  /**
+   * Human-readable PDF size, e.g. "142 KB".
+   * `null` while the asset is not yet uploaded so ResumeCard does not
+   * render a placeholder. Set this to the real measured value at the
+   * same time you flip `fileExists` to true — do not invent a number.
+   */
+  fileSize: null,
   fileExists: false,
   lastUpdated: "2026-07-01",
   summary:
