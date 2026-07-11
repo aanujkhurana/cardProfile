@@ -26,11 +26,18 @@
       <li v-for="(h, i) in data.highlights" :key="i">{{ h }}</li>
     </ul>
 
+    <p v-if="!data.fileExists" class="ai-resume-pending">
+      The PDF is being refreshed — ping me by email and I'll send the
+      latest version directly.
+    </p>
+
     <div class="ai-resume-cta-row">
       <a
+        v-if="data.fileExists"
         class="ai-resume-download"
         :href="data.fileUrl"
         :download="data.fileName"
+        :aria-label="`Download ${data.fullName}'s resume as PDF`"
         rel="noopener"
       >
         <ion-icon name="download-outline"></ion-icon>
@@ -41,10 +48,11 @@
         v-if="data.contact?.email"
         class="ai-resume-email"
         :href="`mailto:${data.contact.email}?subject=Requesting%20your%20latest%20resume`"
+        :aria-label="`Email ${data.fullName} to request the latest resume`"
         rel="noopener"
       >
         <ion-icon name="mail-outline"></ion-icon>
-        <span>Email me instead</span>
+        <span>{{ data.fileExists ? "Email me instead" : "Email me for the latest PDF" }}</span>
       </a>
     </div>
   </div>
@@ -114,6 +122,16 @@ defineProps({
 
 .ai-resume-highlights li {
   color: var(--light-gray);
+}
+
+.ai-resume-pending {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--onyx);
+  color: var(--light-gray);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .ai-resume-cta-row {

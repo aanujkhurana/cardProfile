@@ -9,9 +9,11 @@
  *
  * Asset note:
  *   `fileUrl` resolves under /public so the PDF should be dropped at
- *   `frontend/public/resume/Anuj_Khurana_Resume.pdf`. Until then the
- *   router still surfaces the structured summary + highlights, so the
- *   feature degrades gracefully.
+ *   `frontend/public/resume/Anuj_Khurana_Resume.pdf`. Until the asset
+ *   is uploaded, set `fileExists: false` — the ResumeCard then hides
+ *   the broken download link and offers a mailto CTA instead. Flip
+ *   this flag to true the moment the file lands in /public/resume/
+ *   and the download button reappears automatically.
  */
 
 export const resume = {
@@ -19,6 +21,7 @@ export const resume = {
   title: "Full Stack Developer",
   fileName: "Anuj_Khurana_Resume.pdf",
   fileUrl: "/resume/Anuj_Khurana_Resume.pdf",
+  fileExists: false,
   lastUpdated: "2026-07-01",
   summary:
     "Full Stack Developer with 3+ years building production web applications — frontend-heavy, comfortable across the stack, and actively deepening AI/LLM engineering. Last updated to reflect my current focus on AI portfolio engineering and Vue 3 + TypeScript work at GoDesta.",
