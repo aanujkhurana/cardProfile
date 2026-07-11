@@ -49,6 +49,21 @@
               <div v-else class="ai-msg-text">{{ message.text }}</div>
             </template>
             <div class="ai-msg-time">{{ formatTime(message.timestamp) }}</div>
+            <!-- Follow-up chips after bot messages -->
+            <div
+              v-if="message.type === 'bot' && message.followUp?.length"
+              class="ai-followups"
+            >
+              <button
+                v-for="q in message.followUp"
+                :key="q"
+                class="ai-followup-chip"
+                @click="sendMessage(q)"
+                :disabled="isTyping"
+              >
+                {{ q }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -205,6 +220,11 @@ const sendMessage = async (messageText) => {
         text: result.text,
         timestamp: new Date(),
         source: result.source,
+        followUp: [
+          "Tell me about your skills",
+          "Show me your projects",
+          "What's your work experience?",
+        ],
       });
 
       conversationHistory.value.push(
@@ -223,6 +243,11 @@ const sendMessage = async (messageText) => {
       type: "bot",
       text: getGeminiErrorMessage(error),
       timestamp: new Date(),
+      followUp: [
+        "Tell me about your skills",
+        "Show me your projects",
+        "How can I contact you?",
+      ],
     });
   } finally {
     isTyping.value = false;
@@ -479,6 +504,42 @@ const formatTime = (timestamp) => {
 @keyframes msg-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Follow-up chips */
+.ai-followups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+  padding-left: 2px;
+}
+
+.ai-followup-chip {
+  padding: 6px 14px;
+  border-radius: 18px;
+  background: var(--eerie-black-2);
+  color: var(--light-gray);
+  font-size: 12px;
+  border: 1px solid var(--onyx);
+  transition: color 150ms ease, border-color 150ms ease, transform 150ms var(--ease);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ai-followup-chip:hover:not(:disabled) {
+  color: var(--white-2);
+  border-color: var(--light-gray-70);
+  transform: scale(1.03);
+}
+
+.ai-followup-chip:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.ai-followup-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* Input */

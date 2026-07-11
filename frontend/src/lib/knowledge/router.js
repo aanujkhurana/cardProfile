@@ -87,6 +87,11 @@ function buildSkillsResponse() {
       })),
       technicalSkills,
     },
+    followUp: [
+      "Show me your projects",
+      "What's your work experience?",
+      "Why should we hire you?",
+    ],
   };
 }
 
@@ -118,6 +123,17 @@ function buildProjectsResponse(query) {
         collaboration: p.collaboration,
       })),
     },
+    followUp: isAi
+      ? [
+          "Tell me about your skills",
+          "What technologies do you use?",
+          "How can I contact you?",
+        ]
+      : [
+          "Tell me about your skills",
+          "Show AI projects",
+          "What's your work experience?",
+        ],
   };
 }
 
@@ -136,6 +152,11 @@ function buildExperienceResponse() {
         tech: e.tech,
       })),
     },
+    followUp: [
+      "What's your education?",
+      "Tell me about your skills",
+      "How can I contact you?",
+    ],
   };
 }
 
@@ -158,6 +179,11 @@ function buildEducationResponse() {
         year: c.year,
       })),
     },
+    followUp: [
+      "Tell me about your skills",
+      "What's your work experience?",
+      "Show me your projects",
+    ],
   };
 }
 
@@ -173,6 +199,11 @@ function buildCertificationsResponse() {
         year: c.year,
       })),
     },
+    followUp: [
+      "What's your education?",
+      "Tell me about your skills",
+      "How can I contact you?",
+    ],
   };
 }
 
@@ -182,6 +213,11 @@ function buildContactResponse() {
     component: "contact-card",
     text: "Here's how to reach Anuj.",
     data: { ...contact },
+    followUp: [
+      "What's your work experience?",
+      "Show me your projects",
+      "Why should we hire you?",
+    ],
   };
 }
 
@@ -191,6 +227,11 @@ function buildAvailabilityResponse() {
     component: "contact-card",
     text: `Anuj is currently open to opportunities. ${profile.visaStatus}. Feel free to reach out!`,
     data: { ...contact },
+    followUp: [
+      "Tell me about your skills",
+      "Show me your projects",
+      "What's your work experience?",
+    ],
   };
 }
 
@@ -206,6 +247,11 @@ function buildProfileResponse() {
       currentFocus: profile.currentFocus,
       techStack: profile.techStack,
     },
+    followUp: [
+      "Tell me about your skills",
+      "Show me your projects",
+      "What's your work experience?",
+    ],
   };
 }
 
@@ -222,6 +268,11 @@ function buildFaqResponse(query) {
           type: "local",
           component: "text",
           text: item.answer,
+          followUp: [
+            "Tell me about your skills",
+            "Show me your projects",
+            "How can I contact you?",
+          ],
         };
       }
     }
