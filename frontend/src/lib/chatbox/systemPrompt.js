@@ -42,10 +42,10 @@ Used in: ${projLinks}${learned}`;
   const projectSummary = projects
     .map((project) => {
       const techStack = project.tech?.join(", ") || "N/A";
-      const highlights =
-        project.highlights?.map((h) => `• ${h}`).join("\n") || "N/A";
-      const challenges =
-        project.challenges?.map((c) => `• ${c}`).join("\n") || "N/A";
+      const keyFeatures =
+        project.keyFeatures?.map((f) => `• ${f}`).join("\n") || "N/A";
+      const futureSteps =
+        project.futureImprovements?.map((f) => `• ${f}`).join("\n") || "N/A";
       const learnLinks = [
         project.url ? `[Case study](${project.url})` : null,
         project.repo ? `[Repo](${project.repo})` : null,
@@ -54,13 +54,19 @@ Used in: ${projLinks}${learned}`;
         .filter(Boolean)
         .join(" | ");
 
+      const aiLine = project.aiUsage ? `\nAI Usage: ${project.aiUsage}` : "";
+
       return `**${project.name}** (${project.status || "active"})
 ${project.description}
+Problem: ${project.businessProblem}
+Solution: ${project.solution}
+Architecture: ${project.architecture}
+Key Features:
+${keyFeatures}
+Measurable Impact: ${project.measurableImpact}${aiLine}
+Next Steps:
+${futureSteps}
 Tech Stack: ${techStack}
-Key Achievements:
-${highlights}
-Challenges Solved:
-${challenges}
 
 ${learnLinks}`;
     })

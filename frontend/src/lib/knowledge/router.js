@@ -244,17 +244,27 @@ function buildProjectsResponse(query) {
     type: "local",
     component: "projects-card",
     text: isAi
-      ? "Here are Anuj's AI-focused projects."
-      : `Here are ${list.length} projects Anuj has built.`,
+      ? "Here are Anuj's AI-focused case studies."
+      : `Here are ${list.length} case studies of Anuj's recent work.`,
     data: {
       projects: list.map((p) => ({
         name: p.name,
-        description: p.description,
-        tech: p.tech,
-        highlights: p.highlights,
-        repo: p.repo,
         role: p.role,
         status: p.status,
+        description: p.description,
+        businessProblem: p.businessProblem,
+        solution: p.solution,
+        architecture: p.architecture,
+        keyFeatures: p.keyFeatures,
+        challengesSolved: p.challengesSolved,
+        measurableImpact: p.measurableImpact,
+        aiUsage: p.aiUsage,
+        futureImprovements: p.futureImprovements,
+        screenshots: p.screenshots,
+        tech: p.tech,
+        repo: p.repo,
+        demo: p.demo,
+        url: p.url,
       })),
     },
     followUp: isAi
