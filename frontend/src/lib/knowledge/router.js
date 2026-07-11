@@ -446,9 +446,23 @@ function buildAchievementsResponse() {
         // Look up the optional sourceProject (exact match on projects.js
         // name). When absent (GoDesta work, internship, education, certs)
         // we still ship the achievement but with null cross-link fields
-        // so the card hides the "View Project" link.
+        // so the card hides the "View Project" link AND the inline
+        // case-study drilldown toggle.
         const matchedProject = a.sourceProject
           ? projects.find((p) => p.name === a.sourceProject)
+          : null;
+        // Inline case-study payload (Phase 6.5). Only attached when a
+        // matching project exists; the AchievementCard uses it to power
+        // a click-to-expand drilldown that shows the project's
+        // problem / solution / challenges inline.
+        const caseStudy = matchedProject
+          ? {
+              name: matchedProject.name,
+              url: matchedProject.url || null,
+              businessProblem: matchedProject.businessProblem || null,
+              solution: matchedProject.solution || null,
+              challengesSolved: matchedProject.challengesSolved || [],
+            }
           : null;
         return {
           id: a.id,
@@ -459,6 +473,7 @@ function buildAchievementsResponse() {
           tags: a.tags,
           sourceProjectName: matchedProject ? matchedProject.name : null,
           sourceProjectUrl: matchedProject ? matchedProject.url : null,
+          caseStudy,
         };
       }),
     },

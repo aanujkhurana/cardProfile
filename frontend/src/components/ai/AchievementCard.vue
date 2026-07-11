@@ -1,5 +1,6 @@
 <!--
-  AchievementCard — premium polish (Phase 6).
+  AchievementCard — premium polish (Phase 6) + interactive drilldown
+  (Phase 6.5).
 
   Renders the structured achievements list from the `achievements`
   intent in src/lib/knowledge/router.js. Each achievement is a card
@@ -11,6 +12,24 @@
     4. Meta row: period + tag chips.
     5. Source-project link (only when router resolves sourceProject
        to a real project in projects.js).
+    6. Click-to-expand toggle (Phase 6.5) that surfaces the matched
+       project's case-study fields inline:
+         - The problem
+         - What I built
+         - Challenges solved
+       A real <button> with aria-expanded + aria-controls drives
+       the toggle, so keyboard and screen-reader users get the
+       same affordance as mouse / touch users. Only one card is
+       open at a time, enforced by a single `openId` ref. The
+       expand toggle renders only when the router has attached a
+       caseStudy object with at least one populated field — if all
+       three are empty, the toggle is hidden (no point opening a
+       card with no detail to show).
+
+       The expanded panel uses Vue's <Transition name="drilldown">
+       with a max-height + opacity transition. prefers-reduced-motion
+       disables the transition so users with motion sensitivity get
+       an instant show/hide.
 
   The metric gradient uses -webkit-background-clip with a solid
   fallback color so non-webkit browsers still render the number in
@@ -50,7 +69,10 @@
           </div>
         </div>
 
-        <div v-if="item.sourceProjectUrl" class="ai-achievement-source">
+        <div
+          v-if="item.sourceProjectUrl && !hasCaseStudyContent(item)"
+          class="ai-achievement-source"
+        >
           <a
             :href="item.sourceProjectUrl"
             class="ai-source-link"
@@ -60,15 +82,104 @@
             View project: {{ item.sourceProjectName }}
           </a>
         </div>
+
+        <div
+          v-if="hasCaseStudyContent(item)"
+          class="ai-achievement-drilldown"
+        >
+          <button
+            type="button"
+            class="ai-drilldown-toggle"
+            :aria-expanded="isOpen(item.id) ? 'true' : 'false'"
+            :aria-controls="panelId(item.id)"
+            @click="toggle(item.id)"
+          >
+            <span class="ai-drilldown-toggle-label">
+              <ion-icon
+                :name="isOpen(item.id) ? 'chevron-up-outline' : 'chevron-down-outline'"
+                aria-hidden="true"
+              ></ion-icon>
+              {{ isOpen(item.id) ? "Hide case study" : "Show case study" }}
+            </span>
+            <span v-if="item.sourceProjectName" class="ai-drilldown-toggle-meta">
+              {{ item.sourceProjectName }}
+            </span>
+          </button>
+
+          <Transition name="drilldown">
+            <div
+              v-if="isOpen(item.id)"
+              :id="panelId(item.id)"
+              class="ai-drilldown-panel"
+              role="region"
+              :aria-label="`Case study details for ${item.title}`"
+            >
+              <div v-if="item.caseStudy.businessProblem" class="ai-case-section">
+                <h6 class="ai-label">The problem</h6>
+                <p>{{ item.caseStudy.businessProblem }}</p>
+              </div>
+
+              <div v-if="item.caseStudy.solution" class="ai-case-section">
+                <h6 class="ai-label">What I built</h6>
+                <p>{{ item.caseStudy.solution }}</p>
+              </div>
+
+              <div
+                v-if="item.caseStudy.challengesSolved?.length"
+                class="ai-case-section"
+              >
+                <h6 class="ai-label">Challenges solved</h6>
+                <ul class="ai-drilldown-list">
+                  <li
+                    v-for="c in item.caseStudy.challengesSolved"
+                    :key="c"
+                  >{{ c }}</li>
+                </ul>
+              </div>
+
+              <a
+                v-if="item.caseStudy.url && item.caseStudy.url !== '/'"
+                :href="item.caseStudy.url"
+                class="ai-drilldown-read-more"
+                :aria-label="`Read the full ${item.caseStudy.name} case study`"
+              >
+                Read full case study
+                <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+              </a>
+            </div>
+          </Transition>
+        </div>
       </article>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { ref } from "vue";
+
+const props = defineProps({
   data: { type: Object, required: true },
 });
+
+/**
+ * Tracks the currently-open achievement id. Only one card is open at
+ * a time — opening a new one closes the previous one. This keeps the
+ * focus on a single drilldown at a time and avoids the page getting
+ * visually busy when several case studies are expanded.
+ */
+const openId = ref(null);
+
+function isOpen(id) {
+  return openId.value === id;
+}
+
+function toggle(id) {
+  openId.value = openId.value === id ? null : id;
+}
+
+function panelId(id) {
+  return `achievement-panel-${id}`;
+}
 
 /**
  * Decorative icon per achievement type:
@@ -82,6 +193,23 @@ function achievementIcon(item) {
     return "school-outline";
   }
   return "podium-outline";
+}
+
+/**
+ * Only show the drilldown toggle when the router attached a
+ * caseStudy payload with at least one populated field. If all three
+ * (problem / solution / challenges) are empty, hide the toggle so
+ * the user never expands into a blank panel.
+ */
+function hasCaseStudyContent(item) {
+  const cs = item.caseStudy;
+  if (!cs) return false;
+  if (cs.businessProblem) return true;
+  if (cs.solution) return true;
+  if (Array.isArray(cs.challengesSolved) && cs.challengesSolved.length) {
+    return true;
+  }
+  return false;
 }
 </script>
 
@@ -228,5 +356,195 @@ function achievementIcon(item) {
 .ai-source-link ion-icon {
   font-size: 12px;
   display: inline;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Phase 6.5 — click-to-expand case-study drilldown                    */
+/* ------------------------------------------------------------------ */
+
+.ai-achievement-drilldown {
+  margin-top: 10px;
+}
+
+.ai-drilldown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  background: var(--onyx);
+  color: var(--white-2);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.ai-drilldown-toggle:hover {
+  background: hsla(45, 100%, 72%, 0.1);
+  border-color: hsla(45, 100%, 72%, 0.25);
+}
+
+.ai-drilldown-toggle:focus-visible {
+  outline: 2px solid var(--orange-yellow-crayola);
+  outline-offset: 2px;
+}
+
+.ai-drilldown-toggle[aria-expanded="true"] {
+  background: hsla(45, 100%, 72%, 0.1);
+  border-color: hsla(45, 100%, 72%, 0.3);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.ai-drilldown-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--vegas-gold);
+}
+
+.ai-drilldown-toggle-label ion-icon {
+  font-size: 14px;
+  display: inline;
+  transition: transform 180ms ease;
+}
+
+.ai-drilldown-toggle[aria-expanded="true"] .ai-drilldown-toggle-label ion-icon {
+  transform: rotate(0deg);
+}
+
+.ai-drilldown-toggle-meta {
+  font-size: 10px;
+  color: var(--light-gray-70);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
+.ai-drilldown-panel {
+  background: hsla(0, 0%, 0%, 0.18);
+  border: 1px solid hsla(45, 100%, 72%, 0.2);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  padding: 10px 12px 12px;
+  overflow: hidden;
+}
+
+.ai-case-section {
+  margin-bottom: 10px;
+}
+
+.ai-case-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.ai-label {
+  color: var(--light-gray-70);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 4px;
+}
+
+.ai-case-section p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--light-gray);
+}
+
+.ai-drilldown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ai-drilldown-list li {
+  font-size: 12px;
+  color: var(--light-gray);
+  padding: 2px 0 2px 12px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.ai-drilldown-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--orange-yellow-crayola);
+}
+
+.ai-drilldown-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vegas-gold);
+  text-decoration: none;
+  border-bottom: 1px dashed hsla(45, 100%, 72%, 0.3);
+  padding-bottom: 1px;
+  transition: border-color 150ms ease, transform 180ms ease;
+}
+
+.ai-drilldown-read-more:hover {
+  border-color: var(--vegas-gold);
+  transform: translateX(2px);
+}
+
+.ai-drilldown-read-more ion-icon {
+  font-size: 12px;
+  display: inline;
+}
+
+/* Vue Transition: smooth max-height + opacity expand/collapse.
+   The element starts collapsed (max-height: 0) and animates to a
+   tall cap (max-height: 800px) — large enough for the longest
+   possible case study without clipping. */
+
+.drilldown-enter-active,
+.drilldown-leave-active {
+  transition: max-height 220ms var(--ease, ease), opacity 180ms ease,
+    padding 220ms var(--ease, ease);
+  overflow: hidden;
+}
+
+.drilldown-enter-from,
+.drilldown-leave-to {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.drilldown-enter-to,
+.drilldown-leave-from {
+  max-height: 800px;
+  opacity: 1;
+}
+
+/* Respect prefers-reduced-motion: skip the height/opacity animation. */
+@media (prefers-reduced-motion: reduce) {
+  .drilldown-enter-active,
+  .drilldown-leave-active {
+    transition: none;
+  }
+  .ai-drilldown-toggle-label ion-icon {
+    transition: none;
+  }
 }
 </style>
