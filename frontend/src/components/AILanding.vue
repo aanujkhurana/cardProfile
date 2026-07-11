@@ -1,13 +1,13 @@
 <template>
-  <div class="ai-landing" @mousemove="handleMouseMove">
+  <div class="ai-landing">
     <!-- Background layers -->
     <div class="ai-bg">
       <div class="ai-bg-glow ai-bg-glow--1"></div>
       <div class="ai-bg-glow ai-bg-glow--2"></div>
       <div class="ai-bg-glow ai-bg-glow--3"></div>
-      <div class="ai-bg-spotlight" ref="spotlightRef"></div>
       <div class="ai-bg-grid"></div>
       <div class="ai-bg-grain"></div>
+      <div class="ai-bg-vignette"></div>
     </div>
 
     <!-- Top bar -->
@@ -28,7 +28,7 @@
       <div v-if="messages.length <= 1" class="ai-welcome">
         <span class="ai-welcome-label ai-stagger" data-delay="1">AI-Powered Portfolio</span>
         <div class="ai-welcome-avatar ai-stagger" data-delay="2">
-          <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" />
+          <img src="../assets/images/wave.gif" alt="Hello" />
         </div>
         <h1 class="ai-welcome-title ai-stagger" data-delay="3">Meet Anuj through conversation.</h1>
         <p class="ai-welcome-subtitle ai-stagger" data-delay="4">Learn about my software engineering experience, projects, technical skills, and the products I've built through a natural conversation instead of browsing a traditional portfolio.</p>
@@ -146,7 +146,6 @@ const conversationHistory = ref([]);
 
 const messagesContainer = ref(null);
 const messageInput = ref(null);
-const spotlightRef = ref(null);
 
 const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -161,15 +160,6 @@ onMounted(() => {
   messages.push(welcomeMessage);
   nextTick(() => messageInput.value?.focus());
 });
-
-const handleMouseMove = (e) => {
-  if (!spotlightRef.value) return;
-  const rect = e.currentTarget.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  spotlightRef.value.style.transform = `translate(${x - 200}px, ${y - 200}px)`;
-  spotlightRef.value.style.opacity = "1";
-};
 
 watch(
   () => messages.length,
@@ -367,11 +357,14 @@ const formatTime = (timestamp) => {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(hsla(0, 0%, 100%, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, hsla(0, 0%, 100%, 0.02) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 60% 50% at 50% 40%, black 20%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 40%, black 20%, transparent 70%);
+    linear-gradient(hsla(0, 0%, 100%, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(0, 0%, 100%, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  transform: perspective(500px) rotateX(45deg);
+  transform-origin: center 80%;
+  mask-image: linear-gradient(to top, black 0%, transparent 60%);
+  -webkit-mask-image: linear-gradient(to top, black 0%, transparent 60%);
+  opacity: 0.6;
 }
 
 .ai-bg-grain {
@@ -385,16 +378,10 @@ const formatTime = (timestamp) => {
   opacity: 0.4;
 }
 
-.ai-bg-spotlight {
+.ai-bg-vignette {
   position: absolute;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(circle, hsla(45, 54%, 58%, 0.06) 0%, transparent 70%);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s ease, transform 0.15s ease-out;
-  will-change: transform;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, hsla(240, 2%, 13%, 0.7) 100%);
 }
 
 /* Top bar */
@@ -495,8 +482,8 @@ const formatTime = (timestamp) => {
 }
 
 .ai-welcome-avatar {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   overflow: hidden;
   margin-bottom: 28px;
@@ -507,6 +494,7 @@ const formatTime = (timestamp) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .ai-welcome-title {
@@ -847,8 +835,8 @@ const formatTime = (timestamp) => {
     opacity: 1;
   }
 
-  .ai-bg-spotlight {
-    display: none;
+  .ai-bg-grid {
+    transform: none;
   }
 
   .ai-msg {
