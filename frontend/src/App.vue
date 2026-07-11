@@ -9,7 +9,7 @@
     <div v-show="!showAI" class="website-wrapper">
       <ThemeToggle />
       <v-spacer></v-spacer>
-      <Chatbox :openai-api-key="openaiApiKey" model="gpt-3.5-turbo" ref="chatbot" />
+      <Chatbox openai-api-key="" model="gpt-3.5-turbo" />
       <Card></Card>
 
       <!-- Back to AI floating button -->
@@ -26,9 +26,6 @@ import ThemeToggle from "./components/ThemeToggle.vue";
 import Chatbox from "./components/Chatbox.vue";
 import AILanding from "./components/AILanding.vue";
 import { ref } from "vue";
-
-const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
-const chatbot = ref(null);
 
 // AI is the default view
 const showAI = ref(true);

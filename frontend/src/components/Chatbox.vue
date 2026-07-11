@@ -107,7 +107,7 @@ import { buildSystemPrompt } from "../lib/chatbox/systemPrompt.js";
 const props = defineProps({
   openaiApiKey: {
     type: String,
-    required: true,
+    default: "",
   },
   model: {
     type: String,
@@ -302,9 +302,6 @@ defineExpose({
     isOpen.value = false;
   },
   sendMessage,
-  updateContext: (newContext) => {
-    Object.assign(contextData, newContext);
-  },
 });
 </script>
 

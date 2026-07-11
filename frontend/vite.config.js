@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/chat': {
-        target: 'https://openai-proxy-louxhcirv-anuj-khuranas-projects.vercel.app',
+        target: 'https://openai-proxy-mujovdlo3-anuj-khuranas-projects.vercel.app',
         changeOrigin: true,
         secure: true,
       }

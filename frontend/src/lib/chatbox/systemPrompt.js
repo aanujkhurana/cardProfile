@@ -30,13 +30,13 @@ ${learnLinks}`;
   }).join('\n\n');
 
   const experienceSummary = contextData.experience.map(exp => {
-    return `**${exp.role}** @ ${exp.company} (${exp.location}, ${exp.dates})
-${exp.description?.map(b => `• ${b}`).join('\n')}`;
+    return `**${exp.role}** @ ${exp.company} (${exp.location}, ${exp.period})
+${exp.responsibilities?.map(b => `• ${b}`).join('\n')}`;
   }).join('\n\n');
 
   const educationSummary = contextData.education.map(edu => {
     return `**${edu.degree}** - ${edu.institution} (${edu.location}, ${edu.year})
-${edu.details}`;
+${edu.specialization || ''}`;
   }).join('\n\n');
 
   const certSummary = contextData.certifications.map(cert => {
