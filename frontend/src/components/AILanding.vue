@@ -1,5 +1,14 @@
 <template>
   <div class="ai-landing">
+    <!-- Background layers -->
+    <div class="ai-bg">
+      <div class="ai-bg-glow ai-bg-glow--1"></div>
+      <div class="ai-bg-glow ai-bg-glow--2"></div>
+      <div class="ai-bg-glow ai-bg-glow--3"></div>
+      <div class="ai-bg-grid"></div>
+      <div class="ai-bg-grain"></div>
+    </div>
+
     <!-- Top bar -->
     <header class="ai-topbar">
       <div class="ai-topbar-brand">
@@ -291,6 +300,78 @@ const formatTime = (timestamp) => {
   flex-direction: column;
   background: var(--eerie-black-1);
   font-family: var(--ff-poppins);
+  overflow: hidden;
+}
+
+/* Background layers */
+.ai-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ai-bg-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0;
+  animation: glow-in 1.5s ease forwards;
+}
+
+.ai-bg-glow--1 {
+  width: 600px;
+  height: 600px;
+  top: -15%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, hsla(45, 54%, 58%, 0.08) 0%, transparent 70%);
+  animation-delay: 0.3s;
+}
+
+.ai-bg-glow--2 {
+  width: 400px;
+  height: 400px;
+  top: 20%;
+  right: -10%;
+  background: radial-gradient(circle, hsla(220, 60%, 50%, 0.04) 0%, transparent 70%);
+  animation-delay: 0.6s;
+}
+
+.ai-bg-glow--3 {
+  width: 500px;
+  height: 500px;
+  bottom: -10%;
+  left: -10%;
+  background: radial-gradient(circle, hsla(45, 100%, 72%, 0.05) 0%, transparent 70%);
+  animation-delay: 0.9s;
+}
+
+@keyframes glow-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ai-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(hsla(0, 0%, 100%, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(0, 0%, 100%, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 40%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 40%, black 20%, transparent 70%);
+}
+
+.ai-bg-grain {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  opacity: 0.4;
 }
 
 /* Top bar */
@@ -299,8 +380,13 @@ const formatTime = (timestamp) => {
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-bottom: 1px solid var(--onyx);
+  border-bottom: 1px solid hsla(0, 0%, 17%, 0.5);
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: hsla(240, 2%, 13%, 0.6);
 }
 
 .ai-topbar-brand {
@@ -353,6 +439,8 @@ const formatTime = (timestamp) => {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* Welcome */
@@ -562,6 +650,8 @@ const formatTime = (timestamp) => {
 .ai-input-area {
   padding: 12px 24px 20px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .ai-chips {
