@@ -199,6 +199,7 @@ const sendMessage = async (messageText) => {
         cardComponent: cardComponent,
         cardData: localResponse.data || null,
         source: "local",
+        followUp: localResponse.followUp || null,
       });
 
       conversationHistory.value.push(
