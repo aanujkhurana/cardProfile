@@ -23,7 +23,7 @@
     </header>
 
     <!-- Main content -->
-    <div class="ai-main" ref="scroller" @scroll.passive="onScroll">
+    <div class="ai-main" @scroll.passive="onScroll">
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">          <div class="ai-welcome-avatar-wrap">
           <div class="ai-welcome-avatar">
