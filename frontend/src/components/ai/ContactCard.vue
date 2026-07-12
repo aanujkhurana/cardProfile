@@ -11,8 +11,15 @@
   field name, renames the class to `ai-availability-badge`, and
   elevates the visual treatment.
 
-  The pulse animation is disabled via prefers-reduced-motion so
-  motion-sensitive users see a static dot.
+  Phase 8 update: badge now consumes `data.availability` (a
+  structured object with tone + label + subtext) instead of the
+  flat `availabilityNote` string. Three tone variants
+  (positive = green / open, informational = blue / employed,
+  cautious = amber / selectively-open) are defined as CSS
+  variables on the badge so the pulse animation can retarget the
+  halo colour per state without duplicating keyframes. Edits to
+  `profile.availabilityStatus` flip both this badge and the
+  persona prompt's availability line simultaneously.
 -->
 
 <template>
@@ -23,13 +30,14 @@
     </h4>
 
     <div
-      v-if="data.availabilityNote"
+      v-if="data.availability"
       class="ai-availability-badge"
+      :class="`tone-${data.availability.tone}`"
       role="status"
       aria-live="polite"
     >
       <span class="ai-availability-dot" aria-hidden="true"></span>
-      <span class="ai-availability-text">{{ data.availabilityNote }}</span>
+      <span class="ai-availability-text">{{ data.availability.fullText }}</span>
     </div>
 
     <div class="ai-contact-grid">
@@ -98,31 +106,60 @@ defineProps({ data: { type: Object, required: true } });
 }
 
 /* ------------------------------------------------------------------ */
-/*  Phase 7 — Currently open to opportunities badge                    */
+/*  Phase 8 — Availability state machine                               */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Badge styling is driven entirely by per-tone CSS variables so the
+ * pulse animation can retarget the halo colour without duplicating
+ * keyframes. Each tone sets --badge-color-rgb (used by the shadow
+ * alpha-fade keyframes) plus the visible background/border/text.
+ */
 .ai-availability-badge {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
   padding: 8px 12px;
-  background: rgba(74, 222, 128, 0.08);
-  border: 1px solid rgba(74, 222, 128, 0.22);
   border-radius: 8px;
-  color: #4ade80;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
+  background: var(--badge-bg);
+  border: 1px solid var(--badge-border);
+  color: var(--badge-color);
+}
+
+.ai-availability-badge.tone-positive {
+  /* green — currently open to opportunities */
+  --badge-color-rgb: 74, 222, 128;
+  --badge-color: #4ade80;
+  --badge-bg: rgba(74, 222, 128, 0.08);
+  --badge-border: rgba(74, 222, 128, 0.22);
+}
+
+.ai-availability-badge.tone-informational {
+  /* blue/cyan — currently employed, not actively looking */
+  --badge-color-rgb: 56, 189, 248;
+  --badge-color: #38bdf8;
+  --badge-bg: rgba(56, 189, 248, 0.08);
+  --badge-border: rgba(56, 189, 248, 0.22);
+}
+
+.ai-availability-badge.tone-cautious {
+  /* amber/gold — selectively open to the right fit */
+  --badge-color-rgb: 251, 191, 36;
+  --badge-color: #fbbf24;
+  --badge-bg: rgba(251, 191, 36, 0.08);
+  --badge-border: rgba(251, 191, 36, 0.22);
 }
 
 .ai-availability-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #4ade80;
+  background: var(--badge-color);
   flex-shrink: 0;
-  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
   animation: ai-pulse-dot 2s ease-out infinite;
 }
 
@@ -130,15 +167,21 @@ defineProps({ data: { type: Object, required: true } });
   flex: 1;
 }
 
+/**
+ * Pulse halo fades from a soft tinted ring (alpha 0.6) to fully
+ * transparent while expanding from 0 → 8px. The colour comes from
+ * the per-tone --badge-color-rgb variable so a single keyframes
+ * rule covers all three states.
+ */
 @keyframes ai-pulse-dot {
   0% {
-    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+    box-shadow: 0 0 0 0 rgba(var(--badge-color-rgb), 0.6);
   }
   70% {
-    box-shadow: 0 0 0 8px rgba(74, 222, 128, 0);
+    box-shadow: 0 0 0 8px rgba(var(--badge-color-rgb), 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+    box-shadow: 0 0 0 0 rgba(var(--badge-color-rgb), 0);
   }
 }
 

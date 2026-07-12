@@ -11,6 +11,7 @@
 
 import {
   profile,
+  getAvailability,
   skills,
   projects,
   experience,
@@ -24,6 +25,11 @@ const projectIndex = new Map();
 for (const p of projects) projectIndex.set(p.name.toLowerCase(), p);
 
 export function buildSystemPrompt() {
+  // Phase 8: same single source of truth the ContactCard reads
+  // from. Flipping profile.availabilityStatus updates the badge
+  // AND this prompt line in one edit.
+  const availability = getAvailability();
+
   const skillSummary = skills
     .map((skill) => {
       const projLinks = skill.projects
@@ -131,7 +137,7 @@ ANUJ'S PROFILE:
 🔗 [GitHub](${profile.contact.github}) | [LinkedIn](${profile.contact.linkedin}) | [Website](${profile.contact.website})
 🎯 **Current Focus**: ${profile.currentFocus.join(", ")}
 🛂 **Visa**: ${profile.visaStatus}
-📅 **Availability**: ${profile.availabilityNote}
+📅 **Availability**: ${availability.fullText}
 
 📝 **Summary**:
 ${profile.summary}
@@ -185,7 +191,7 @@ INSTRUCTIONS:
 7. If asked about Anuj's personal interests, hobbies, or non-professional topics, respond politely that you can only provide information related to Anuj's professional background and projects.
 8. Keep responses concise but informative, focusing on Anuj's strengths and achievements.
 9. If the user asks about Anuj's future plans or aspirations, mention his interest in AI and LLM app engineering, plus his focus on Vue 3 and real-time systems.
-10. If asked about availability, mention ${profile.availabilityNote} (with ${profile.visaStatus}) and direct to the contact card.
+10. If asked about availability, mention ${availability.narrative} (with ${profile.visaStatus}) and direct to the contact card.
 11. If asked about Anuj's personal life, redirect politely to the contact page.
 `;
 }

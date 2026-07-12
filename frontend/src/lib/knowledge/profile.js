@@ -50,19 +50,24 @@ Comfortable across the stack — frontend, API design, Postgres, serverless — 
   ],
   visaStatus: "VISA 485 with full working rights in Australia, valid until 2029",
   /**
-   * Human-readable availability statement surfaced in:
-   *   - the ContactCard badge (Phase 7, with a live pulse dot)
-   *   - the persona prompt so Gemini can answer "are you open to
-   *     opportunities?" directly
-   *   - the buildContactResponse and buildAvailabilityResponse
-   *     data envelopes in src/lib/knowledge/router.js
+   * Canonical availability signal (Phase 8).
    *
-   * ⚠️  When you change this string, mirror the change in any card
-   *     that renders the full note (ContactCard's badge) so the
-   *     visible copy matches the persona prompt.
+   * Drives the ContactCard badge colour + label AND the persona
+   * prompt's availability line AND the buildAvailabilityResponse
+   * AI text. To flip the signal — e.g., when Anuj starts a new
+   * role — change this single enum value. `getAvailability()`
+   * resolves it to a structured object (tone, label, subtext,
+   * narrative) that the card and prompt both consume.
+   *
+   * Valid values:
+   *   - "open"               → actively exploring (green badge)
+   *   - "employed"           → not actively looking (blue badge)
+   *   - "selectively-open"   → passive candidate (amber badge)
+   *
+   * Unrecognised values gracefully fall back to "open" so a typo
+   * can't hide the highest-signal state from recruiters.
    */
-  availabilityNote:
-    "Currently open to opportunities · Responds within 24 hours",
+  availabilityStatus: "open",
   contact: {
     phone: "+61 48 12 50 988",
     email: "aanujkhurana@gmail.com",
@@ -85,3 +90,63 @@ Comfortable across the stack — frontend, API design, Postgres, serverless — 
     "CSS",
   ],
 };
+
+/* ------------------------------------------------------------------ */
+/*  Availability state machine (Phase 8)                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Per-state presentation + narrative. Single source of truth for
+ * everything the AI or cards surface about Anuj's availability.
+ *
+ * Shape per state:
+ *   - tone      : CSS tone class (positive / informational / cautious)
+ *   - label     : primary headline shown on the ContactCard badge
+ *   - subtext   : short detail line shown after the "·" on the badge
+ *   - narrative : 1-sentence signal the LLM persona uses in
+ *                 buildAvailabilityResponse and instruction 10
+ */
+const AVAILABILITY_STATES = {
+  open: {
+    tone: "positive",
+    label: "Currently open to opportunities",
+    subtext: "Responds within 24 hours",
+    narrative: "Currently open to opportunities",
+  },
+  employed: {
+    tone: "informational",
+    label: "Currently working at GoDesta",
+    subtext: "Not actively looking",
+    narrative: "Currently employed and not actively looking",
+  },
+  "selectively-open": {
+    tone: "cautious",
+    label: "Selectively open to opportunities",
+    subtext: "Open to the right fit",
+    narrative: "Selectively open to the right opportunities",
+  },
+};
+
+/**
+ * Resolves `profile.availabilityStatus` into a structured object.
+ *
+ * Always returns a valid state (graceful fallback to "open" on an
+ * unrecognised value). The returned object also carries `status`
+ * (the raw enum) and `fullText` (label · subtext, the single
+ * string the ContactCard renders and the systemPrompt persona
+ * line shows).
+ */
+export function getAvailability() {
+  const state =
+    AVAILABILITY_STATES[profile.availabilityStatus] || AVAILABILITY_STATES.open;
+  return {
+    status: profile.availabilityStatus in AVAILABILITY_STATES
+      ? profile.availabilityStatus
+      : "open",
+    tone: state.tone,
+    label: state.label,
+    subtext: state.subtext,
+    narrative: state.narrative,
+    fullText: `${state.label} · ${state.subtext}`,
+  };
+}

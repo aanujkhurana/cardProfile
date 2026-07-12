@@ -12,6 +12,7 @@
 
 import {
   profile,
+  getAvailability,
   skills,
   technicalSkills,
   getSkillsByCategory,
@@ -359,7 +360,11 @@ function buildContactResponse() {
     data: {
       ...contact,
       visaStatus: profile.visaStatus,
-      availabilityNote: profile.availabilityNote,
+      // Phase 8: structured availability surface — tone drives the
+      // CSS variant, fullText drives the badge copy. Editing
+      // profile.availabilityStatus updates this object + the
+      // persona prompt simultaneously.
+      availability: getAvailability(),
     },
     followUp: [
       "Show me your projects",
@@ -370,14 +375,15 @@ function buildContactResponse() {
 }
 
 function buildAvailabilityResponse() {
+  const availability = getAvailability();
   return {
     type: "local",
     component: "contact-card",
-    text: `${profile.availabilityNote}. ${profile.visaStatus}. Feel free to reach out!`,
+    text: `${availability.narrative}. ${profile.visaStatus}. Feel free to reach out!`,
     data: {
       ...contact,
       visaStatus: profile.visaStatus,
-      availabilityNote: profile.availabilityNote,
+      availability,
     },
     followUp: [
       "Tell me about your skills",

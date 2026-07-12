@@ -7,7 +7,7 @@
  * Use the canonical modules below instead.
  */
 
-export { profile } from "./profile.js";
+export { profile, getAvailability } from "./profile.js";
 export {
   skills,
   technicalSkills,
