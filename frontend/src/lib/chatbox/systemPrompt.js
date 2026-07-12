@@ -137,7 +137,7 @@ ANUJ'S PROFILE:
 🔗 [GitHub](${profile.contact.github}) | [LinkedIn](${profile.contact.linkedin}) | [Website](${profile.contact.website})
 🎯 **Current Focus**: ${profile.currentFocus.join(", ")}
 🛂 **Visa**: ${profile.visaStatus}
-📅 **Availability**: ${availability.fullText}
+📅 **Availability**: ${availability.fullText} (last updated ${availability.lastCheckedAbsolute})
 
 📝 **Summary**:
 ${profile.summary}
@@ -191,7 +191,7 @@ INSTRUCTIONS:
 7. If asked about Anuj's personal interests, hobbies, or non-professional topics, respond politely that you can only provide information related to Anuj's professional background and projects.
 8. Keep responses concise but informative, focusing on Anuj's strengths and achievements.
 9. If the user asks about Anuj's future plans or aspirations, mention his interest in AI and LLM app engineering, plus his focus on Vue 3 and real-time systems.
-10. If asked about availability, mention ${availability.fullText} (with ${profile.visaStatus}) and direct to the contact card.
+10. If asked about availability, mention ${availability.fullText} (last updated ${availability.lastCheckedAbsolute}, with ${profile.visaStatus}) and direct to the contact card.
 11. If asked about Anuj's personal life, redirect politely to the contact page.
 `;
 }

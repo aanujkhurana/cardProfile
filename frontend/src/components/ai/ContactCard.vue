@@ -20,6 +20,13 @@
   halo colour per state without duplicating keyframes. Edits to
   `profile.availabilityStatus` flip both this badge and the
   persona prompt's availability line simultaneously.
+
+  Phase 10 update: badge gains a small `<time>` element next to
+  the main text showing the relative "Last updated" phrase from
+  `data.availability.lastCheckedFormatted` (e.g. "Today", "3 days
+  ago"). The same `availabilityLastChecked` field in profile.js
+  drives the static sidebar chip (Phase 9) and this badge, so a
+  single edit updates both.
 -->
 
 <template>
@@ -38,6 +45,11 @@
     >
       <span class="ai-availability-dot" aria-hidden="true"></span>
       <span class="ai-availability-text">{{ data.availability.fullText }}</span>
+      <time
+        v-if="data.availability.lastCheckedFormatted"
+        class="ai-availability-timestamp"
+        :datetime="data.availability.lastChecked || undefined"
+      >· {{ data.availability.lastCheckedFormatted }}</time>
     </div>
 
     <div class="ai-contact-grid">
@@ -165,6 +177,22 @@ defineProps({ data: { type: Object, required: true } });
 
 .ai-availability-text {
   flex: 1;
+}
+
+/**
+ * Phase 10 — relative "Last updated" caption. Smaller + dimmer
+ * than the main label so the recruiter's eye lands on the
+ * headline first. Theme-aware via --light-gray-70 (auto-flips
+ * in light mode via the existing token override).
+ */
+.ai-availability-timestamp {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--light-gray-70);
+  opacity: 0.85;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 /**

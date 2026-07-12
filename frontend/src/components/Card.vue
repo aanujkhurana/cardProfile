@@ -25,16 +25,36 @@
           prompt. Editing that one enum updates all three surfaces.
           The `title` attribute surfaces the subtext on hover; the
           `aria-label` carries the full statement for screen readers.
+
+          Phase 10 — the chip gains a small `<time>` element next to
+          the label showing the relative "Last updated" phrase from
+          `availability.lastCheckedFormatted`. The same
+          `availabilityLastChecked` field in profile.js drives this
+          chip AND the ContactCard badge, so a single edit to the
+          ISO date updates both surfaces.
         -->
         <div
           v-if="availability"
           class="info-availability"
           :class="`tone-${availability.tone}`"
-          :title="availability.subtext"
-          :aria-label="`${availability.label}. ${availability.subtext}`"
+          :title="
+            availability.lastCheckedAbsolute
+              ? `${availability.subtext} · Last updated ${availability.lastCheckedAbsolute}`
+              : availability.subtext
+          "
+          :aria-label="
+            availability.lastCheckedAbsolute
+              ? `${availability.label}. ${availability.subtext}. Last updated ${availability.lastCheckedAbsolute}`
+              : `${availability.label}. ${availability.subtext}`
+          "
         >
           <span class="info-availability-dot" aria-hidden="true"></span>
           <span class="info-availability-text">{{ availability.label }}</span>
+          <time
+            v-if="availability.lastCheckedFormatted"
+            class="info-availability-timestamp"
+            :datetime="availability.lastChecked || undefined"
+          >· {{ availability.lastCheckedFormatted }}</time>
         </div>
       </div>
 

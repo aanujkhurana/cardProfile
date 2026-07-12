@@ -68,6 +68,20 @@ Comfortable across the stack — frontend, API design, Postgres, serverless — 
    * can't hide the highest-signal state from recruiters.
    */
   availabilityStatus: "open",
+  /**
+   * Phase 10 — last-updated timestamp (ISO 8601 date).
+   *
+   * Set at deploy time so the chip + persona prompt can show
+   * recruiters how fresh the availability signal is. Update this
+   * field whenever the signal above changes (e.g. when Anuj
+   * starts a new role). The `formatLastChecked()` helper turns
+   * this ISO string into a human relative phrase ("Today",
+   * "Yesterday", "3 days ago", "Jul 12, 2026") at render time
+   * so the relative phrase stays accurate without a rebuild.
+   *
+   * Today: this build was deployed on 2026-07-12.
+   */
+  availabilityLastChecked: "2026-07-12",
   contact: {
     phone: "+61 48 12 50 988",
     email: "aanujkhurana@gmail.com",
@@ -130,14 +144,29 @@ const AVAILABILITY_STATES = {
  * Resolves `profile.availabilityStatus` into a structured object.
  *
  * Always returns a valid state (graceful fallback to "open" on an
- * unrecognised value). The returned object also carries `status`
- * (the raw enum) and `fullText` (label · subtext, the single
- * string the ContactCard renders and the systemPrompt persona
- * line shows).
+ * unrecognised value). The returned object carries:
+ *   - status               : the raw enum (for ad-hoc logic)
+ *   - tone / label / subtext: per-state presentation (Phase 8)
+ *   - fullText             : "label · subtext" — the single string
+ *                            the ContactCard / persona prompt read
+ *   - lastChecked          : raw ISO date from profile.js (or null)
+ *   - lastCheckedFormatted : relative phrase ("Today", "3 days ago",
+ *                            or absolute for > 30 days) — the
+ *                            ContactCard + static chip display this
+ *   - lastCheckedAbsolute  : always-absolute phrase ("Jul 12, 2026")
+ *                            — the persona prompt uses this for
+ *                            "as of [date]" mentions
+ *
+ * `formatLastChecked(isoDate, { now, style })` is exported alongside
+ * so tests can inject a fixed `now` value and exercise edge cases
+ * (future dates from clock skew, invalid strings, multi-year
+ * intervals) deterministically.
  */
 export function getAvailability() {
   const state =
     AVAILABILITY_STATES[profile.availabilityStatus] || AVAILABILITY_STATES.open;
+  const now = new Date();
+  const lastChecked = profile.availabilityLastChecked || null;
   return {
     status: profile.availabilityStatus in AVAILABILITY_STATES
       ? profile.availabilityStatus
@@ -146,5 +175,82 @@ export function getAvailability() {
     label: state.label,
     subtext: state.subtext,
     fullText: `${state.label} · ${state.subtext}`,
+    lastChecked,
+    lastCheckedFormatted: formatLastChecked(lastChecked, { now }),
+    lastCheckedAbsolute: formatLastChecked(lastChecked, {
+      now,
+      style: "absolute",
+    }),
   };
+}
+
+/* ------------------------------------------------------------------ */
+/*  Phase 10 — last-updated formatter                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Formats an ISO-8601 date string into a human phrase.
+ *
+ *   style = "relative" (default) — "Today" / "Yesterday" /
+ *            "3 days ago" / "2 weeks ago" / "Jul 12" / "Jul 12, 2025"
+ *   style = "absolute"           — always "Jul 12, 2026"
+ *
+ * Edge cases:
+ *   - null / empty / unparseable input  → returns null (callers hide
+ *                                          the timestamp element)
+ *   - future date (clock skew)          → "Today" (clamped to today)
+ *   - same calendar day                 → "Today"
+ *   - previous calendar day             → "Yesterday"
+ *   - older than 30 days                → falls back to absolute-ish
+ *                                          format ("Jul 12" this year,
+ *                                          "Jul 12, 2025" otherwise)
+ *
+ * `now` defaults to `new Date()` and is injectable so unit tests
+ * can pin the reference date and assert the exact output without
+ * mocking the global clock.
+ */
+export function formatLastChecked(
+  isoDate,
+  { now = new Date(), style = "relative" } = {}
+) {
+  if (!isoDate) return null;
+  const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return null;
+
+  const MONTHS = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ];
+  const month = MONTHS[date.getMonth()];
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const absoluteFormatted = `${month} ${day}, ${year}`;
+
+  if (style === "absolute") return absoluteFormatted;
+
+  // UTC day math avoids timezone surprises: a "Jul 12" stored at
+  // 23:00 UTC shouldn't read as "Jul 13" for a recruiter in a
+  // timezone east of UTC who loads the page at 09:00 their time.
+  const dateDay = Date.UTC(year, date.getMonth(), day);
+  const nowDay = Date.UTC(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+  const diffDays = Math.floor((nowDay - dateDay) / (1000 * 60 * 60 * 24));
+
+  // Future date (clock skew) — treat as today rather than rendering
+  // a confusing "in -2 days" phrase.
+  if (diffDays <= 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
+  }
+
+  // Older than 30 days: short month-day, plus year only if it
+  // doesn't match the current year. Keeps the chip compact while
+  // still giving the recruiter enough context to know it's stale.
+  return year === now.getFullYear() ? `${month} ${day}` : absoluteFormatted;
 }
