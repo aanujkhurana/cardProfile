@@ -379,7 +379,10 @@ function buildAvailabilityResponse() {
   return {
     type: "local",
     component: "contact-card",
-    text: `${availability.narrative}. ${profile.visaStatus}. Feel free to reach out!`,
+    // Mirror the badge copy verbatim: fullText = label · subtext.
+    // Single source of truth keeps the spoken AI reply and the
+    // visible badge lined up — flipping the enum updates both.
+    text: `${availability.fullText}. ${profile.visaStatus}. Feel free to reach out!`,
     data: {
       ...contact,
       visaStatus: profile.visaStatus,

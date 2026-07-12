@@ -100,30 +100,29 @@ Comfortable across the stack — frontend, API design, Postgres, serverless — 
  * everything the AI or cards surface about Anuj's availability.
  *
  * Shape per state:
- *   - tone      : CSS tone class (positive / informational / cautious)
- *   - label     : primary headline shown on the ContactCard badge
- *   - subtext   : short detail line shown after the "·" on the badge
- *   - narrative : 1-sentence signal the LLM persona uses in
- *                 buildAvailabilityResponse and instruction 10
+ *   - tone     : CSS tone class (positive / informational / cautious)
+ *   - label    : primary headline shown on the ContactCard badge
+ *   - subtext  : short detail line shown after the "·" on the badge
+ *
+ * The badge, persona prompt line, and router AI text all read the
+ * resolved `fullText` (label · subtext) so a recruiter sees the
+ * exact same signal on the badge AND in the AI's spoken reply.
  */
 const AVAILABILITY_STATES = {
   open: {
     tone: "positive",
     label: "Currently open to opportunities",
     subtext: "Responds within 24 hours",
-    narrative: "Currently open to opportunities",
   },
   employed: {
     tone: "informational",
     label: "Currently working at GoDesta",
     subtext: "Not actively looking",
-    narrative: "Currently employed and not actively looking",
   },
   "selectively-open": {
     tone: "cautious",
     label: "Selectively open to opportunities",
     subtext: "Open to the right fit",
-    narrative: "Selectively open to the right opportunities",
   },
 };
 
@@ -146,7 +145,6 @@ export function getAvailability() {
     tone: state.tone,
     label: state.label,
     subtext: state.subtext,
-    narrative: state.narrative,
     fullText: `${state.label} · ${state.subtext}`,
   };
 }
