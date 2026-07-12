@@ -23,7 +23,7 @@
     </header>
 
     <!-- Main content -->
-    <div class="ai-main" ref="mainContainer" @scroll.passive="handleScroll">
+    <div class="ai-main" @scroll.passive="handleScroll">
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">          <div class="ai-welcome-avatar-wrap">
           <div class="ai-welcome-avatar">
@@ -155,7 +155,6 @@ const messageInput = ref(null);
 // ambient grid + grain read edge-to-edge. The scroll listener
 // uses .passive (set via @scroll.passive in the template) so
 // it never blocks the scroll thread.
-const mainContainer = ref(null);
 const isScrolled = ref(false);
 const handleScroll = (e) => {
   isScrolled.value = e.target.scrollTop > 10;
