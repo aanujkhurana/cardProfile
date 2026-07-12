@@ -27,7 +27,34 @@
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">          <div class="ai-welcome-avatar-wrap">
           <div class="ai-welcome-avatar">
-            <img src="../assets/images/wave.gif" alt="Hello" />
+            <!-- Phase 20 — Hand-wave gif replaced with an inline
+                 SVG smiley face so the avatar stays theme-coherent
+                 (still yellow in light mode thanks to raw HSL; the
+                 previous --vegas-gold / --orange-yellow-crayola
+                 tokens would have turned it indigo in light mode),
+                 scales crisply on retina, and ships no extra asset.
+                 role="img" + aria-label preserve accessibility for
+                 screen readers. The .ai-welcome-avatar envelope +
+                 welcome-avatar-in entrance animation + .ai-hey-
+                 badge bubble are unchanged. -->
+            <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hello">
+              <!-- Face: yellow filled circle that fills the 80x80
+                   viewBox edge-to-edge. -->
+              <circle cx="40" cy="40" r="40" fill="hsl(45, 95%, 60%)" />
+              <!-- Eyes: two dark-brown dots, upper-mid area, evenly
+                   spread left/right around the vertical center. -->
+              <circle cx="30" cy="34" r="4" fill="hsl(30, 35%, 18%)" />
+              <circle cx="50" cy="34" r="4" fill="hsl(30, 35%, 18%)" />
+              <!-- Smile: quadratic curve from lower-left corner up
+                   through the bottom dip and back up to lower-right
+                   corner. The Q control point at (40, 62) sits BELOW
+                   the line between the corners (Y 50 -> 50), so the
+                   curve dips DOWN on screen (visually) building a
+                   friendly U-shaped smile. stroke-linecap round
+                   softens the corners, stroke-width 3.5 keeps the
+                   mouth legibly thick against the yellow bg. -->
+              <path d="M 26 50 Q 40 62 54 50" stroke="hsl(30, 35%, 18%)" stroke-width="3.5" stroke-linecap="round" fill="none" />
+            </svg>
           </div>
           <span class="ai-hey-badge">hey</span>
         </div>
@@ -679,10 +706,10 @@ const formatTime = (timestamp) => {
   overflow: hidden;
 }
 
-.ai-welcome-avatar img {
+.ai-welcome-avatar svg {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: block;
 }
 
 .ai-hey-badge {
