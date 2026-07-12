@@ -11,7 +11,7 @@
     </div>
 
     <!-- Top bar -->
-    <header class="ai-topbar" :class="{ 'is-scrolled': isScrolled }">
+    <header class="ai-topbar" :class="{ 'is-scrolled': isScrolled, 'is-hidden': isHidden }">
       <div class="ai-topbar-brand">
         <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" class="ai-topbar-avatar" />
         <span class="ai-topbar-name">Anuj Khurana</span>
@@ -23,7 +23,7 @@
     </header>
 
     <!-- Main content -->
-    <div class="ai-main" @scroll.passive="handleScroll">
+    <div class="ai-main" ref="scroller" @scroll.passive="onScroll">
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">          <div class="ai-welcome-avatar-wrap">
           <div class="ai-welcome-avatar">
@@ -137,6 +137,7 @@ import { routeQuery } from "../lib/knowledge/router.js";
 import { sendToGemini, getGeminiErrorMessage } from "../lib/gemini/service.js";
 import { defaultQuestions } from "../lib/config/defaultQuestions.js";
 import { resolveComponent } from "./ai/index.js";
+import { useScrollFlag } from "../composables/useScrollFlag.js";
 
 const emit = defineEmits(["browse-website"]);
 
@@ -148,17 +149,18 @@ const conversationHistory = ref([]);
 const messagesContainer = ref(null);
 const messageInput = ref(null);
 
-// Phase 14 — topbar scroll-state machine.
-// When the user scrolls inside .ai-main (the AI landing's inner
-// scroll container), the topbar gains its background + backdrop
-// blur; otherwise it sits transparent over the page so the
-// ambient grid + grain read edge-to-edge. The scroll listener
-// uses .passive (set via @scroll.passive in the template) so
-// it never blocks the scroll thread.
-const isScrolled = ref(false);
-const handleScroll = (e) => {
-  isScrolled.value = e.target.scrollTop > 10;
-};
+// Phase 16 — topbar scroll-state machine via useScrollFlag composable.
+// Tracks scroll direction (top/down/up) + threshold (isScrolled) so
+// the topbar gains its bg + blur when scrolled AND hides when the
+// user is moving their scroll position downward (Apple pattern:
+// content takes focus while scrolling down, chrome re-emerges when
+// the user scrolls up to navigate back). Composable owns the state
+// logic + reactive outputs; the @scroll.passive listener stays in
+// the template so Vue keeps the passive-scroll optimisation intact.
+// The composable is exported at src/composables/useScrollFlag.js so
+// a future Card.vue followup can adopt the same state machine for
+// the website's bottom .navbar.
+const { isScrolled, isHidden, onScroll } = useScrollFlag({ threshold: 10 });
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -552,10 +554,16 @@ const formatTime = (timestamp) => {
   background: transparent;
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
+  /* Phase 16 — transform baseline so the .is-hidden rule can
+     translate the topbar off-screen without snapping. The hide-
+     on-down transform uses the same --ease as everywhere else
+     for visual consistency with the page-load choreography. */
+  transform: translateY(0);
   animation: topbar-in 0.5s 0.1s var(--ease) forwards;
   transition: background 240ms ease, border-color 240ms ease,
-    backdrop-filter 240ms ease, -webkit-backdrop-filter 240ms ease;
-  will-change: background, border-color;
+    backdrop-filter 240ms ease, -webkit-backdrop-filter 240ms ease,
+    transform 220ms var(--ease);
+  will-change: transform, background, border-color;
 }
 
 .ai-topbar.is-scrolled {
@@ -563,6 +571,20 @@ const formatTime = (timestamp) => {
   border-bottom-color: hsla(0, 0%, 17%, 0.5);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+/* Phase 16 — Apple-style hide-on-scroll-down. When the user is
+   scrolling downward AND past the threshold, the topbar slides
+   up out of view so the chat content takes focus. Scrolling up
+   re-emerges it (the up state leaves transform at translateY(0)).
+   The .is-hidden flag is bound from the useScrollFlag composable
+   (isHidden = scrollState === 'down' AND isScrolled). The
+   specificity (0,2,0) > base .ai-topbar (0,1,0), so the .is-hidden
+   transform wins in normal mode; the @media reduced-motion block
+   below lists .ai-topbar.is-hidden to neutralise it for vestibular
+   sensitivity. */
+.ai-topbar.is-hidden {
+  transform: translateY(-100%);
 }
 
 .ai-topbar-brand {
@@ -1022,6 +1044,13 @@ const formatTime = (timestamp) => {
   .ai-stagger,
   .ai-landing,
   .ai-topbar,
+  /* Phase 16 — same-selector listing + .ai-topbar.is-hidden so
+     reduced-motion's transform: none overrides the .is-hidden
+     translateY (which has higher specificity 0,2,0 > 0,1,0 and
+     would otherwise slide the topbar out of view for vestibular-
+     sensitive users). Listing it explicitly matches that
+     specificity so the reduce override actually wins. */
+  .ai-topbar.is-hidden,
   .ai-bg-glow,
   .ai-bg-grid,
   .ai-bg-grain,
