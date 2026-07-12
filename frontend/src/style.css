@@ -499,9 +499,16 @@ main {
 }
 
 .info-availability-text {
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* Phase 10 fixup: the label needs flex: 1 + min-width: 0 so the
+     ellipsis can actually trigger when the non-shrinkable timestamp
+     (.info-availability-timestamp, flex-shrink: 0) claims its width
+     on narrow viewports. Without these the chip risks horizontal
+     overflow into the sidebar's neighbouring content. */
 }
 
 /**

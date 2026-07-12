@@ -177,6 +177,13 @@ defineProps({ data: { type: Object, required: true } });
 
 .ai-availability-text {
   flex: 1;
+  /* Phase 10 fixup: with white-space: nowrap the text's intrinsic
+     min-width is the full unbreakable string; without min-width: 0
+     the flex item can't shrink below that width, so the existing
+     text-overflow: ellipsis can't trigger when the non-shrinkable
+     timestamp (.ai-availability-timestamp, flex-shrink: 0) claims
+     its width on narrow viewports. */
+  min-width: 0;
 }
 
 /**
