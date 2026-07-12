@@ -16,46 +16,6 @@
             <p>github.com/aanujkhurana</p>
           </span>
         </a>
-
-        <!--
-          Phase 9 — availability chip. Mirrors the ContactCard badge
-          in the AI assistant so non-chat visitors see the same
-          signal. Single source of truth: profile.availabilityStatus
-          drives this chip AND the ContactCard badge AND the persona
-          prompt. Editing that one enum updates all three surfaces.
-          The `title` attribute surfaces the subtext on hover; the
-          `aria-label` carries the full statement for screen readers.
-
-          Phase 10 — the chip gains a small `<time>` element next to
-          the label showing the relative "Last updated" phrase from
-          `availability.lastCheckedFormatted`. The same
-          `availabilityLastChecked` field in profile.js drives this
-          chip AND the ContactCard badge, so a single edit to the
-          ISO date updates both surfaces.
-        -->
-        <div
-          v-if="availability"
-          class="info-availability"
-          :class="`tone-${availability.tone}`"
-          :title="
-            availability.lastCheckedAbsolute
-              ? `${availability.subtext} · Last updated ${availability.lastCheckedAbsolute}`
-              : availability.subtext
-          "
-          :aria-label="
-            availability.lastCheckedAbsolute
-              ? `${availability.label}. ${availability.subtext}. Last updated ${availability.lastCheckedAbsolute}`
-              : `${availability.label}. ${availability.subtext}`
-          "
-        >
-          <span class="info-availability-dot" aria-hidden="true"></span>
-          <span class="info-availability-text">{{ availability.label }}</span>
-          <time
-            v-if="availability.lastCheckedFormatted"
-            class="info-availability-timestamp"
-            :datetime="availability.lastChecked || undefined"
-          >· {{ availability.lastCheckedFormatted }}</time>
-        </div>
       </div>
 
       <button class="info_more-btn" data-sidebar-btn>
@@ -170,30 +130,6 @@
       <header>
         <h2 class="h2 article-title">About me</h2>
       </header>
-
-      <!--
-        Phase 11 — subtle "Updated X ago" pill so visitors scrolling
-        through the static page see a freshness signal even when they
-        don't read the sidebar chip (Phase 9) or open the AI chat.
-        Reads from the same `availabilityLastChecked` field that
-        drives all the other availability surfaces, so editing
-        profile.availabilityLastChecked in one place flips every
-        surface simultaneously.
-
-        Wrapped in a semantic <time> element with the ISO date in
-        the `datetime` attribute; the relative phrase is in the
-        visible text. The `title` attribute surfaces the absolute
-        date on hover for recruiters who want precision.
-      -->
-      <time
-        v-if="availability && availability.lastCheckedFormatted"
-        class="about-freshness"
-        :datetime="availability.lastChecked"
-        :title="`Last refreshed ${availability.lastCheckedAbsolute}`"
-      >
-        <span class="about-freshness-dot" aria-hidden="true"></span>
-        <span>Updated {{ availability.lastCheckedFormatted }}</span>
-      </time>
 
       <!-- ⚠️  Keep this <section class="about-text"> in sync with
            src/lib/knowledge/profile.js (narrative + summary). They are
@@ -510,13 +446,6 @@ import Experiences from "./Experiences.vue";
 import Skills from "./Skills.vue";
 import Contact from "./Contact.vue";
 import ThemeToggle from "./ThemeToggle.vue";
-import { getAvailability } from "../lib/knowledge/index.js";
-
-// Phase 9 — resolve the canonical availability signal once for the
-// static sidebar chip. The same helper the ContactCard and persona
-// prompt read from. Flipping profile.availabilityStatus updates this
-// chip + the AI badge + the AI text in one edit.
-const availability = getAvailability();
 
 // Reactive refs for state management
 const isLoading = ref(true);
