@@ -728,6 +728,35 @@ main {
   flex-shrink: 0;
 }
 
+/**
+ * Phase 11 fixup — light-mode contrast override.
+ *
+ * In dark mode --light-gray-70 (medium gray, L≈56%) sits on
+ * --onyx (L≈17%) with ~5:1 contrast, which is "subtle but
+ * readable". In light mode the same tokens flip to a near-white
+ * --onyx pill (L≈94%) with --light-gray-70 text (L≈56%), giving
+ * only ~3:1 contrast and failing WCAG AA for the 12px body text.
+ *
+ * Override the pill's text + dot to --light-gray, which is
+ * darker in light mode (L=50%) and gives ~5.5:1 contrast on
+ * the near-white pill surface. The dark-mode look is unchanged
+ * because --light-gray in dark mode is light gray (L≈84%), which
+ * also keeps a similar subtle feel.
+ *
+ * The same issue exists in the Phase 9 sidebar chip and Phase
+ * 10 ContactCard timestamp (both use --light-gray-70 as a
+ * token that flips). A broader fix would override the token
+ * itself in :root.light-theme; scoped to the pill for now so
+ * future phases can decide whether to apply the source fix.
+ */
+:root.light-theme .about-freshness {
+  color: var(--light-gray);
+}
+
+:root.light-theme .about-freshness-dot {
+  background: var(--light-gray);
+}
+
 
 
 /**
