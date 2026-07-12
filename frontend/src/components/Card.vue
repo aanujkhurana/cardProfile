@@ -16,6 +16,26 @@
             <p>github.com/aanujkhurana</p>
           </span>
         </a>
+
+        <!--
+          Phase 9 — availability chip. Mirrors the ContactCard badge
+          in the AI assistant so non-chat visitors see the same
+          signal. Single source of truth: profile.availabilityStatus
+          drives this chip AND the ContactCard badge AND the persona
+          prompt. Editing that one enum updates all three surfaces.
+          The `title` attribute surfaces the subtext on hover; the
+          `aria-label` carries the full statement for screen readers.
+        -->
+        <div
+          v-if="availability"
+          class="info-availability"
+          :class="`tone-${availability.tone}`"
+          :title="availability.subtext"
+          :aria-label="`${availability.label}. ${availability.subtext}`"
+        >
+          <span class="info-availability-dot" aria-hidden="true"></span>
+          <span class="info-availability-text">{{ availability.label }}</span>
+        </div>
       </div>
 
       <button class="info_more-btn" data-sidebar-btn>
@@ -446,6 +466,13 @@ import Experiences from "./Experiences.vue";
 import Skills from "./Skills.vue";
 import Contact from "./Contact.vue";
 import ThemeToggle from "./ThemeToggle.vue";
+import { getAvailability } from "../lib/knowledge/index.js";
+
+// Phase 9 — resolve the canonical availability signal once for the
+// static sidebar chip. The same helper the ContactCard and persona
+// prompt read from. Flipping profile.availabilityStatus updates this
+// chip + the AI badge + the AI text in one edit.
+const availability = getAvailability();
 
 // Reactive refs for state management
 const isLoading = ref(true);

@@ -57,6 +57,17 @@
   --bittersweet-shimmer: hsl(0, 43%, 51%);
 
   /**
+   * Phase 9 — availability chip foregrounds.
+   * Per-tone foreground tokens consumed by the static sidebar
+   * chip in Card.vue. The light-theme block below overrides each
+   * with a darker variant so the chip stays legible on the
+   * near-white surface in light mode.
+   */
+  --avail-positive-fg: #4ade80;
+  --avail-informational-fg: #38bdf8;
+  --avail-cautious-fg: #fbbf24;
+
+  /**
    * typography
    */
 
@@ -149,8 +160,13 @@
   --orange-yellow-crayola: hsl(239, 100%, 60%);
   --vegas-gold:     hsl(247, 100%, 60%);
   --light-gray: hsl(0, 0%, 50%);
-  --light-gray-70: rgb(144, 143, 163);
+  --light-gray-70: rgb(144, 143, 143);
   --bittersweet-shimmer: hsl(0, 60%, 60%);
+
+  /* Phase 9 — light-theme chip foregrounds (darker for contrast). */
+  --avail-positive-fg: #15803d;
+  --avail-informational-fg: #0369a1;
+  --avail-cautious-fg: #b45309;
 
   /* --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.1);
   --shadow-2: 0 16px 30px hsla(0, 0%, 10%, 0.1);
@@ -361,7 +377,10 @@ main {
 
 .sidebar {
   margin-bottom: 15px;
-  max-height: 112px;
+  /* Phase 9: bumped from 112px to fit the availability chip in
+     the collapsed hero. The chip adds ~30px to the info-content
+     column. */
+  max-height: 145px;
   overflow: hidden;
   transition: var(--transition-2);
 }
@@ -436,6 +455,71 @@ main {
   margin-right: 6px;
   height: 13px;
   width: 13px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Phase 9 — Availability chip (static sidebar hero)                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Static availability badge in the sidebar hero. Mirrors the
+ * ContactCard badge in shape (small dot + label) but skips the
+ * pulse animation — the static portfolio is documentation, not a
+ * live assistant, so a pulsing dot would feel out of place.
+ *
+ * Theme-awareness: per-tone foreground tokens override in
+ * :root.light-theme so the chip text stays legible on the
+ * near-white surface in light mode. Background tint + border use
+ * the same alpha in both themes (applied over the theme-aware
+ * surface, so the perceived tint shifts naturally).
+ */
+.info-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: 100%;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--avail-border);
+  background: var(--avail-bg);
+  color: var(--avail-fg);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-400);
+  line-height: 1.3;
+}
+
+.info-availability-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--avail-fg);
+  flex-shrink: 0;
+}
+
+.info-availability-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-availability.tone-positive {
+  --avail-fg: var(--avail-positive-fg);
+  --avail-bg: rgba(74, 222, 128, 0.10);
+  --avail-border: rgba(74, 222, 128, 0.30);
+}
+
+.info-availability.tone-informational {
+  --avail-fg: var(--avail-informational-fg);
+  --avail-bg: rgba(56, 189, 248, 0.10);
+  --avail-border: rgba(56, 189, 248, 0.30);
+}
+
+.info-availability.tone-cautious {
+  --avail-fg: var(--avail-cautious-fg);
+  --avail-bg: rgba(251, 191, 36, 0.10);
+  --avail-border: rgba(251, 191, 36, 0.30);
 }
 
 .info_more-btn {
@@ -1450,7 +1534,10 @@ textarea.form-input::-webkit-resizer { display: none; }
    */
 
   .sidebar {
-    max-height: 180px;
+    /* Phase 9: bumped from 180px to fit the availability chip on
+       tablet (580-1250px) where the sidebar is collapsed by
+       default. The chip + 25px gives a little headroom. */
+    max-height: 200px;
     margin-bottom: 30px;
   }
 
