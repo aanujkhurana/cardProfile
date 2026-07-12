@@ -323,6 +323,12 @@ const formatTime = (timestamp) => {
      fades in over 240ms so the transition from "blank" to
      "structured" feels intentional, not abrupt. */
   opacity: 0;
+  /* Phase 19 — smooth theme flip. background-image is
+     transitionable in modern browsers (Chrome 71+, Safari 16+);
+     the 240ms ease matches the topbar scroll-state machine
+     timing from Phase 14 so dark <-> light feel visually
+     cohesive with the rest of the surface choreography. */
+  transition: background-image 240ms ease;
   animation: landing-in 0.24s linear forwards;
 }
 
@@ -1123,5 +1129,128 @@ const formatTime = (timestamp) => {
     padding: 6px 12px;
     font-size: 12px;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Phase 19 — :root.light-theme overrides                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Extend the AI landing's bg + ambient palette to obey the
+ * global light-theme so the AI assistant inherits the user's
+ * chosen theme like the static Card.vue side does. ThemeToggle
+ * toggles `document.documentElement.classList.light-theme`,
+ * so :root.light-theme is the right scope selector (the AI
+ * landing wrapper lives inside App.vue, but its <html>
+ * ancestor carries the light-theme class).
+ *
+ * WHAT'S ALREADY AUTO-FLIPPED (no override needed) — these
+ * selectors consume var(--eerie-black-2 / --onyx / --jet /
+ * --white-1 / --white-2 / --light-gray / --light-gray-70 /
+ * --vegas-gold) which style.css automatically redefines under
+ * :root.light-theme:
+ *  - ai-input-row, ai-chip, ai-msg.bot .ai-msg-text,
+ *    ai-msg.user .ai-msg-text, ai-typing, ai-followup-chip,
+ *    ai-send, ai-input, ai-welcome-title, ai-welcome-subtitle,
+ *    ai-footnote, ai-msg-time, ai-msg-text :deep(a),
+ *    ai-browse-btn, ai-topbar-name.
+ *
+ * WHAT NEEDS EXPLICIT :root.light-theme OVERRIDES — hard-coded
+ * tones that paint OVER base surfaces or are visible ambient
+ * structural layers (would otherwise stay dark when the user
+ * toggles to light):
+ *  1. .ai-landing bg gradient — the base surface layer. Light
+ *     version keeps the same 160deg 3-stop rhythm but on
+ *     near-white surfaces (L* 95-99%) with a faint cool tint
+ *     so the visual rhythm matches dark mode.
+ *  2. .ai-bg-glow--1/--2/--3 — ambient radial glows. Alpha
+ *     bumped slightly in light (0.08 -> 0.10 / 0.04 -> 0.08 /
+ *     0.05 -> 0.08) so the cool indigo/violet/cyan reads
+ *     above the near-white base. The indigo hue is consistent
+ *     with the static site's --vegas-gold light-mode accent
+ *     (hsl(247, 100%, 60%)) — no aestetic mismatch.
+ *  3. .ai-bg-grid — 3D grid line color swapped from
+ *     white-on-dark (hsla(0, 0%, 100%, 0.07)) to
+ *     dark-on-light (hsla(240, 10%, 30%, 0.08)) so the lines
+ *     remain visible against the new bg.
+ *  4. .ai-bg-vignette — radial frame. The dark-on-dark vignette
+ *     in dark mode fades the corners; in light mode the frame
+ *     is inverted to a light-on-light fade (L* 88%, alpha 0.4)
+ *     so the same "edge-frame" effect reads without going
+ *     darker than the bg. transparent 30% -> 50% gives the
+ *     light-mode vignette a softer interior since the page
+ *     is already high-key.
+ *  5. .ai-topbar.is-scrolled — glass-blur bg + border so the
+ *     topbar reads as a coherent surface in light mode
+ *     (hsla(0, 0%, 99%, 0.7) blur + hsla(0, 0%, 88%, 0.6)
+ *     hairline). The .ai-topbar rule already extends its
+ *     transition list with background + border-color +
+ *     backdrop-filter from Phase 14 so this flips smoothly.
+ *  6. .ai-hey-badge box-shadow — the red badge itself reads
+ *     in both themes (red hsl(0, 65%, 55%) on either bg); only
+ *     the halo alpha is tamed (0.4 -> 0.25) so it doesn't feel
+ *     blown-out against the near-white surface.
+ *
+ * NOTE: The 3 glows + grid + vignette rules don't carry
+ * transition properties for these per-property flips — they
+ * transition instantaneously on toggle. Acceptable: those are
+ * ambient layers, not affordances the user is interacting
+ * with, and the topbar + .ai-landing bg already smooth-flip
+ * via the transitions added in this phase + Phase 14.
+ */
+:root.light-theme .ai-landing {
+  background: linear-gradient(
+    160deg,
+    hsl(240, 8%, 97%) 0%,
+    hsl(240, 12%, 99%) 40%,
+    hsl(240, 6%, 95%) 100%
+  );
+}
+
+:root.light-theme .ai-bg-glow--1 {
+  background: radial-gradient(
+    circle,
+    hsla(245, 70%, 70%, 0.10) 0%,
+    transparent 70%
+  );
+}
+
+:root.light-theme .ai-bg-glow--2 {
+  background: radial-gradient(
+    circle,
+    hsla(220, 70%, 65%, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+:root.light-theme .ai-bg-glow--3 {
+  background: radial-gradient(
+    circle,
+    hsla(180, 60%, 60%, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+:root.light-theme .ai-bg-grid {
+  background-image:
+    linear-gradient(hsla(240, 10%, 30%, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(240, 10%, 30%, 0.08) 1px, transparent 1px);
+}
+
+:root.light-theme .ai-bg-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    hsla(240, 8%, 88%, 0.4) 100%
+  );
+}
+
+:root.light-theme .ai-topbar.is-scrolled {
+  background: hsla(0, 0%, 99%, 0.7);
+  border-bottom-color: hsla(0, 0%, 88%, 0.6);
+}
+
+:root.light-theme .ai-hey-badge {
+  box-shadow: 0 2px 8px hsla(0, 65%, 55%, 0.25);
 }
 </style>
