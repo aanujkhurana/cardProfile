@@ -171,6 +171,30 @@
         <h2 class="h2 article-title">About me</h2>
       </header>
 
+      <!--
+        Phase 11 — subtle "Updated X ago" pill so visitors scrolling
+        through the static page see a freshness signal even when they
+        don't read the sidebar chip (Phase 9) or open the AI chat.
+        Reads from the same `availabilityLastChecked` field that
+        drives all the other availability surfaces, so editing
+        profile.availabilityLastChecked in one place flips every
+        surface simultaneously.
+
+        Wrapped in a semantic <time> element with the ISO date in
+        the `datetime` attribute; the relative phrase is in the
+        visible text. The `title` attribute surfaces the absolute
+        date on hover for recruiters who want precision.
+      -->
+      <time
+        v-if="availability && availability.lastCheckedFormatted"
+        class="about-freshness"
+        :datetime="availability.lastChecked"
+        :title="`Last refreshed ${availability.lastCheckedAbsolute}`"
+      >
+        <span class="about-freshness-dot" aria-hidden="true"></span>
+        <span>Updated {{ availability.lastCheckedFormatted }}</span>
+      </time>
+
       <!-- ⚠️  Keep this <section class="about-text"> in sync with
            src/lib/knowledge/profile.js (narrative + summary). They are
            intentionally separate text sources for layout reasons. -->
