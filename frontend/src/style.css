@@ -527,6 +527,41 @@ main {
   letter-spacing: 0.01em;
 }
 
+/**
+ * Phase 12 — light-mode WCAG AA fix for the relative caption
+ * on both subtle-metadata Availability surfaces (this sidebar
+ * chip and the ContactCard badge in ai/ContactCard.vue).
+ *
+ * The Phase 11 fixup comment block pre-flagged this exact case:
+ * --light-gray-70 (light mode: rgb(144, 143, 163), L≈0.317) on
+ * the near-white chip surface in light mode gives only ~2.5:1
+ * contrast, failing WCAG AA for the 10px body text. Dark mode
+ * is unaffected (~5:1, AA). The chip's per-tone bg tints (rgba
+ * over the theme-aware surface) shift naturally in both modes,
+ * so the contrast issue is unique to the metadata subtext.
+ *
+ * Override both timestamps to --white-2 in light mode
+ * (hsl(0, 0%, 20%), L≈0.033 → ~13:1 contrast on the near-white
+ * chip, well past AAA). Dark mode unchanged because --white-2
+ * in dark mode is near-white (L≈0.96) on the dark chip
+ * (~13:1, AAA in dark too). The trade-off: dark mode gets a
+ * higher contrast than the original "subtle" intent (was ~5:1,
+ * now ~13:1), but recruiter-facing freshness signals read
+ * better when they pop slightly out of the metadata rhythm.
+ *
+ * Implementation note: .ai-availability-timestamp lives in
+ * ContactCard.vue's <style scoped>, but a :root.light-theme
+ * rule in the global style sheet still matches it because
+ * Vue's scoped attribute is additive to the class selector.
+ */
+:root.light-theme .info-availability-timestamp {
+  color: var(--white-2);
+}
+
+:root.light-theme .ai-availability-timestamp {
+  color: var(--white-2);
+}
+
 .info-availability.tone-positive {
   --avail-fg: var(--avail-positive-fg);
   --avail-bg: rgba(74, 222, 128, 0.10);
