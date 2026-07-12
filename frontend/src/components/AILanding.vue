@@ -11,7 +11,7 @@
     </div>
 
     <!-- Top bar -->
-    <header class="ai-topbar">
+    <header class="ai-topbar" :class="{ 'is-scrolled': isScrolled }">
       <div class="ai-topbar-brand">
         <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" class="ai-topbar-avatar" />
         <span class="ai-topbar-name">Anuj Khurana</span>
@@ -23,10 +23,9 @@
     </header>
 
     <!-- Main content -->
-    <div class="ai-main">
+    <div class="ai-main" ref="mainContainer" @scroll.passive="handleScroll">
       <!-- Welcome state -->
-      <div v-if="messages.length <= 1" class="ai-welcome">
-        <div class="ai-welcome-avatar-wrap ai-stagger" data-delay="2">
+      <div v-if="messages.length <= 1" class="ai-welcome">          <div class="ai-welcome-avatar-wrap">
           <div class="ai-welcome-avatar">
             <img src="../assets/images/wave.gif" alt="Hello" />
           </div>
@@ -96,7 +95,7 @@
 
     <!-- Input area -->
     <div class="ai-input-area">
-      <div v-if="messages.length <= 1" class="ai-chips ai-stagger" data-delay="6">
+      <div v-if="messages.length <= 1" class="ai-chips">
         <button
           v-for="q in defaultQuestions"
           :key="q.label"
@@ -148,6 +147,19 @@ const conversationHistory = ref([]);
 
 const messagesContainer = ref(null);
 const messageInput = ref(null);
+
+// Phase 14 — topbar scroll-state machine.
+// When the user scrolls inside .ai-main (the AI landing's inner
+// scroll container), the topbar gains its background + backdrop
+// blur; otherwise it sits transparent over the page so the
+// ambient grid + grain read edge-to-edge. The scroll listener
+// uses .passive (set via @scroll.passive in the template) so
+// it never blocks the scroll thread.
+const mainContainer = ref(null);
+const isScrolled = ref(false);
+const handleScroll = (e) => {
+  isScrolled.value = e.target.scrollTop > 10;
+};
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -306,6 +318,11 @@ const formatTime = (timestamp) => {
   background: linear-gradient(160deg, hsl(240, 3%, 10%) 0%, hsl(240, 2%, 13%) 40%, hsl(240, 4%, 8%) 100%);
   font-family: var(--ff-poppins);
   overflow: hidden;
+  /* Phase 14 — page-load entry beat 1 (0ms): the whole landing
+     fades in over 240ms so the transition from "blank" to
+     "structured" feels intentional, not abrupt. */
+  opacity: 0;
+  animation: landing-in 0.24s linear forwards;
 }
 
 /* Background layers */
@@ -330,7 +347,11 @@ const formatTime = (timestamp) => {
   top: -15%;
   left: 50%;
   transform: translateX(-50%);
-  background: radial-gradient(circle, hsla(45, 54%, 58%, 0.08) 0%, transparent 70%);
+  /* Phase 14 — gold swapped for cool indigo/violet so the top
+     ambient glow reads as "studio lighting" rather than "gold
+     accent" when paired with the unchanged warm gold UI bits
+     (hey-badge, focus rings). */
+  background: radial-gradient(circle, hsla(245, 60%, 60%, 0.08) 0%, transparent 70%);
   animation-delay: 0.3s;
 }
 
@@ -348,7 +369,11 @@ const formatTime = (timestamp) => {
   height: 500px;
   bottom: -10%;
   left: -10%;
-  background: radial-gradient(circle, hsla(45, 100%, 72%, 0.05) 0%, transparent 70%);
+  /* Phase 14 — bright yellow swapped for cyan/teal so the bottom-
+     left ambient glow reads as "cool rising light" complementing
+     the indigo top glow, rather than competing with the warm UI
+     accent tokens. */
+  background: radial-gradient(circle, hsla(180, 50%, 55%, 0.05) 0%, transparent 70%);
   animation-delay: 0.9s;
 }
 
@@ -356,6 +381,114 @@ const formatTime = (timestamp) => {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ------------------------------------------------------------------ */
+/*  Phase 14 — Page-load choreography keyframes                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Layered entrance beats: whole page fades in (0.24s) → topbar
+ * slides down (0.5s @ 0.1s) → ambient layers (grid + glow + grain
+ * + vignette) cascade in at 0.3-0.5s → welcome avatar (0.7s) →
+ * hey-badge pop with back-out easing (0.8s) → welcome copy +
+ * input row → chips cascade in per-item at 1.25s+ (80ms stagger,
+ * up to 6 chips). All timings tuned to read as a unified "app is
+ * alive" sequence rather than disjointed entrance. Reduced-motion
+ * users get a single instant paint (all animations disabled in
+ * the @media block below).
+ */
+@keyframes landing-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes topbar-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes grid-in {
+  from {
+    opacity: 0;
+    transform: perspective(500px) rotateX(45deg) scale(1.05);
+  }
+  to {
+    opacity: 0.8;
+    transform: perspective(500px) rotateX(45deg) scale(1);
+  }
+}
+
+@keyframes grain-in {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  to {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+@keyframes vignette-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes welcome-avatar-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hey-badge-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/**
+ * Per-chip entrance stagger. The defaultQuestions config can
+ * surface up to 6 entries, so we stagger up to 6 visible chips.
+ * :nth-child matches work cleanly with v-for because Vue preserves
+ * DOM order keyed by :key.
+ */
+.ai-chips .ai-chip:nth-child(1) { animation-delay: 1.25s; }
+.ai-chips .ai-chip:nth-child(2) { animation-delay: 1.33s; }
+.ai-chips .ai-chip:nth-child(3) { animation-delay: 1.41s; }
+.ai-chips .ai-chip:nth-child(4) { animation-delay: 1.49s; }
+.ai-chips .ai-chip:nth-child(5) { animation-delay: 1.57s; }
+.ai-chips .ai-chip:nth-child(6) { animation-delay: 1.65s; }
 
 .ai-bg-grid {
   position: absolute;
@@ -368,7 +501,13 @@ const formatTime = (timestamp) => {
   transform-origin: center 80%;
   mask-image: linear-gradient(to top, black 0%, transparent 55%);
   -webkit-mask-image: linear-gradient(to top, black 0%, transparent 55%);
-  opacity: 0.8;
+  /* Phase 14 — opacity 0→0.8 + scale 1.05→1 entrance over 1.2s,
+     so the 3D grid "lowers into place" rather than being static
+     from page paint. The grid-in keyframe preserves the static
+     perspective + rotateX throughout so depth doesn't pop in late. */
+  opacity: 0;
+  animation: grid-in 1.2s 0.3s var(--ease) forwards;
+  will-change: transform, opacity;
 }
 
 .ai-bg-grain {
@@ -379,13 +518,25 @@ const formatTime = (timestamp) => {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 256px 256px;
-  opacity: 0.6;
+  /* Phase 14 — opacity bumped 0.6 → 0.85 so the noise reads
+     against the 3D grid (effective ~0.034 once you factor the
+     SVG inner 0.04 alpha). Scale 1.02→1 entrance over 1s gives
+     the noise a subtle organic "settle" effect rather than a
+     hard pop. */
+  opacity: 0;
+  animation: grain-in 1s 0.5s var(--ease) forwards;
+  will-change: transform, opacity;
 }
 
 .ai-bg-vignette {
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse at center, transparent 30%, hsla(240, 4%, 6%, 0.8) 100%);
+  /* Phase 14 — opacity 0→1 entrance so the radial vignette
+     frames the UI AFTER the ambient layers + welcome content
+     have settled, rather than competing with them from frame 1. */
+  opacity: 0;
+  animation: vignette-in 0.8s 0.4s linear forwards;
 }
 
 /* Top bar */
@@ -394,13 +545,25 @@ const formatTime = (timestamp) => {
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-bottom: 1px solid hsla(0, 0%, 17%, 0.5);
+  border-bottom: 1px solid transparent;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
+  opacity: 0;
+  background: transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  animation: topbar-in 0.5s 0.1s var(--ease) forwards;
+  transition: background 240ms ease, border-color 240ms ease,
+    backdrop-filter 240ms ease, -webkit-backdrop-filter 240ms ease;
+  will-change: background, border-color;
+}
+
+.ai-topbar.is-scrolled {
+  background: hsla(240, 2%, 13%, 0.6);
+  border-bottom-color: hsla(0, 0%, 17%, 0.5);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  background: hsla(240, 2%, 13%, 0.6);
 }
 
 .ai-topbar-brand {
@@ -474,6 +637,12 @@ const formatTime = (timestamp) => {
 .ai-welcome-avatar-wrap {
   position: relative;
   margin-bottom: 28px;
+  /* Phase 14 — scale 0.85→1 + opacity entrance so the wave.gif
+     avatar feels alive. Replaces the older generic .ai-stagger
+     translateY-only animation which was harder to read against
+     the avatar's natural stillness. */
+  opacity: 0;
+  animation: welcome-avatar-in 0.6s 0.7s var(--ease) forwards;
 }
 
 .ai-welcome-avatar {
@@ -501,6 +670,15 @@ const formatTime = (timestamp) => {
   border-radius: 10px;
   line-height: 1;
   box-shadow: 0 2px 8px hsla(0, 65%, 55%, 0.4);
+  /* Phase 14 — three-stop scale bounce (0 → 1.15 → 1) with a
+     back-out easing. transform-origin: bottom right anchors the
+     bounce to the corner sitting closest to the avatar, so the
+     badge feels like it physically pops OUT of the avatar
+     rather than scaling from its center. */
+  opacity: 0;
+  transform: scale(0);
+  transform-origin: bottom right;
+  animation: hey-badge-pop 0.5s 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .ai-welcome-title {
@@ -728,6 +906,12 @@ const formatTime = (timestamp) => {
   transition: color 150ms ease, border-color 150ms ease, transform 180ms var(--ease), box-shadow 180ms ease, background 150ms ease;
   cursor: pointer;
   white-space: nowrap;
+  /* Phase 14 — chip-in keyframe is the shared per-item animation
+     (translateY 10→0 + scale 0.95→1 + opacity 0→1 over 350ms).
+     The per-:nth-child selectors below stagger the start times
+     80ms apart, starting at 1.25s. */
+  opacity: 0;
+  animation: chip-in 0.35s var(--ease) forwards;
 }
 
 .ai-chip:hover:not(:disabled) {
@@ -830,19 +1014,25 @@ const formatTime = (timestamp) => {
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .ai-stagger {
+  /* Phase 14 update — the same selector list now also covers the
+     new entrance animations (landing-in, topbar-in, grid-in,
+     grain-in, vignette-in, welcome-avatar-in, hey-badge-pop,
+     chip-in + staggered chip nth-child delays). Users with
+     vestibular sensitivity get a single instant paint instead
+     of the layered choreography. */
+  .ai-stagger,
+  .ai-landing,
+  .ai-topbar,
+  .ai-bg-glow,
+  .ai-bg-grid,
+  .ai-bg-grain,
+  .ai-bg-vignette,
+  .ai-welcome-avatar-wrap,
+  .ai-hey-badge,
+  .ai-chips .ai-chip {
     opacity: 1;
     transform: none;
     animation: none;
-  }
-
-  .ai-bg-glow {
-    animation: none;
-    opacity: 1;
-  }
-
-  .ai-bg-grid {
-    transform: none;
   }
 
   .ai-msg {
