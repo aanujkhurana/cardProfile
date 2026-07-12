@@ -160,7 +160,7 @@
   --orange-yellow-crayola: hsl(239, 100%, 60%);
   --vegas-gold:     hsl(247, 100%, 60%);
   --light-gray: hsl(0, 0%, 50%);
-  --light-gray-70: rgb(144, 143, 143);
+  --light-gray-70: rgb(144, 143, 163);
   --bittersweet-shimmer: hsl(0, 60%, 60%);
 
   /* Phase 9 — light-theme chip foregrounds (darker for contrast). */
