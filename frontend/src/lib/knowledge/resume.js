@@ -9,19 +9,34 @@
  *
  * ⚠️  FILE-EXISTS WORKFLOW — READ BEFORE FLIPPING fileExists
  * ─────────────────────────────────────────────────────────────
- *  `fileUrl` resolves under /public, so the PDF must exist at:
- *      frontend/public/resume/Anuj_Khurana_Resume.pdf
+ *  Phase 26 — the resume PDF now lives at the project-root of the
+ *  public/ folder (one file, no subdirectory) and is downloaded via
+ *  a GitHub raw URL pinned to the current feature branch.
+ *
+ *  Primary deliverable path (per user's explicit destination):
+ *      frontend/public/resume.pdf
+ *  Vite copies everything in public/ verbatim to dist/, so the same
+ *  file is also reachable locally on any deploy:
+ *      http://localhost:5173/resume.pdf (after `npm run dev`)
+ *      https://<your-domain>/resume.pdf (after deploy)
+ *
+ *  The PRIMARY download link in the AI chat's ResumeCard surfaces
+ *  the GitHub raw URL by design (user's deliberate choice for the
+ *  "use the GitHub download link" requirement — stable on GitHub
+ *  without depending on the deployed site):
+ *      https://raw.githubusercontent.com/aanujkhurana/cardProfile/
+ *      feature/ai-portfolio-production-upgrade/frontend/public/resume.pdf
  *
  *  Until the asset is uploaded, KEEP `fileExists: false` — the
- *  ResumeCard will then hide the download link and offer a mailto
+ *  ResumeCard then hides the download link and offers a mailto
  *  fallback ("PDF being refreshed — ping me for the latest copy").
  *
  *  ⚠️  Do NOT flip `fileExists` to `true` until you have:
- *      1. Dropped Anuj_Khurana_Resume.pdf into frontend/public/resume/
- *      2. Confirmed the route returns 200 by running one of:
- *           curl -I https://<your-domain>/resume/Anuj_Khurana_Resume.pdf
- *               (expect: HTTP/1.1 200 OK)
- *           curl -I http://localhost:3000/resume/Anuj_Khurana_Resume.pdf
+ *      1. Dropped resume.pdf into frontend/public/
+ *      2. Confirmed the raw URL returns 200 by running either:
+ *           curl -I https://raw.githubusercontent.com/aanujkhurana/cardProfile/feature/ai-portfolio-production-upgrade/frontend/public/resume.pdf
+ *               (expect: HTTP/2 200)
+ *           curl -I http://localhost:5173/resume.pdf
  *               (after `npm run dev`)
  *
  *  Flipping the flag without the asset re-introduces the original 404
@@ -32,16 +47,18 @@
 export const resume = {
   fullName: "Anuj Khurana",
   title: "Full Stack Developer",
-  fileName: "Anuj_Khurana_Resume.pdf",
-  fileUrl: "/resume/Anuj_Khurana_Resume.pdf",
+  fileName: "resume.pdf",
+  fileUrl:
+    "https://raw.githubusercontent.com/aanujkhurana/cardProfile/feature/ai-portfolio-production-upgrade/frontend/public/resume.pdf",
   /**
-   * Human-readable PDF size, e.g. "142 KB".
-   * `null` while the asset is not yet uploaded so ResumeCard does not
-   * render a placeholder. Set this to the real measured value at the
-   * same time you flip `fileExists` to true — do not invent a number.
+   * Human-readable PDF size, e.g. "192 KB".
+   * Set to the real measured value (the actual bytes / 1024) at
+   * the same time you flip `fileExists` to true — do not invent a
+   * number. ResumeCard.vue's `<span v-if="data.fileSize">` only
+   * renders this meta bullet when non-null.
    */
-  fileSize: null,
-  fileExists: false,
+  fileSize: "192 KB",
+  fileExists: true,
   lastUpdated: "2026-07-01",
   summary:
     "Full Stack Developer with 3+ years building production web applications — frontend-heavy, comfortable across the stack, and actively deepening AI/LLM engineering. Last updated to reflect my current focus on AI portfolio engineering and Vue 3 + TypeScript work at GoDesta.",
