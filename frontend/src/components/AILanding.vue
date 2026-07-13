@@ -27,33 +27,68 @@
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">          <div class="ai-welcome-avatar-wrap">
           <div class="ai-welcome-avatar">
-            <!-- Phase 20 — Hand-wave gif replaced with an inline
-                 SVG smiley face so the avatar stays theme-coherent
-                 (still yellow in light mode thanks to raw HSL; the
-                 previous --vegas-gold / --orange-yellow-crayola
-                 tokens would have turned it indigo in light mode),
-                 scales crisply on retina, and ships no extra asset.
-                 role="img" + aria-label preserve accessibility for
-                 screen readers. The .ai-welcome-avatar envelope +
-                 welcome-avatar-in entrance animation + .ai-hey-
-                 badge bubble are unchanged. -->
+            <!-- Phase 21 — Phase 20 yellow filled smiley replaced with a
+                 chalk-on-blackboard smiley that DRAWS ITSELF via
+                 stroke-dashoffset animation once other entrance beats
+                 have settled. The 80x80 envelope holds a full-bleed
+                 chalkboard (.chalk-board, r=40) and strokes for the
+                 face outline (.chalk-face, r=35), two small eye
+                 circles (.chalk-eye-l / .chalk-eye-r, r=3.5), and the
+                 smile U-curve (.chalk-smile). A single SVG filter
+                 (feTurbulence + feDisplacementMap, scale=2.5) gives
+                 every stroke a slightly irregular chalk edge. Shared
+                 pathLength="100" normalises the dasharray math across
+                 the three circle elements and the smile path so a
+                 single chalk-draw keyframe (100 -> 0) reveals them
+                 all. Sequences: face outline @ 1.3s (lands ~1.9s)
+                 -> left eye @ 1.9s -> right eye @ 2.15s -> smile @
+                 2.4s (lands ~2.9s). Each new beat starts as the
+                 avatar envelope has finished scaling in (~1.3s) and
+                 finishes alongside the cascading chip entries
+                 (~2.0s) so the chalk-draw reads as the visual final
+                 beat before user input. .ai-hey-badge bubble +
+                 welcome-avatar-in entrance animation stay untouched.
+                 role="img" + aria-label preserve a11y. -->
             <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hello">
-              <!-- Face: yellow filled circle that fills the 80x80
-                   viewBox edge-to-edge. -->
-              <circle cx="40" cy="40" r="40" fill="hsl(45, 95%, 60%)" />
-              <!-- Eyes: two dark-brown dots, upper-mid area, evenly
-                   spread left/right around the vertical center. -->
-              <circle cx="30" cy="34" r="4" fill="hsl(30, 35%, 18%)" />
-              <circle cx="50" cy="34" r="4" fill="hsl(30, 35%, 18%)" />
-              <!-- Smile: quadratic curve from lower-left corner up
-                   through the bottom dip and back up to lower-right
-                   corner. The Q control point at (40, 62) sits BELOW
-                   the line between the corners (Y 50 -> 50), so the
-                   curve dips DOWN on screen (visually) building a
-                   friendly U-shaped smile. stroke-linecap round
-                   softens the corners, stroke-width 3.5 keeps the
-                   mouth legibly thick against the yellow bg. -->
-              <path d="M 26 50 Q 40 62 54 50" stroke="hsl(30, 35%, 18%)" stroke-width="3.5" stroke-linecap="round" fill="none" />
+              <defs>
+                <!-- Chalk roughness: feTurbulence generates high-
+                     frequency fractal noise (sandy grain) used as
+                     a displacement map. feDisplacementMap bends
+                     each pixel of SourceGraphic by up to 2.5px in
+                     either direction using the noise's R/G as the
+                     offset vector. The combined effect: chalk
+                     strokes look dusty + irregular at the edge.
+                     The filter region (-20% / 140%) gives generous
+                     bleed room so displaced pixels at the stroke
+                     edges aren't clipped to invisible. -->
+                <filter id="chalk-texture" x="-20%" y="-20%" width="140%" height="140%">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" result="noise" />
+                  <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+                </filter>
+              </defs>
+
+              <!-- Filled chalkboard: edge-to-edge r=40 fills the
+                   whole 80x80 viewBox so the chalk strokes always
+                   have a board beneath them regardless of theme. -->
+              <circle cx="40" cy="40" r="40" class="chalk-board" />
+
+              <!-- Stroked chalk drawing. fill="none" on the group
+                   is required — if any element had a fill, the
+                   fill would pop in BEFORE the stroke finishes
+                   drawing (visually wrong for the chalk metaphor).
+                   stroke-linecap="round" softens the edges (chalk
+                   doesn't have sharp square ends). The filter is
+                   applied to the WHOLE GROUP so the four strokes
+                   share one chalk pass and stay visually unified.
+                   face radius drops to r=35 (vs Phase 20's
+                   fill r=40) so the 3.5px stroke doesn't bleed
+                   outside the 80x80 viewBox. -->
+              <g filter="url(#chalk-texture)" class="chalk-strokes" fill="none" stroke-linecap="round">
+                <circle cx="40" cy="40" r="35" class="chalk-face" pathLength="100" />
+                <circle cx="28" cy="34" r="3.5" class="chalk-eye-l" pathLength="100" />
+                <circle cx="52" cy="34" r="3.5" class="chalk-eye-r" pathLength="100" />
+                <path d="M 26 50 Q 40 62 54 50" class="chalk-smile" pathLength="100" />
+              </g>
             </svg>
           </div>
           <span class="ai-hey-badge">hey</span>
@@ -712,6 +747,58 @@ const formatTime = (timestamp) => {
   display: block;
 }
 
+/* Phase 21 — Chalk-on-blackboard styling + draw-on animation.
+   The chalkboard (.chalk-board) is a flat filled circle that
+   occupies the full 80x80 viewBox so it sits edge-to-edge within
+   the .ai-welcome-avatar 80px envelope. The chalk-strokes group
+   carries the shared stroke color + stroke-width + linecap (set
+   once on the group so the four child elements stay uniform).
+   The fill/stroke values transition on a 240ms ease so the
+   palette FLIPS smoothly when the user toggles to light theme
+   (the chalk-board turns parchment and chalk turns dark slate,
+   matching the existing Phase 19 light-theme bg/glow palette).
+   The four stroked children share the same chalk-draw keyframe
+   (stroke-dashoffset 100 -> 0) and use pathLength="100" so the
+   dasharray math is identical across the three circles and the
+   smile path. animation-fill-mode: both keeps each stroke
+   hidden (offset 100) during its delay window so nothing paints
+   before its turn in the sequence — without "both", the
+   stroke would flash at offset 0 from t=0 and only animate from
+   t=delay-1frame onwards. Sequencing: face outline @ 1.3s
+   (lands ~1.9s) -> left eye @ 1.9s -> right eye @ 2.15s -> smile
+   @ 2.4s (lands ~2.9s). Each element starts AFTER the previous
+   has fully drawn so the user reads the sequence as deliberate
+   chalk drawing rather than a single simultaneous reveal. */
+.chalk-board {
+  fill: hsl(220, 15%, 12%);
+  transition: fill 240ms ease;
+}
+
+.chalk-strokes {
+  stroke: hsl(40, 15%, 92%);
+  stroke-width: 3.5;
+  transition: stroke 240ms ease;
+}
+
+.chalk-face,
+.chalk-eye-l,
+.chalk-eye-r,
+.chalk-smile {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: chalk-draw linear both;
+}
+
+.chalk-face  { animation-duration: 0.6s;  animation-delay: 1.3s;  }
+.chalk-eye-l { animation-duration: 0.25s; animation-delay: 1.9s;  }
+.chalk-eye-r { animation-duration: 0.25s; animation-delay: 2.15s; }
+.chalk-smile { animation-duration: 0.5s;  animation-delay: 2.4s;  }
+
+@keyframes chalk-draw {
+  from { stroke-dashoffset: 100; }
+  to   { stroke-dashoffset: 0;   }
+}
+
 .ai-hey-badge {
   position: absolute;
   top: -4px;
@@ -1090,10 +1177,22 @@ const formatTime = (timestamp) => {
   .ai-bg-vignette,
   .ai-welcome-avatar-wrap,
   .ai-hey-badge,
-  .ai-chips .ai-chip {
+  .ai-chips .ai-chip,
+  /* Phase 21 — chalk-draw selectors. animation: none cancels the
+     draw-on reveal but the chalk strokes ALSO need stroke-dashoffset:
+     0 explicitly so the stroke is fully visible (otherwise the base
+     rule's offset:100 + animation-fill-mode: both would leave the
+     strokes blank for reduced-motion users). Without the explicit
+     stroke-dashoffset: 0 the chalk draw-on logic would STILL run as
+     an end-state attr, leaving the face invisible. */
+  .chalk-face,
+  .chalk-eye-l,
+  .chalk-eye-r,
+  .chalk-smile {
     opacity: 1;
     transform: none;
     animation: none;
+    stroke-dashoffset: 0;
   }
 
   .ai-msg {
@@ -1279,5 +1378,28 @@ const formatTime = (timestamp) => {
 
 :root.light-theme .ai-hey-badge {
   box-shadow: 0 2px 8px hsla(0, 65%, 55%, 0.25);
+}
+
+/* Phase 21 — Chalk theme parity. The .chalk-board (dark mode:
+   slate blackboard) flips to a warm off-white parchment board in
+   light mode. The chalk stroke color flips from dusty off-white
+   to deep slate so the chalk-on-board metaphor reads in BOTH
+   themes (chalk reads as "the opposite color of the board").
+   The values chosen here match the existing Phase 19 bg palette
+   tones (light-mode bg ramp tops out at L* 99% so the board fill
+   of L* 96% sits just slightly below the envelope bg, giving
+   subtle contrast that suggests a small drawing surface rather
+   than a hard swatch). The chalk stroke sits at L* 28% which
+   reads as "dark ink" against the L* 96% board. The fill +
+   stroke carry their own 240ms transition (set on the base
+   .chalk-board + .chalk-strokes rules above) so they smooth-
+   flip alongside the bg + topbar surfaces when the user toggles
+   the theme. */
+:root.light-theme .chalk-board {
+  fill: hsl(35, 25%, 96%);
+}
+
+:root.light-theme .chalk-strokes {
+  stroke: hsl(220, 30%, 28%);
 }
 </style>
