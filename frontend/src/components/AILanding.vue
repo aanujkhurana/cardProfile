@@ -27,28 +27,32 @@
       <!-- Welcome state -->
       <div v-if="messages.length <= 1" class="ai-welcome">          <div class="ai-welcome-avatar-wrap">
           <div class="ai-welcome-avatar">
-            <!-- Phase 21 — Phase 20 yellow filled smiley replaced with a
-                 chalk-on-blackboard smiley that DRAWS ITSELF via
-                 stroke-dashoffset animation once other entrance beats
-                 have settled. The 80x80 envelope holds a full-bleed
-                 chalkboard (.chalk-board, r=40) and strokes for the
-                 face outline (.chalk-face, r=35), two small eye
-                 circles (.chalk-eye-l / .chalk-eye-r, r=3.5), and the
-                 smile U-curve (.chalk-smile). A single SVG filter
-                 (feTurbulence + feDisplacementMap, scale=2.5) gives
-                 every stroke a slightly irregular chalk edge. Shared
-                 pathLength="100" normalises the dasharray math across
-                 the three circle elements and the smile path so a
-                 single chalk-draw keyframe (100 -> 0) reveals them
-                 all. Sequences: face outline @ 1.3s (lands ~1.9s)
-                 -> left eye @ 1.9s -> right eye @ 2.15s -> smile @
-                 2.4s (lands ~2.9s). Each new beat starts as the
-                 avatar envelope has finished scaling in (~1.3s) and
-                 finishes alongside the cascading chip entries
-                 (~2.0s) so the chalk-draw reads as the visual final
-                 beat before user input. .ai-hey-badge bubble +
-                 welcome-avatar-in entrance animation stay untouched.
-                 role="img" + aria-label preserve a11y. -->
+            <!-- Phase 22 — Phase 21 chalk-on-blackboard trimmed back:
+                 (a) the .chalk-board fill is removed so the chalk
+                 strokes now draw directly on the (theme-aware) bg
+                 of .ai-landing — the chalk reads as "doodle on the
+                 surface" rather than "drawing inside a board";
+                 (b) the avatar envelope is bumped from 80px to
+                 120px (still circular clip via border-radius:50%)
+                 so the chalk strokes render at gallery scale (the
+                 SVG viewBox stays 80x80 so geometry is unchanged
+                 and stroke-width ~3.5 visually thickens to ~5.25
+                 rendered px for chunkier chalk);
+                 (c) the whole envelope is tilted transform:
+                 rotate(-4deg) around its visual center so the
+                 smiley reads as a casual hand-drawn doodle rather
+                 than a stamped icon — the welcome-avatar-in
+                 keyframe still scales the WRAP from 0.85→1 so the
+                 rotation composes cleanly (independent transforms
+                 on different elements);
+                 (d) the .ai-hey-badge bubble is removed entirely
+                 so the chalk strokes are the only ornament in the
+                 welcome state (no orbit label, no pop animation,
+                 no light-theme box-shadow override). The chalk-
+                 draw choreography + stroke geometry + theme
+                 palette parity from Phase 21 stay intact (the
+                 smile still lands ~2.9s as the visual final
+                 beat). role="img" + aria-label preserve a11y. -->
             <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hello">
               <defs>
                 <!-- Chalk roughness: feTurbulence generates high-
@@ -67,22 +71,19 @@
                 </filter>
               </defs>
 
-              <!-- Filled chalkboard: edge-to-edge r=40 fills the
-                   whole 80x80 viewBox so the chalk strokes always
-                   have a board beneath them regardless of theme. -->
-              <circle cx="40" cy="40" r="40" class="chalk-board" />
-
-              <!-- Stroked chalk drawing. fill="none" on the group
-                   is required — if any element had a fill, the
-                   fill would pop in BEFORE the stroke finishes
-                   drawing (visually wrong for the chalk metaphor).
-                   stroke-linecap="round" softens the edges (chalk
-                   doesn't have sharp square ends). The filter is
-                   applied to the WHOLE GROUP so the four strokes
-                   share one chalk pass and stay visually unified.
-                   face radius drops to r=35 (vs Phase 20's
-                   fill r=40) so the 3.5px stroke doesn't bleed
-                   outside the 80x80 viewBox. -->
+              <!-- Stroked chalk drawing on the (theme-aware) bg of
+                   .ai-landing (no chalkboard fill beneath). fill=
+                   "none" on the group is required — if any element
+                   had a fill, the fill would pop in BEFORE the
+                   stroke finishes drawing (visually wrong for the
+                   chalk metaphor). stroke-linecap="round" softens
+                   the edges (chalk doesn't have sharp square
+                   ends). The filter is applied to the WHOLE GROUP
+                   so the four strokes share one chalk pass and
+                   stay visually unified. Coordinates/pathLength
+                   all unchanged from Phase 21 — only the
+                   surrounding envelope (size + tilt) and absence
+                   of board + orbit badge changed in this phase. -->
               <g filter="url(#chalk-texture)" class="chalk-strokes" fill="none" stroke-linecap="round">
                 <circle cx="40" cy="40" r="35" class="chalk-face" pathLength="100" />
                 <circle cx="28" cy="34" r="3.5" class="chalk-eye-l" pathLength="100" />
@@ -91,7 +92,6 @@
               </g>
             </svg>
           </div>
-          <span class="ai-hey-badge">hey</span>
         </div>
         <h1 class="ai-welcome-title ai-stagger" data-delay="3">Meet Anuj through conversation.</h1>
         <p class="ai-welcome-subtitle ai-stagger" data-delay="4">Learn about my software engineering experience, projects, technical skills, and the products I've built through a natural conversation instead of browsing a traditional portfolio.</p>
@@ -520,21 +520,6 @@ const formatTime = (timestamp) => {
   }
 }
 
-@keyframes hey-badge-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.15);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 @keyframes chip-in {
   from {
     opacity: 0;
@@ -735,8 +720,16 @@ const formatTime = (timestamp) => {
 }
 
 .ai-welcome-avatar {
-  width: 80px;
-  height: 80px;
+  /* Phase 22 — envelope bumped from 80px to 120px so the chalk
+     strokes render at gallery scale (the SVG viewBox stays 80x80
+     so geometry is unchanged, and stroke-width ~3.5 visually
+     thickens to ~5.25 rendered px for chunkier chalk). border-
+     radius: 50% + overflow: hidden clip is preserved so the chalk
+     reads inside a soft circular frame, even though the chalk
+     strokes are now drawn over the (theme-aware) bg of
+     .ai-landing rather than over a chalkboard plate. */
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
 }
@@ -745,35 +738,44 @@ const formatTime = (timestamp) => {
   width: 100%;
   height: 100%;
   display: block;
+  /* Phase 22 — slight leftward tilt (rotate -4deg) so the smiley
+     reads as a casual hand-drawn doodle rather than a stamped
+     icon. transform-origin: center keeps the rotation pivot at
+     the visual center so the chalk strokes don't drift off
+     axis. The rotation composes cleanly with the wrap's
+     welcome-avatar-in scale (0.85->1) entrance transform:
+     SCALE is on the WRAP, ROTATE is on the SVG (different
+     elements, no transform stacking). The -4deg tilt is small
+     enough that the chalk strokes still fit inside the 120x120
+     circular clip even after rotation (the rotated bounding
+     box is well within the clip). */
+  transform: rotate(-4deg);
+  transform-origin: center;
 }
 
-/* Phase 21 — Chalk-on-blackboard styling + draw-on animation.
-   The chalkboard (.chalk-board) is a flat filled circle that
-   occupies the full 80x80 viewBox so it sits edge-to-edge within
-   the .ai-welcome-avatar 80px envelope. The chalk-strokes group
-   carries the shared stroke color + stroke-width + linecap (set
-   once on the group so the four child elements stay uniform).
-   The fill/stroke values transition on a 240ms ease so the
-   palette FLIPS smoothly when the user toggles to light theme
-   (the chalk-board turns parchment and chalk turns dark slate,
-   matching the existing Phase 19 light-theme bg/glow palette).
-   The four stroked children share the same chalk-draw keyframe
-   (stroke-dashoffset 100 -> 0) and use pathLength="100" so the
-   dasharray math is identical across the three circles and the
-   smile path. animation-fill-mode: both keeps each stroke
-   hidden (offset 100) during its delay window so nothing paints
-   before its turn in the sequence — without "both", the
-   stroke would flash at offset 0 from t=0 and only animate from
-   t=delay-1frame onwards. Sequencing: face outline @ 1.3s
-   (lands ~1.9s) -> left eye @ 1.9s -> right eye @ 2.15s -> smile
-   @ 2.4s (lands ~2.9s). Each element starts AFTER the previous
-   has fully drawn so the user reads the sequence as deliberate
-   chalk drawing rather than a single simultaneous reveal. */
-.chalk-board {
-  fill: hsl(220, 15%, 12%);
-  transition: fill 240ms ease;
-}
-
+/* Phase 22 — Chalk strokes now draw on the (theme-aware) bg of
+   .ai-landing directly, with no opaque chalkboard plate beneath
+   (the .chalk-board fill rule was removed in this phase). The
+   chalk-strokes group carries the shared stroke color + stroke-
+   width + linecap (set once on the group so the four child
+   elements stay uniform). The stroke value transitions on a
+   240ms ease so the palette FLIPS smoothly when the user
+   toggles to light theme (chalk turns deep slate over the near-
+   white bg, matching the existing Phase 19 light-theme
+   palette). The four stroked children share the same chalk-draw
+   keyframe (stroke-dashoffset 100 -> 0) and use pathLength="
+   100" so the dasharray math is identical across the three
+   circles and the smile path. animation-fill-mode: both keeps
+   each stroke hidden (offset 100) during its delay window so
+   nothing paints before its turn in the sequence. Sequencing:
+   face outline @ 1.3s (lands ~1.9s) -> left eye @ 1.9s ->
+   right eye @ 2.15s -> smile @ 2.4s (lands ~2.9s). Each
+   element starts AFTER the previous has fully drawn so the user
+   reads the sequence as deliberate chalk drawing rather than a
+   single simultaneous reveal. The chalk-draw choreography
+   timing itself is unchanged from Phase 21; only the visual
+   surroundings (no board, larger + tilted envelope, no hey-
+   badge) changed in this phase. */
 .chalk-strokes {
   stroke: hsl(40, 15%, 92%);
   stroke-width: 3.5;
@@ -799,28 +801,6 @@ const formatTime = (timestamp) => {
   to   { stroke-dashoffset: 0;   }
 }
 
-.ai-hey-badge {
-  position: absolute;
-  top: -4px;
-  right: -8px;
-  background: hsl(0, 65%, 55%);
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 10px;
-  line-height: 1;
-  box-shadow: 0 2px 8px hsla(0, 65%, 55%, 0.4);
-  /* Phase 14 — three-stop scale bounce (0 → 1.15 → 1) with a
-     back-out easing. transform-origin: bottom right anchors the
-     bounce to the corner sitting closest to the avatar, so the
-     badge feels like it physically pops OUT of the avatar
-     rather than scaling from its center. */
-  opacity: 0;
-  transform: scale(0);
-  transform-origin: bottom right;
-  animation: hey-badge-pop 0.5s 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
 
 .ai-welcome-title {
   color: var(--white-2);
@@ -1176,7 +1156,9 @@ const formatTime = (timestamp) => {
   .ai-bg-grain,
   .ai-bg-vignette,
   .ai-welcome-avatar-wrap,
-  .ai-hey-badge,
+  /* Phase 22 .ai-hey-badge selector removed from this list —
+     the badge span was dropped from the template in this phase
+     so listing it here would have been dead CSS. */
   .ai-chips .ai-chip,
   /* Phase 21 — chalk-draw selectors. animation: none cancels the
      draw-on reveal but the chalk strokes ALSO need stroke-dashoffset:
@@ -1374,10 +1356,6 @@ const formatTime = (timestamp) => {
 :root.light-theme .ai-topbar.is-scrolled {
   background: hsla(0, 0%, 99%, 0.7);
   border-bottom-color: hsla(0, 0%, 88%, 0.6);
-}
-
-:root.light-theme .ai-hey-badge {
-  box-shadow: 0 2px 8px hsla(0, 65%, 55%, 0.25);
 }
 
 /* Phase 21 — Chalk theme parity. The .chalk-board (dark mode:
