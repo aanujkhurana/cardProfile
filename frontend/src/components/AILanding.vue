@@ -16,10 +16,38 @@
         <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" class="ai-topbar-avatar" />
         <span class="ai-topbar-name">Anuj Khurana</span>
       </div>
-      <button class="ai-browse-btn" @click="$emit('browse-website')">
-        <ion-icon name="globe-outline"></ion-icon>
-        <span>Browse Website</span>
-      </button>
+      <!-- Phase 25 — Wrap the top-right chrome actions in a
+           .ai-topbar-actions flex container so the GitHub icon
+           button can sit SIDE-BY-SIDE with the Browse Website
+           button while keeping the brand pinned to the topbar's
+           left edge (.ai-topbar's justify-content: space-between
+           spreads the brand on the left + the new actions
+           cluster on the right). GitHub goes first (secondary
+           external action), Browse Website stays second
+           (primary portfolio-nav action) — matches the
+           secondary-then-primary button convention. -->
+      <div class="ai-topbar-actions">
+        <!-- GitHub anchor — icon-only, opens in new tab via
+             target="_blank" + rel="noopener" (security). Links
+             to the same profile URL shown in Card.vue's
+             sidebar info (https://github.com/aanujkhurana).
+             aria-label + title give screen readers + hover-
+             tooltip semantic context despite no visible text. -->
+        <a
+          class="ai-icon-btn"
+          href="https://github.com/aanujkhurana"
+          target="_blank"
+          rel="noopener"
+          aria-label="GitHub"
+          title="GitHub"
+        >
+          <ion-icon name="logo-github"></ion-icon>
+        </a>
+        <button class="ai-browse-btn" @click="$emit('browse-website')">
+          <ion-icon name="globe-outline"></ion-icon>
+          <span>Browse Website</span>
+        </button>
+      </div>
     </header>
 
     <!-- Main content -->
@@ -703,6 +731,59 @@ const formatTime = (timestamp) => {
   box-shadow: 0 2px 8px hsla(0, 0%, 0%, 0.15);
 }
 
+/* Phase 25 — Topbar actions container + GitHub icon-only
+   button. The .ai-topbar-actions flex wrapper lets the
+   GitHub icon button sit SIDE-BY-SIDE with the existing
+   Browse Website button while keeping the brand pinned
+   left via .ai-topbar's justify-content: space-between.
+   The .ai-icon-btn base style mirrors .ai-browse-btn's
+   hover/border/colour tokens exactly (var(--light-gray-70)
+   resting + var(--white-2) hover, var(--onyx) resting
+   border + hsla(45, 54%, 58%, 0.3) hover border) so both
+   buttons read as the same visual + interactive family.
+   width/height: 40x40 makes the GitHub button SQUARE
+   (icon-only vs the pill-shaped Browse Website); this
+   matches the same visual mass as the icon-only mobile
+   collapse (.ai-browse-btn @media max-width:580px already
+   squares up by hiding the span + 8px padding). Both
+   buttons share the gold-tone border accent on hover so
+   the topbar's right cluster reads as one cohesive action
+   group. Light theme is automatic — both buttons consume
+   var(--light-gray-70) + var(--onyx) + var(--white-2)
+   which flip via style.css's :root.light-theme blocks. */
+.ai-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--light-gray-70);
+  font-size: 13px;
+  border: 1px solid var(--onyx);
+  transition: color 150ms ease, border-color 150ms ease, transform 200ms var(--ease), box-shadow 180ms ease;
+}
+
+.ai-icon-btn:hover {
+  color: var(--white-2);
+  border-color: hsla(45, 54%, 58%, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px hsla(0, 0%, 0%, 0.15);
+}
+
+.ai-icon-btn ion-icon {
+  font-size: 17px;
+  color: inherit;
+  display: inline;
+}
+
 .ai-browse-btn ion-icon {
   font-size: 15px;
   color: inherit;
@@ -1213,6 +1294,11 @@ const formatTime = (timestamp) => {
   .ai-followup-chip,
   .ai-send,
   .ai-browse-btn,
+  /* Phase 25 — new GitHub icon button. Same hover transform/
+     border transition as .ai-browse-btn; needs the same
+     reduce override so vestibular-sensitive users see
+     instant state flips on hover/focus instead of slide. */
+  .ai-icon-btn,
   .ai-input-row {
     transition-duration: 0.01ms;
   }
