@@ -569,6 +569,33 @@ main {
   border-radius: 12px 12px 0 0;
   box-shadow: var(--shadow-2);
   z-index: 5;
+  /* Phase 24 — Apple-style hide-on-scroll-down choreography
+     composable-driven by useScrollFlag (bound in Card.vue's
+     <script setup> as :class="{ 'is-hidden': isHidden }"). The
+     .navbar base rule carries a transform: translateY(0)
+     baseline so the .is-hidden rule below can transition a
+     translateY without the bar snapping from "unset" to
+     "-100%"/"+100%". transition holds transform alone (background
+     and border-color already auto-flip through the var(--onyx)
+     color shift in light-mode theme, so they need no extra
+     transition). will-change: transform hints the compositor
+     to pre-allocate a layer so the slide doesn't stutter on
+     touch-scroll devices. */
+  transform: translateY(0);
+  transition: transform 220ms ease;
+  will-change: transform;
+}
+
+/* Phase 24 — hide-on-scroll-down. Mobile default (navbar is
+   bottom-fixed at <1024px per the base rule above): translate
+   DOWN by 100% of the navbar height so it slides off the
+   bottom of the viewport. The composable is symmetric — it
+   sets isHidden = true only when scrollState === 'down' AND
+   isScrolled (past the 20px threshold), so the bar always
+   stays visible at the top of page (state = 'top') and at all
+   non-scrolled frames. */
+.navbar.is-hidden {
+  transform: translateY(100%);
 }
 
 .navbar-list {
@@ -1370,6 +1397,21 @@ textarea.form-input::-webkit-resizer { display: none; }
   #RESPONSIVE
 \*-----------------------------------*/
 
+/* Phase 24 — global reduced-motion neutralisation for the
+   static website's .navbar. The Phase 16/19 AILanding has its
+   own scoped <style> reduced-motion block, but the static
+   Card.vue lives in the global stylesheet, so the reduced-
+   motion override belongs here at the global level. Vestibular-
+   sensitive users see the navbar snap instantly between visible
+   and hidden states with no transform animation. The composable
+   still FLIPS isHidden via reactivity (so the bar still hides
+   on scroll-down), just without the sliding motion. */
+@media (prefers-reduced-motion: reduce) {
+  .navbar {
+    transition-duration: 0.01ms;
+  }
+}
+
 /**
  * responsive larger than 450px screen
  */
@@ -1849,6 +1891,19 @@ textarea.form-input::-webkit-resizer { display: none; }
     border-radius: 0 20px;
     padding: 0 20px;
     box-shadow: none;
+  }
+
+  /* Phase 24 — desktop hide-direction override. At >=1024px the
+     navbar is at top-right (position: absolute; top: 0; right:
+     0), so when hiding on scroll-down it should slide UP (off
+     the top of the viewport) rather than DOWN. The -100%
+     translate keeps the navbar off any descendants below it
+     and matches the direction of the AI landing's topbar
+     (Phase 16 used translateY(-100%) for its top-positioned
+     topbar). The same composable drives both viewports — only
+     the @media-conditional transform value changes. */
+  .navbar.is-hidden {
+    transform: translateY(-100%);
   }
 
   .navbar-list {

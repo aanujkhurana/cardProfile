@@ -102,7 +102,7 @@
     </div>
   </aside>
   <div class="main-content">
-    <nav class="navbar">
+    <nav class="navbar" :class="{ 'is-hidden': isHidden }">
       <ul class="navbar-list">
         <li class="navbar-item">
           <button class="navbar-link active" data-nav-link>About</button>
@@ -446,6 +446,7 @@ import Experiences from "./Experiences.vue";
 import Skills from "./Skills.vue";
 import Contact from "./Contact.vue";
 import ThemeToggle from "./ThemeToggle.vue";
+import { useScrollFlag } from "../composables/useScrollFlag.js";
 
 // Reactive refs for state management
 const isLoading = ref(true);
@@ -459,6 +460,25 @@ const formData = ref({
 
 // DOM element refs
 const sidebar = ref(null);
+
+// Phase 24 — adopt useScrollFlag (created in Phase 16 for the AI
+// landing's topbar) for the static website's bottom/top navbar.
+// The composable was extended in this phase to handle BOTH
+// element-level scroll events (e.target is a DOM element with
+// .scrollTop) AND window-level scroll events (e.target is window
+// or document — composable reads window.scrollY in that case).
+// Card.vue scrolls at the WINDOW level (the body itself scrolls,
+// not a sub-div), so we attach a window scroll listener via the
+// existing addEventListenerSafe utility in onMounted and remove it
+// in onBeforeUnmount through the existing eventListeners cleanup
+// pattern. threshold: 20 (vs the AI landing's 10) sits a tiny bit
+// higher on window scroll because mouse-wheel notches are larger
+// (~100px) and we want the navbar to wait for a deliberate scroll
+// pulse before hiding. The composable returns isHidden directly;
+// scrollState / isScrolled aren't needed for the navbar UX (no
+// background or border state change for the navbar — only the
+// direction-driven translateY hide).
+const { isHidden, onScroll } = useScrollFlag({ threshold: 20 });
 const modalContainer = ref(null);
 const overlay = ref(null);
 const form = ref(null);
@@ -676,6 +696,18 @@ const setupNavigation = () => {
   });
 };
 
+// Phase 24 — window scroll listener (drives the navbar's hide-on-
+// scroll-down / show-on-scroll-up motion). Attached with
+// passive: true so the browser can keep its scroll-optimisation
+// pipeline (no event.preventDefault path). The composable's
+// onScroll handler reads window.scrollY when called from this
+// listener (vs e.target.scrollTop when called from an element
+// @scroll binding). The existing eventListeners array + cleanup()
+// removes this listener on unmount.
+const setupScrollListener = () => {
+  addEventListenerSafe(window, "scroll", onScroll, { passive: true });
+};
+
 // Setup sidebar toggle
 const setupSidebar = () => {
   const sidebarBtn = safeQuerySelector("[data-sidebar-btn]");
@@ -793,6 +825,7 @@ const initializePortfolio = async () => {
     setupFormSubmission();
     setupNavigation();
     setupIntersectionObserver();
+    setupScrollListener();
 
     // Initial form validation
     validateForm();

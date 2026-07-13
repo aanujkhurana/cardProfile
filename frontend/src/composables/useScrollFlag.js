@@ -56,8 +56,36 @@ export function useScrollFlag({
     isHidden,
     scrollState,
     onScroll: (e) => {
-      // Clamp negative scrollTop (overscroll behaviour) to 0.
-      const top = Math.max(0, e.target.scrollTop || 0);
+      // Phase 24 — handle BOTH element scroll events (e.g. the
+      // AI landing's internally-scrollable .ai-main binds
+      // @scroll.passive="onScroll" so e.target is the div) AND
+      // window-level scroll events (e.g. the static Card.vue
+      // website where the BODY/document scrolls and the caller
+      // attaches via window.addEventListener('scroll', onScroll,
+      // { passive: true })). For window-level events, e.target is
+      // either `window` or `document` (browser-dependent — Chrome
+      // reports `document`, Firefox/Safari report `window`); in
+      // either case there is no `scrollTop` property on the target
+      // so we read `window.scrollY` (the unified source of truth
+      // for the document's vertical scroll position). This keeps
+      // the composable pure (no Vue lifecycle imports) and lets
+      // each caller bind the listener at whatever level makes
+      // sense for their content without needing a separate source:
+      // 'window' option.
+      const isWindowOrDocument =
+        typeof window !== 'undefined' &&
+        (e.target === window || e.target === document);
+      const rawScroll = isWindowOrDocument
+        ? window.scrollY
+        : e.target.scrollTop;
+
+      // Clamp negative scrollTop (iOS rubber-band / Android pull-
+      // to-refresh overscroll) to 0 so the state machine treats
+      // it as "at top" rather than firing a phantom direction
+      // change. window.scrollY is non-negative by definition so
+      // this clamp is a no-op for window-level events; safe in
+      // both modes.
+      const top = Math.max(0, rawScroll || 0);
       isScrolled.value = top > threshold;
 
       const delta = top - prev;
