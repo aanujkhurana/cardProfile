@@ -93,8 +93,31 @@
             </svg>
           </div>
         </div>
-        <h1 class="ai-welcome-title ai-stagger" data-delay="3">Meet Anuj through conversation.</h1>
-        <p class="ai-welcome-subtitle ai-stagger" data-delay="4">Learn about my software engineering experience, projects, technical skills, and the products I've built through a natural conversation instead of browsing a traditional portfolio.</p>
+        <!-- Phase 23 — Hero copy rewrite. The old title "Meet Anuj
+             through conversation." + formal "Learn about my software
+             engineering experience, projects..." subtitle were
+             portfolio-polite but read as a static-website pitch on
+             an interactive assistant. The new copy + subtitle lean
+             into the assistant-as-interrogation framing: the title
+             explicitly tells visitors to skip small talk (the
+             AI's purpose is to be poked at for portfolio intel,
+             not greeted), and the subtitle broadly advertises the
+             AI's knowledge surface (projects, career journey,
+             tech stack, wins, commits, bugs fixed) and closes
+             with a soft invitation "Go ahead, ask it anything."
+             The self-deprecating "questionable commits, and even
+             the bugs I eventually fixed" beats the AI's tone:
+             it's the kind of thing the AI will ACTIVELY admit
+             when asked (matches the existing FAQ + system-prompt
+             honesty discipline). Length-wise the new title is 4
+             words (fits ~ one line at every breakpoint); the new
+             subtitle is ~190 chars (wraps to ~3 lines at desktop
+             max-width: 520px, fits comfortably inside the welcome
+             state). The .ai-stagger + data-delay entries stay
+             untouched so the entrance choreography + timing carry
+             over. -->
+        <h1 class="ai-welcome-title ai-stagger" data-delay="3">Skip the small talk.</h1>
+        <p class="ai-welcome-subtitle ai-stagger" data-delay="4">Interrogate my AI instead. It knows my projects, career journey, tech stack, biggest wins, questionable commits, and even the bugs I eventually fixed. Go ahead, ask it anything.</p>
       </div>
 
       <!-- Chat messages -->
