@@ -814,11 +814,17 @@ const formatTime = (timestamp) => {
 
 .ai-welcome-avatar-wrap {
   position: relative;
-  margin-bottom: 28px;
+  /* Phase 23/22 polish — margin-bottom bumped from 28px to 34px
+     so the chalk envelope sits a touch further from the welcome
+     title; gives the welcome stack more breathing room on the
+     narrow vertical padding rhythm of .ai-welcome. */
+  margin-bottom: 34px;
   /* Phase 14 — scale 0.85→1 + opacity entrance so the wave.gif
      avatar feels alive. Replaces the older generic .ai-stagger
      translateY-only animation which was harder to read against
-     the avatar's natural stillness. */
+     the avatar's natural stillness. Phase 23 — wave.gif later
+     swapped for the chalk-stroke avatar; the entrance animation
+     itself is preserved unchanged. */
   opacity: 0;
   animation: welcome-avatar-in 0.6s 0.7s var(--ease) forwards;
 }
@@ -895,10 +901,10 @@ const formatTime = (timestamp) => {
   animation: chalk-draw linear both;
 }
 
-.chalk-face  { animation-duration: 0.6s;  animation-delay: 1.3s;  }
-.chalk-eye-l { animation-duration: 0.25s; animation-delay: 1.9s;  }
-.chalk-eye-r { animation-duration: 0.25s; animation-delay: 2.15s; }
-.chalk-smile { animation-duration: 0.5s;  animation-delay: 2.4s;  }
+.chalk-face  { animation-duration: 0.6s;  animation-delay: 1.0s;  }
+.chalk-eye-l { animation-duration: 0.25s; animation-delay: 1.6s;  }
+.chalk-eye-r { animation-duration: 0.25s; animation-delay: 1.85s; }
+.chalk-smile { animation-duration: 0.5s;  animation-delay: 2.1s;  }
 
 @keyframes chalk-draw {
   from { stroke-dashoffset: 100; }
@@ -1320,6 +1326,18 @@ const formatTime = (timestamp) => {
 
   .ai-welcome {
     padding: 24px 16px 0;
+  }
+
+  /* Phase 22 mobile polish — shrink the chalk envelope from
+     120px to 96px on narrow phones so the avatar + title +
+     chips stack fits comfortably within ~640px viewports
+     without the title wrapping awkwardly mid-line. Overrides
+     the default .ai-welcome-avatar { width: 120px } only
+     under this breakpoint; the wrap and entrance animation
+     are unchanged. */
+  .ai-welcome-avatar {
+    width: 96px;
+    height: 96px;
   }
 
   .ai-welcome-title {

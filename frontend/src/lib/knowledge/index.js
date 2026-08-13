@@ -25,3 +25,9 @@ export { contact } from "./contact.js";
 export { faq } from "./faq.js";
 export { resume, getResume } from "./resume.js";
 export { achievements, getAchievements, getAchievementsByTag } from "./achievements.js";
+export {
+  bugsAndLessons,
+  getBugsAndLessons,
+  getBugsAndLessonsByType,
+  getBugsAndLessonsById,
+} from "./bugsAndLessons.js";

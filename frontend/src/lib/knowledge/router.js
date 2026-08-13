@@ -24,6 +24,7 @@ import {
   faq,
   resume,
   achievements,
+  bugsAndLessons,
 } from "../knowledge/index.js";
 
 /* ------------------------------------------------------------------ */
@@ -67,6 +68,38 @@ const INTENT_RULES = [
       "results",
       "outcomes",
       "milestones",
+    ],
+  },
+  {
+    // Phase 23 polish — backs the witty subtitle promise of
+    // "questionable commits, and even the bugs I eventually
+    // fixed". Recruiter-natural phrases route here; the
+    // builder emits a text rollup + per-id follow-up chips.
+    // Listed AFTER achievements so its single-word "impact"
+    // overlap stays with achievements (the more general
+    // metric-intent), and AFTER resume (resume phrase-keywords
+    // win top-down precedence).
+    intent: "bugs-and-lessons",
+    keywords: [
+      "bugs and lessons",
+      "bugs-and-lessons",
+      "questionable commit",
+      "questionable commits",
+      "bugs you fixed",
+      "bug you fixed",
+      "what bugs",
+      "what is a bug",
+      "what's a bug",
+      "lessons learned",
+      "lesson learned",
+      "lessons learnt",
+      "your failures",
+      "production bug",
+      "production bugs",
+      "what went wrong",
+      "what did you learn",
+      "engineering lessons",
+      "your mistakes",
     ],
   },
   {
@@ -509,6 +542,65 @@ function buildAchievementsResponse() {
   };
 }
 
+/**
+ * Phase 23 polish — text-only response backing the
+ * `bugs-and-lessons` intent. No rich card component yet;
+ * the rollup reads as a recruiter-friendly bullet ledger
+ * with one teaser line per entry + follow-up chips that
+ * drill into any specific bug or lesson by `id` via a
+ * subsequent query. Tags and id-slugs both match for
+ * `learn more about X` recruiter probes.
+ */
+function buildBugsAndLessonsResponse(query) {
+  const lower = (query || "").toLowerCase();
+  // Per-id drill-down — if the query mentions a known id
+  // slug or one of its tags, surface that single entry's
+  // full context (description + root cause + resolution +
+  // lesson learned).
+  const allEntries = bugsAndLessons.entries();
+  const matched =
+    allEntries.find(
+      (e) =>
+        lower.includes(e.id) ||
+        e.tags.some((t) => lower.includes(t.toLowerCase()))
+    ) || null;
+  if (matched) {
+    return {
+      type: "local",
+      component: "text",
+      text: [
+        `**${matched.title}**`,
+        matched.description,
+        `Root cause: ${matched.rootCause}`,
+        `Resolution: ${matched.resolution}`,
+        `Lesson: ${matched.lessonLearned}`,
+      ].join("\n\n"),
+      followUp: [
+        "What other bugs have you fixed?",
+        "Show me your projects",
+        "Download your resume",
+      ],
+    };
+  }
+  // Top-level rollup — list every entry's title + sentence-1
+  // teaser so recruiters see the breadth in one screen.
+  const bugCount = bugsAndLessons.count("bug");
+  const lessonCount = bugsAndLessons.count("lesson-learned");
+  const teaser = allEntries
+    .map((e) => `• ${e.title} — *${e.description.split(".")[0]}.*`)
+    .join("\n");
+  return {
+    type: "local",
+    component: "text",
+    text: `Honest answer — I have **${bugCount} production bugs** I shipped (and fixed) and **${lessonCount} broader engineering lessons** I've carried forward. The full ledger:\n\n${teaser}\n\nAsk about any entry by name (try "vue3-reactivity-regression" or "findmylease-mapbox-performance") and I'll dive deep.`,
+    followUp: [
+      "vue3-reactivity-regression",
+      "findmylease-mapbox-performance",
+      "gemini-key-leak",
+    ],
+  };
+}
+
 function buildFaqResponse(query) {
   const lower = query.toLowerCase();
   for (const item of faq) {
@@ -546,6 +638,7 @@ const BUILDERS = {
   availability: buildAvailabilityResponse,
   profile: buildProfileResponse,
   ai_projects: buildAiProjectsResponse,
+  "bugs-and-lessons": buildBugsAndLessonsResponse,
 };
 
 /**
