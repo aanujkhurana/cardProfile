@@ -25,9 +25,10 @@ export { contact } from "./contact.js";
 export { faq } from "./faq.js";
 export { resume, getResume } from "./resume.js";
 export { achievements, getAchievements, getAchievementsByTag } from "./achievements.js";
-export {
-  bugsAndLessons,
-  getBugsAndLessons,
-  getBugsAndLessonsByType,
-  getBugsAndLessonsById,
-} from "./bugsAndLessons.js";
+// bugsAndLessons module exposes 3 helpers (getBugsAndLessons /
+// getBugsAndLessonsByType / getBugsAndLessonsById) in source, but
+// only `bugsAndLessons` is consumed downstream today (router.js).
+// Helpers stay defined in source for future re-export when a real
+// caller emerges; the barrel keeps the public surface minimal in
+// the meantime so dead exports don't linger.
+export { bugsAndLessons } from "./bugsAndLessons.js";
