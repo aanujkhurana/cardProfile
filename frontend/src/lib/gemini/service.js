@@ -150,7 +150,7 @@ export function getGeminiErrorMessage(error) {
   const status = error?.status;
 
   if (status === 404 || code.includes("MISSING_API_KEY")) {
-    return "The Gemini API key isn't configured on the server. I'll keep answering from my built-in knowledge.";
+    return "Unable to connect to AI. I'll keep answering from my built-in knowledge.";
   }
   if (status === 429 || code.includes("RATE_LIMITED")) {
     return "Too many requests. Please wait a moment and try again.";
@@ -166,11 +166,11 @@ export function getGeminiErrorMessage(error) {
     code.includes("SERVER_ERROR") ||
     code.includes("timeout")
   ) {
-    return "Gemini is taking too long right now. I'll answer from my built-in knowledge for this turn.";
+    return "Gemini is taking too long right now. I'll keep answering from my built-in knowledge.";
   }
   if (code.includes("NETWORK_ERROR") || status === 0) {
     return "Network error. Please check your connection and try again.";
   }
 
-  return "I'm having trouble reaching the AI service. I can still answer questions using my built-in knowledge.";
+  return "I'm having trouble reaching the AI service. I'll keep answering from my built-in knowledge.";
 }
