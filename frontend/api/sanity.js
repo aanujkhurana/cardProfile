@@ -8,6 +8,13 @@
  *    This function holds the token in the server-only `SANITY_TOKEN` env var
  *    and never exposes it to the client.
  *
+ * Current usage:
+ *  - Reads (projects / experience) now go DIRECTLY to the public Sanity CDN
+ *    from the browser — see src/lib/sanity_client.js. No token is needed for
+ *    a public dataset, so those calls work even on a pure static host.
+ *  - This proxy is what the contact form uses for its authenticated WRITE
+ *    (the one operation that still requires SANITY_TOKEN).
+ *
  * Contract:
  *  - Method: POST
  *  - Body:

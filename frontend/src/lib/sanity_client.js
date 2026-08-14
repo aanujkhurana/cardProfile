@@ -2,9 +2,10 @@ import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url';
 
 // Project ID + dataset are NOT secret (they appear in CDN image URLs), so
-// they stay client-side for building image URLs. The API token lives ONLY
-// on the server in `SANITY_TOKEN` — authenticated reads and the contact
-// write go through `/api/sanity` (see fetchSanity / createContact below).
+// they stay client-side. The dataset is PUBLIC, so reads run straight against
+// the Sanity CDN with NO token — this is why projects/experience load on a
+// static frontend host that has no serverless functions. Only the contact-form
+// WRITE needs the token, so createContact() still posts to /api/sanity.
 const client = createClient({
     projectId: import.meta.env.VITE_SANITY_PROJECT_ID,
     dataset: 'production',
@@ -17,15 +18,36 @@ const builder = imageUrlBuilder(client);
 
 export const urlFor = (source) => builder.image(source);
 
+// Allowlisted reads, mirroring api/sanity.js so behavior is identical. Adding
+// a new read means adding a row here (and optionally to api/sanity.js).
+const QUERIES = {
+  experiences: '*[_type == "experiences"] | order(year desc)',
+  works: '*[_type == "works"] | order(_updatedAt desc)',
+  worksAll: '*[_type == "works" && "All" in tags] | order(_updatedAt desc)',
+};
+
+/** Read an allowlisted resource ("experiences" | "works" | "worksAll"). */
+export function fetchSanity(resource) {
+  const query = QUERIES[resource];
+  if (!query) {
+    return Promise.reject(new Error(`invalid_resource: ${resource}`));
+  }
+  return client.fetch(query);
+}
+
 /**
- * Thin wrapper around the /api/sanity serverless proxy. Throws on non-2xx
- * so callers keep their existing try/catch + error handling.
+ * Submit the contact form. This is the ONLY call that needs the Sanity token,
+ * so it goes through the /api/sanity serverless proxy (requires a host with
+ * serverless functions, e.g. Vercel — it will not work on a pure static host).
  */
-async function sanityRequest(body) {
+export async function createContact({ name, email, message }) {
   const response = await fetch('/api/sanity', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      action: 'create',
+      document: { _type: 'contact', name, email, message },
+    }),
   });
 
   const payload = await response.json().catch(() => null);
@@ -35,17 +57,4 @@ async function sanityRequest(body) {
     throw err;
   }
   return payload.data;
-}
-
-/** Read an allowlisted resource ("experiences" | "works" | "worksAll"). */
-export function fetchSanity(resource) {
-  return sanityRequest({ action: 'fetch', resource });
-}
-
-/** Submit the contact form (server-side `client.create`). */
-export function createContact({ name, email, message }) {
-  return sanityRequest({
-    action: 'create',
-    document: { _type: 'contact', name, email, message },
-  });
 }
