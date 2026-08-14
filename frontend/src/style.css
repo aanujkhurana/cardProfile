@@ -379,8 +379,49 @@ main {
 .avatar-box {
   background: var(--bg-gradient-onyx);
   border-radius: 20px;
+  /* Hover swap — an explicit square frame so the pixel art and the
+     real photo occupy the exact same box regardless of their
+     intrinsic sizes. overflow: hidden clips both to the rounded
+     corners. */
+  position: relative;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
   /* padding-bottom: 12px; */
   /* margin-bottom: 22px; */
+}
+
+/* Both images fill the same frame and crossfade on hover. object-fit:
+   cover makes the portrait profile.png (487x512) cover the square
+   frame the same way the square pixel art does — no size mismatch. */
+.avatar-box img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 250ms ease;
+}
+
+.avatar-box .avatar-real {
+  opacity: 0;
+  /* profile.png has ~16% empty padding around the subject (measured:
+     person is 408x429 inside a 487x512 canvas), so a plain cover-fit
+     makes the person read noticeably smaller than the full-bleed pixel
+     art. Zoom in to bring the subject up to the same visual scale; the
+     box's overflow: hidden crops the overflow. transform-origin is biased
+     slightly above center to keep the head (a top-heavy portrait) safely
+     inside the frame. */
+  transform: scale(1.3);
+  transform-origin: 50% 40%;
+}
+
+.avatar-box:hover .avatar-pixel {
+  opacity: 0;
+}
+
+.avatar-box:hover .avatar-real {
+  opacity: 1;
 }
 
 .info-content {
@@ -1520,9 +1561,7 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .sidebar-info { gap: 25px; }
 
-  .avatar-box { border-radius: 30px; }
-
-  .avatar-box img { width: 120px; }
+  .avatar-box { border-radius: 30px; width: 120px; height: 120px; }
 
   .info-content .name { margin-bottom: 15px; }
 
@@ -2031,7 +2070,7 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .sidebar-info { flex-direction: column; }
 
-  .avatar-box img { width: 150px; }
+  .avatar-box { width: 150px; height: 150px; }
 
   .info-content .name {
     white-space: nowrap;

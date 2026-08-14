@@ -2,7 +2,19 @@
   <aside class="sidebar" data-sidebar>
     <div class="sidebar-info">
       <figure class="avatar-box">
-        <img src="../assets/images/my-avatar.png" alt="AnujKhurana" width="100" />
+        <img
+          src="../assets/images/my-avatar.png"
+          alt="AnujKhurana"
+          width="100"
+          class="avatar-pixel"
+        />
+        <img
+          src="/profile.png"
+          alt=""
+          width="100"
+          class="avatar-real"
+          aria-hidden="true"
+        />
       </figure>
 
       <div class="info-content">

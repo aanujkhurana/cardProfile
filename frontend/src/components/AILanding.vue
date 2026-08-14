@@ -47,6 +47,7 @@
           <ion-icon name="globe-outline"></ion-icon>
           <span>Browse Website</span>
         </button>
+        <ThemeToggle />
       </div>
     </header>
 
@@ -251,6 +252,7 @@ import { sendToGemini, getGeminiErrorMessage } from "../lib/gemini/service.js";
 import { defaultQuestions } from "../lib/config/defaultQuestions.js";
 import { resolveComponent } from "./ai/index.js";
 import { useScrollFlag } from "../composables/useScrollFlag.js";
+import ThemeToggle from "./ThemeToggle.vue";
 
 const emit = defineEmits(["browse-website"]);
 
@@ -759,6 +761,20 @@ const formatTime = (timestamp) => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* ThemeToggle is reused from the static site; by default it is
+   absolutely positioned (floating at top:1rem for the sidebar view).
+   Inside the AI topbar it must sit inline with the GitHub + Browse
+   buttons, so we neutralise that absolute positioning here. The
+   toggle still drives the same shared `light-theme` class on <html>
+   via useTheme, so dark/light stays in sync between both views. */
+.ai-topbar-actions :deep(.theme-toggle-wrapper) {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
+  background-color: transparent;
 }
 
 .ai-icon-btn {
