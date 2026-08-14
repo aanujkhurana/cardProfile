@@ -512,7 +512,7 @@ const formatTime = (timestamp) => {
  * + vignette) cascade in at 0.3-0.5s → welcome avatar (0.7s) →
  * hey-badge pop with back-out easing (0.8s) → welcome copy +
  * input row → chips cascade in per-item at 1.25s+ (80ms stagger,
- * up to 6 chips). All timings tuned to read as a unified "app is
+ * up to 8 chips). All timings tuned to read as a unified "app is
  * alive" sequence rather than disjointed entrance. Reduced-motion
  * users get a single instant paint (all animations disabled in
  * the @media block below).
@@ -583,10 +583,12 @@ const formatTime = (timestamp) => {
 }
 
 /**
- * Per-chip entrance stagger. The defaultQuestions config can
- * surface up to 6 entries, so we stagger up to 6 visible chips.
- * :nth-child matches work cleanly with v-for because Vue preserves
- * DOM order keyed by :key.
+ * Per-chip entrance stagger. The defaultQuestions config surfaces
+ * 8 entries, so we stagger all 8 visible chips. :nth-child matches
+ * work cleanly with v-for because Vue preserves DOM order keyed by
+ * :key. Every chip must have a delay here — a chip that falls off
+ * the end of this list gets delay: 0 and pops in before its
+ * siblings (the "two chips appear early" regression).
  */
 .ai-chips .ai-chip:nth-child(1) { animation-delay: 1.25s; }
 .ai-chips .ai-chip:nth-child(2) { animation-delay: 1.33s; }
@@ -594,6 +596,8 @@ const formatTime = (timestamp) => {
 .ai-chips .ai-chip:nth-child(4) { animation-delay: 1.49s; }
 .ai-chips .ai-chip:nth-child(5) { animation-delay: 1.57s; }
 .ai-chips .ai-chip:nth-child(6) { animation-delay: 1.65s; }
+.ai-chips .ai-chip:nth-child(7) { animation-delay: 1.73s; }
+.ai-chips .ai-chip:nth-child(8) { animation-delay: 1.81s; }
 
 .ai-bg-grid {
   position: absolute;
