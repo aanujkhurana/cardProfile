@@ -982,6 +982,17 @@ const formatTime = (timestamp) => {
   flex-direction: row-reverse;
 }
 
+/* Phase 14 fix — the user bubble's max-width is a percentage, so it
+   needs a definite parent width to resolve against. Without flex: 1
+   the content column is shrink-wrapped to the text itself, which
+   makes 80% of a short message even shorter (a 2-word message wraps
+   mid-phrase). Letting the user's content column fill the row gives
+   the bubble a stable width and lets margin-left: auto right-align
+   it like a normal chat bubble. Bot bubbles stay shrink-wrapped. */
+.ai-msg.user .ai-msg-content {
+  flex: 1;
+}
+
 .ai-msg-avatar img {
   width: 26px;
   height: 26px;
