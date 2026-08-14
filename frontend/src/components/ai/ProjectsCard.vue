@@ -103,10 +103,7 @@
         </div>
       </div>
 
-      <div
-        v-if="project.repo || project.demo || project.url"
-        class="ai-project-actions"
-      >
+      <div class="ai-project-actions">
         <a
           v-if="project.repo"
           :href="project.repo"
@@ -130,13 +127,12 @@
           Demo
         </a>
         <a
-          v-if="project.url"
-          :href="project.url"
-          class="ai-action-btn case-study-btn"
-          :aria-label="`Read the ${project.name} case study`"
+          href="#projects"
+          class="ai-action-btn view-site-btn"
+          :aria-label="`View ${project.name} on the website`"
         >
-          <ion-icon name="document-text-outline"></ion-icon>
-          Case study
+          <ion-icon name="globe-outline"></ion-icon>
+          View website
         </a>
       </div>
     </div>
@@ -363,12 +359,12 @@ defineProps({ data: { type: Object, required: true } });
   display: inline;
 }
 
-.case-study-btn {
+.view-site-btn {
   background: hsla(45, 100%, 72%, 0.1);
   border: 1px solid hsla(45, 100%, 72%, 0.3);
 }
 
-.case-study-btn:hover {
+.view-site-btn:hover {
   background: hsla(45, 100%, 72%, 0.2);
 }
 </style>

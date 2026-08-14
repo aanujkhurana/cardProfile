@@ -600,6 +600,25 @@ const navigateToPage = (pageName) => {
   });
 };
 
+// Support the AI project card's "View website" link, which uses a
+// "#projects"-style hash to jump straight to a static-site section.
+// The hash maps 1:1 to the data-page names used by navigateToPage.
+const hashToPage = (hash) => {
+  const page = (hash || "").replace(/^#\/?/, "").trim().toLowerCase();
+  const valid = ["about", "projects", "experience", "contact"];
+  return valid.includes(page) ? page : null;
+};
+
+const handleHashChange = () => {
+  const page = hashToPage(window.location.hash);
+  if (page) navigateToPage(page);
+};
+
+const setupHashNavigation = () => {
+  addEventListenerSafe(window, "hashchange", handleHashChange);
+  handleHashChange();
+};
+
 // Setup testimonials modal
 const setupTestimonialsModal = () => {
   const testimonialsItems = safeQuerySelectorAll("[data-testimonials-item]");
@@ -836,6 +855,7 @@ const initializePortfolio = async () => {
     setupFormValidation();
     setupFormSubmission();
     setupNavigation();
+    setupHashNavigation();
     setupIntersectionObserver();
     setupScrollListener();
 

@@ -53,7 +53,7 @@ Used in: ${projLinks}${learned}`;
       const futureSteps =
         project.futureImprovements?.map((f) => `• ${f}`).join("\n") || "N/A";
       const learnLinks = [
-        project.url ? `[Case study](${project.url})` : null,
+        `[View website](#projects)`,
         project.repo ? `[Repo](${project.repo})` : null,
         project.demo ? `[Demo](${project.demo})` : null,
       ]
