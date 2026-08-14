@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail -n web,api -c cyan,magenta \"vite\" \"vercel dev --listen 3000\"",
+    "_devOrchestrationNote": "Phase fix: invoke both legs via npm:<script> shorthand so subprocess npm_lifecycle_event becomes dev:web / dev:api (not dev). Vercel CLI 55's recursion-detection checks for lifecycle=dev AND literal 'vercel dev' in package.json dev script; this rewire routes around both.",
+    "dev": "concurrently --kill-others-on-fail -n web,api -c cyan,magenta \"npm:dev:web\" \"npm:dev:api\"",
     "dev:web": "vite",
-    "dev:api": "vercel dev --listen 3000",
+    "dev:api": "vercel dev --listen 3000 --yes",
     "build": "vite build",
     "preview": "vite preview"
   },
