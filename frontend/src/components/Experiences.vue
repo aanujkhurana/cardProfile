@@ -1,13 +1,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { client } from "../lib/sanity_client.js";
+import { fetchSanity } from "../lib/sanity_client.js";
 
 const experiences = ref([]);
 
 const fetchExperiences = async () => {
-  // Fetch and order experiences by year descending
-  const query = '*[_type == "experiences"] | order(year desc)';
-  const data = await client.fetch(query);
+  // Fetch and order experiences by year descending (allowlisted server-side).
+  const data = await fetchSanity("experiences");
   experiences.value = data;
 };
 

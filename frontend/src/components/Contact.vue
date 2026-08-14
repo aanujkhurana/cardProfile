@@ -64,7 +64,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { client } from "../lib/sanity_client";
+import { createContact } from "../lib/sanity_client";
 
 const formData = ref({ name: "", email: "", message: "" });
 const isFormSubmitted = ref(false);
@@ -91,15 +91,7 @@ const handleSubmit = () => {
 
   loading.value = true;
 
-  const contact = {
-    _type: "contact",
-    name: formData.value.name,
-    email: formData.value.email,
-    message: formData.value.message,
-  };
-
-  client
-    .create(contact)
+  createContact({ name, email, message })
     .then(() => {
       loading.value = false;
       isFormSubmitted.value = true;

@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
-import { client, urlFor } from "../lib/sanity_client";
+import { urlFor, fetchSanity } from "../lib/sanity_client";
 
 // Data
 const works = ref([]);
@@ -122,12 +122,9 @@ onMounted(async () => {
   updatePageSize();
   window.addEventListener("resize", updatePageSize);
 
-  const worksQuery = '*[_type == "works"] | order(_updatedAt desc)';
-  const filterQuery = '*[_type == "works" && "All" in tags] | order(_updatedAt desc)';
-
   try {
-    const worksData = await client.fetch(worksQuery);
-    const filterData = await client.fetch(filterQuery);
+    const worksData = await fetchSanity("works");
+    const filterData = await fetchSanity("worksAll");
 
     works.value = worksData;
     filterWork.value = filterData;
