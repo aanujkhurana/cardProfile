@@ -16,8 +16,9 @@
  *
  * Environment:
  *  - GEMINI_API_KEY (server-only, required)
- *  - GEMINI_MODEL   (optional, defaults to "gemini-3.7-flash"; on a 404 or
- *                    503 the proxy walks a known-good fallback model chain)
+ *  - GEMINI_MODEL   (optional, defaults to "gemini-3.7-flash"; on a 404,
+ *                    503, or timeout the proxy walks a known-good fallback
+ *                    model chain)
  *
  * Notes:
  *  - Streaming is deferred to Phase 14 (the audit's polish phase). This
@@ -26,6 +27,10 @@
  */
 
 const DEFAULT_MODEL = "gemini-3.7-flash";
+// Per-attempt timeout. Kept short so a slow primary model yields quickly and
+// the fallback chain still has room to try other candidates inside the
+// client's 30s budget (see src/lib/gemini/service.js).
+const MODEL_TIMEOUT_MS = 10_000;
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 // Ordered fallback chain. Google rotates and deprecates model IDs, and hot
@@ -179,7 +184,7 @@ export default async function handler(req, res) {
   for (const model of models) {
     const url = `${GEMINI_API_BASE}/${encodeURIComponent(model)}:generateContent`;
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25_000);
+    const timeout = setTimeout(() => controller.abort(), MODEL_TIMEOUT_MS);
 
     try {
       const upstream = await fetch(url, {
@@ -234,12 +239,14 @@ export default async function handler(req, res) {
       });
     } catch (err) {
       if (err?.name === "AbortError") {
-        // Timeouts are latency-sensitive: falling back would open another
-        // 25s window, so surface immediately instead.
-        console.error(`[gemini proxy] ${model} timed out after 25s`);
-        return res
-          .status(504)
-          .json({ error: "timeout", errorCode: "SERVER_ERROR" });
+        // Slow model — record it and advance to the next candidate. The
+        // short per-attempt window keeps the whole chain inside the
+        // client's 30s budget instead of one model eating it all.
+        lastError = { status: 504, errorCode: "SERVER_ERROR" };
+        console.error(
+          `[gemini proxy] ${model} timed out after ${MODEL_TIMEOUT_MS / 1000}s; trying next model`
+        );
+        continue;
       }
       console.error("[gemini proxy] transport error:", err?.message || err);
       return res
@@ -250,7 +257,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // Every candidate failed with a fallback-eligible (404/503) error.
+  // Every candidate failed with a fallback-eligible (404/503/timeout) error.
   const status = lastError?.status || 502;
   const errorCode = lastError?.errorCode || "SERVER_ERROR";
   return res.status(status).json({

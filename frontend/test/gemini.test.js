@@ -71,6 +71,13 @@ function errorResponse(status) {
   };
 }
 
+/** A fetch rejection shaped like the AbortController timeout. */
+function abortError() {
+  const err = new Error("The operation was aborted.");
+  err.name = "AbortError";
+  return err;
+}
+
 /** Build a fetch mock keyed by model name; records the call order. */
 function makeFetch(handlers) {
   const calls = [];
@@ -215,4 +222,44 @@ test("does not fall back on rate limiting (429)", async () => {
   assert.equal(res.statusCode, 429);
   assert.equal(res.jsonBody.errorCode, "RATE_LIMITED");
   assert.deepEqual(fetch.calls, ["gemini-3.7-flash"]);
+});
+
+test("falls back to the next model when the primary times out", async () => {
+  const fetch = makeFetch({
+    "gemini-3.7-flash": () => {
+      throw abortError();
+    },
+    "gemini-3.6-flash": () => okResponse("hello from 3.6"),
+  });
+  globalThis.fetch = fetch;
+
+  const res = await invokeHandler();
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.jsonBody.model, "gemini-3.6-flash");
+  assert.deepEqual(fetch.calls, ["gemini-3.7-flash", "gemini-3.6-flash"]);
+});
+
+test("surfaces a timeout when every model times out", async () => {
+  const fetch = makeFetch({
+    "gemini-3.7-flash": () => {
+      throw abortError();
+    },
+    "gemini-3.6-flash": () => {
+      throw abortError();
+    },
+    "gemini-3.5-flash": () => {
+      throw abortError();
+    },
+    "gemini-flash-latest": () => {
+      throw abortError();
+    },
+  });
+  globalThis.fetch = fetch;
+
+  const res = await invokeHandler();
+
+  assert.equal(res.statusCode, 504);
+  assert.equal(res.jsonBody.errorCode, "SERVER_ERROR");
+  assert.equal(fetch.calls.length, 4);
 });
