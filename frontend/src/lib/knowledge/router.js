@@ -1,5 +1,18 @@
+/**
+ * Portfolio intent router.
+ *
+ * Lightweight keyword matching. The router runs before we ever call
+ * Gemini: anything that can be answered locally renders as a rich AI
+ * card in <1s; anything else is forwarded to Gemini for reasoning.
+ *
+ * Order matters: `RULES` is scanned top-down and the first keyword
+ * hit wins. Phrase-based keywords come before single words so
+ * "download resume" doesn't get caught by the experience intent.
+ */
+
 import {
   profile,
+  getAvailability,
   skills,
   technicalSkills,
   getSkillsByCategory,
@@ -9,48 +22,198 @@ import {
   certifications,
   contact,
   faq,
+  resume,
+  achievements,
+  bugsAndLessons,
 } from "../knowledge/index.js";
 
 /* ------------------------------------------------------------------ */
-/*  Intent detection — lightweight keyword matching, no AI needed      */
+/*  Intent detection                                                   */
 /* ------------------------------------------------------------------ */
 
 const INTENT_RULES = [
   {
+    intent: "resume",
+    // Specific phrases that should always route to the resume card.
+    // Single-word "resume" stays in the experience intent so that
+    // "what does your resume show about your experience?" still hits
+    // the work-history card.
+    keywords: [
+      "download resume",
+      "download cv",
+      "show resume",
+      "show cv",
+      "view resume",
+      "view cv",
+      "view my resume",
+      "send resume",
+      "send cv",
+      "resume pdf",
+      "cv pdf",
+      "your resume pdf",
+      "get resume",
+      "get cv",
+      "your resume",
+    ],
+  },
+  {
+    intent: "achievements",
+    keywords: [
+      "achievement",
+      "achievements",
+      "key wins",
+      "measurable",
+      "quantified",
+      "impact",
+      "results",
+      "outcomes",
+      "milestones",
+    ],
+  },
+  {
+    // Phase 23 polish — backs the witty subtitle promise of
+    // "questionable commits, and even the bugs I eventually
+    // fixed". Recruiter-natural phrases route here; the
+    // builder emits a text rollup + per-id follow-up chips.
+    // Listed AFTER achievements so its single-word "impact"
+    // overlap stays with achievements (the more general
+    // metric-intent), and AFTER resume (resume phrase-keywords
+    // win top-down precedence).
+    intent: "bugs-and-lessons",
+    keywords: [
+      "bugs and lessons",
+      "bugs-and-lessons",
+      "questionable commit",
+      "questionable commits",
+      "bugs you fixed",
+      "bug you fixed",
+      "what bugs",
+      "what is a bug",
+      "what's a bug",
+      "lessons learned",
+      "lesson learned",
+      "lessons learnt",
+      "your failures",
+      "production bug",
+      "production bugs",
+      "what went wrong",
+      "what did you learn",
+      "engineering lessons",
+      "your mistakes",
+    ],
+  },
+  {
     intent: "skills",
-    keywords: ["skill", "technology", "technologies", "tech stack", "techstack", "stack", "proficient", "good at", "know"],
+    keywords: [
+      "skill",
+      "technology",
+      "technologies",
+      "tech stack",
+      "techstack",
+      "stack",
+      "proficient",
+      "good at",
+      "know",
+    ],
   },
   {
     intent: "projects",
-    keywords: ["project", "built", "work", "portfolio", "app", "application", "product"],
+    keywords: [
+      "project",
+      "built",
+      "work",
+      "portfolio",
+      "app",
+      "application",
+      "product",
+    ],
   },
   {
     intent: "experience",
-    keywords: ["experience", "work history", "resume", "career", "job", "employed", "company", "worked at"],
+    keywords: [
+      "experience",
+      "work history",
+      "resume",
+      "career",
+      "job",
+      "employed",
+      "company",
+      "worked at",
+    ],
   },
   {
     intent: "education",
-    keywords: ["education", "degree", "university", "college", "studied", "graduated", "school", "master", "bachelor"],
+    keywords: [
+      "education",
+      "degree",
+      "university",
+      "college",
+      "studied",
+      "graduated",
+      "school",
+      "master",
+      "bachelor",
+    ],
   },
   {
     intent: "certifications",
-    keywords: ["certification", "certificate", "certified", "credential", "course"],
+    keywords: [
+      "certification",
+      "certificate",
+      "certified",
+      "credential",
+      "course",
+    ],
   },
   {
     intent: "contact",
-    keywords: ["contact", "email", "phone", "reach", "linkedin", "github", "get in touch", "call"],
+    keywords: [
+      "contact",
+      "email",
+      "phone",
+      "reach",
+      "linkedin",
+      "github",
+      "get in touch",
+      "call",
+    ],
   },
   {
     intent: "availability",
-    keywords: ["available", "hire", "opportunity", "work", "freelance", "contract", "visa", "right to work"],
+    keywords: [
+      "available",
+      "hire",
+      "opportunity",
+      "freelance",
+      "contract",
+      "visa",
+      "right to work",
+    ],
   },
   {
     intent: "profile",
-    keywords: ["who are you", "about", "tell me about", "introduce", "summary", "who is anuj", "background"],
+    keywords: [
+      "who are you",
+      "about",
+      "tell me about",
+      "introduce",
+      "summary",
+      "who is anuj",
+      "background",
+    ],
   },
   {
     intent: "ai_projects",
-    keywords: ["ai project", "ai", "llm", "chatbot", "langchain", "openai", "machine learning", "artificial intelligence"],
+    keywords: [
+      "ai project",
+      "ai",
+      "llm",
+      "chatbot",
+      "langchain",
+      "openai",
+      "machine learning",
+      "artificial intelligence",
+    ],
   },
 ];
 
@@ -66,7 +229,7 @@ function detectIntent(query) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Local response builders — return structured data for UI cards      */
+/*  Local response builders                                            */
 /* ------------------------------------------------------------------ */
 
 function buildSkillsResponse() {
@@ -89,20 +252,25 @@ function buildSkillsResponse() {
     },
     followUp: [
       "Show me your projects",
-      "What's your work experience?",
+      "What impact have you made?",
       "Why should we hire you?",
     ],
   };
 }
 
 function buildProjectsResponse(query) {
-  const lower = query.toLowerCase();
-  const isAi = lower.includes("ai") || lower.includes("llm") || lower.includes("chatbot");
+  const lower = (query || "").toLowerCase();
+  const isAi =
+    lower.includes("ai") ||
+    lower.includes("llm") ||
+    lower.includes("chatbot");
   const list = isAi
     ? projects.filter((p) =>
-        p.tech.some((t) => ["langchain", "openai"].includes(t.toLowerCase())) ||
-        p.name.toLowerCase().includes("chatbot") ||
-        p.name.toLowerCase().includes("summarizer")
+        p.tech.some((t) =>
+          ["langchain", "openai", "gemini"].includes(t.toLowerCase())
+        ) ||
+          p.name.toLowerCase().includes("chatbot") ||
+          p.name.toLowerCase().includes("portfolio assistant")
       )
     : projects;
 
@@ -110,17 +278,27 @@ function buildProjectsResponse(query) {
     type: "local",
     component: "projects-card",
     text: isAi
-      ? "Here are Anuj's AI-focused projects."
-      : `Here are ${list.length} projects Anuj has built.`,
+      ? "Here are Anuj's AI-focused case studies."
+      : `Here are ${list.length} case studies of Anuj's recent work.`,
     data: {
       projects: list.map((p) => ({
         name: p.name,
-        description: p.description,
-        tech: p.tech,
-        highlights: p.highlights,
-        repo: p.repo,
         role: p.role,
-        collaboration: p.collaboration,
+        status: p.status,
+        description: p.description,
+        businessProblem: p.businessProblem,
+        solution: p.solution,
+        architecture: p.architecture,
+        keyFeatures: p.keyFeatures,
+        challengesSolved: p.challengesSolved,
+        measurableImpact: p.measurableImpact,
+        aiUsage: p.aiUsage,
+        futureImprovements: p.futureImprovements,
+        screenshots: p.screenshots,
+        tech: p.tech,
+        repo: p.repo,
+        demo: p.demo,
+        url: p.url,
       })),
     },
     followUp: isAi
@@ -153,8 +331,8 @@ function buildExperienceResponse() {
       })),
     },
     followUp: [
-      "What's your education?",
-      "Tell me about your skills",
+      "What impact have you made?",
+      "Show me your projects",
       "How can I contact you?",
     ],
   };
@@ -212,25 +390,41 @@ function buildContactResponse() {
     type: "local",
     component: "contact-card",
     text: "Here's how to reach Anuj.",
-    data: { ...contact },
+    data: {
+      ...contact,
+      visaStatus: profile.visaStatus,
+      // Phase 8: structured availability surface — tone drives the
+      // CSS variant, fullText drives the badge copy. Editing
+      // profile.availabilityStatus updates this object + the
+      // persona prompt simultaneously.
+      availability: getAvailability(),
+    },
     followUp: [
-      "What's your work experience?",
       "Show me your projects",
+      "Download your resume",
       "Why should we hire you?",
     ],
   };
 }
 
 function buildAvailabilityResponse() {
+  const availability = getAvailability();
   return {
     type: "local",
     component: "contact-card",
-    text: `Anuj is currently open to opportunities. ${profile.visaStatus}. Feel free to reach out!`,
-    data: { ...contact },
+    // Mirror the badge copy verbatim: fullText = label · subtext.
+    // Single source of truth keeps the spoken AI reply and the
+    // visible badge lined up — flipping the enum updates both.
+    text: `${availability.fullText}. ${profile.visaStatus}. Feel free to reach out!`,
+    data: {
+      ...contact,
+      visaStatus: profile.visaStatus,
+      availability,
+    },
     followUp: [
       "Tell me about your skills",
       "Show me your projects",
-      "What's your work experience?",
+      "Download your resume",
     ],
   };
 }
@@ -239,24 +433,172 @@ function buildProfileResponse() {
   return {
     type: "local",
     component: "profile-card",
-    text: profile.summary,
+    text: profile.narrative,
     data: {
       name: profile.name,
       title: profile.title,
+      headline: profile.headline,
+      narrative: profile.narrative,
       location: profile.location,
       currentFocus: profile.currentFocus,
       techStack: profile.techStack,
+      visaStatus: profile.visaStatus,
     },
     followUp: [
       "Tell me about your skills",
       "Show me your projects",
-      "What's your work experience?",
+      "Download your resume",
     ],
   };
 }
 
 function buildAiProjectsResponse() {
   return buildProjectsResponse("ai projects");
+}
+
+function buildResumeResponse() {
+  return {
+    type: "local",
+    component: "resume-card",
+    text: `Here's Anuj's resume (last updated ${resume.lastUpdated}). You can download the PDF or read the summary below.`,
+    data: {
+      fileName: resume.fileName,
+      fileUrl: resume.fileUrl,
+      fileSize: resume.fileSize,
+      fileExists: resume.fileExists,
+      lastUpdated: resume.lastUpdated,
+      summary: resume.summary,
+      highlights: resume.highlights,
+      fullName: resume.fullName,
+      title: resume.title,
+      contact: resume.contact,
+    },
+    followUp: [
+      "What's your work experience?",
+      "Show me your projects",
+      "How can I contact you?",
+    ],
+  };
+}
+
+function buildAchievementsResponse() {
+  return {
+    type: "local",
+    component: "achievements-card",
+    text: `Here are ${achievements.length} quantified wins, awards, and milestones from Anuj's work so far.`,
+    data: {
+      // Phase 6.6: surface the `highlight: true` entries as a separate
+      // hero array so AchievementCard can render a "Highlights at a
+      // glance" tile grid at the top. Only the 3 work wins are flagged
+      // so the hero stays tight on portfolio-grade numbers.
+      highlights: achievements
+        .filter((a) => a.highlight === true)
+        .map((a) => ({
+          id: a.id,
+          title: a.title,
+          metric: a.metric,
+          period: a.period,
+        })),
+      achievements: achievements.map((a) => {
+        // Look up the optional sourceProject (exact match on projects.js
+        // name). When absent (GoDesta work, internship, education, certs)
+        // we still ship the achievement but with null cross-link fields
+        // so the card hides the "View Project" link AND the inline
+        // case-study drilldown toggle.
+        const matchedProject = a.sourceProject
+          ? projects.find((p) => p.name === a.sourceProject)
+          : null;
+        // Inline case-study payload (Phase 6.5). Only attached when a
+        // matching project exists; the AchievementCard uses it to power
+        // a click-to-expand drilldown that shows the project's
+        // problem / solution / challenges inline.
+        const caseStudy = matchedProject
+          ? {
+              name: matchedProject.name,
+              url: matchedProject.url || null,
+              businessProblem: matchedProject.businessProblem || null,
+              solution: matchedProject.solution || null,
+              challengesSolved: matchedProject.challengesSolved || [],
+            }
+          : null;
+        return {
+          id: a.id,
+          title: a.title,
+          metric: a.metric,
+          context: a.context,
+          period: a.period,
+          tags: a.tags,
+          sourceProjectName: matchedProject ? matchedProject.name : null,
+          sourceProjectUrl: matchedProject ? matchedProject.url : null,
+          caseStudy,
+        };
+      }),
+    },
+    followUp: [
+      "Tell me about your skills",
+      "What's your work experience?",
+      "Download your resume",
+    ],
+  };
+}
+
+/**
+ * Phase 23 polish — text-only response backing the
+ * `bugs-and-lessons` intent. No rich card component yet;
+ * the rollup reads as a recruiter-friendly bullet ledger
+ * with one teaser line per entry + follow-up chips that
+ * drill into any specific bug or lesson by `id` via a
+ * subsequent query. Tags and id-slugs both match for
+ * `learn more about X` recruiter probes.
+ */
+function buildBugsAndLessonsResponse(query) {
+  const lower = (query || "").toLowerCase();
+  // Per-id drill-down — if the query mentions a known id
+  // slug or one of its tags, surface that single entry's
+  // full context (description + root cause + resolution +
+  // lesson learned).
+  const allEntries = bugsAndLessons.entries();
+  const matched =
+    allEntries.find(
+      (e) =>
+        lower.includes(e.id) ||
+        e.tags.some((t) => lower.includes(t.toLowerCase()))
+    ) || null;
+  if (matched) {
+    return {
+      type: "local",
+      component: "text",
+      text: [
+        `**${matched.title}**`,
+        matched.description,
+        `Root cause: ${matched.rootCause}`,
+        `Resolution: ${matched.resolution}`,
+        `Lesson: ${matched.lessonLearned}`,
+      ].join("\n\n"),
+      followUp: [
+        "What other bugs have you fixed?",
+        "Show me your projects",
+        "Download your resume",
+      ],
+    };
+  }
+  // Top-level rollup — list every entry's title + sentence-1
+  // teaser so recruiters see the breadth in one screen.
+  const bugCount = bugsAndLessons.count("bug");
+  const lessonCount = bugsAndLessons.count("lesson-learned");
+  const teaser = allEntries
+    .map((e) => `• ${e.title} — *${e.description.split(".")[0]}.*`)
+    .join("\n");
+  return {
+    type: "local",
+    component: "text",
+    text: `Honest answer — I have **${bugCount} production bugs** I shipped (and fixed) and **${lessonCount} broader engineering lessons** I've carried forward. The full ledger:\n\n${teaser}\n\nAsk about any entry by name (try "vue3-reactivity-regression" or "findmylease-mapbox-performance") and I'll dive deep.`,
+    followUp: [
+      "vue3-reactivity-regression",
+      "findmylease-mapbox-performance",
+      "gemini-key-leak",
+    ],
+  };
 }
 
 function buildFaqResponse(query) {
@@ -285,6 +627,8 @@ function buildFaqResponse(query) {
 /* ------------------------------------------------------------------ */
 
 const BUILDERS = {
+  resume: buildResumeResponse,
+  achievements: buildAchievementsResponse,
   skills: buildSkillsResponse,
   projects: buildProjectsResponse,
   experience: buildExperienceResponse,
@@ -294,6 +638,7 @@ const BUILDERS = {
   availability: buildAvailabilityResponse,
   profile: buildProfileResponse,
   ai_projects: buildAiProjectsResponse,
+  "bugs-and-lessons": buildBugsAndLessonsResponse,
 };
 
 /**
@@ -315,8 +660,26 @@ export function routeQuery(query) {
 }
 
 /**
- * Check if a query can be handled locally (for quick-response UX).
+ * Quick check for whether a query can be answered locally.
  */
 export function isLocalQuery(query) {
   return routeQuery(query) !== null;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Internal exports for future Phase 8 cards                          */
+/* ------------------------------------------------------------------ */
+
+export {
+  buildResumeResponse,
+  buildAchievementsResponse,
+  buildSkillsResponse,
+  buildProjectsResponse,
+  buildExperienceResponse,
+  buildEducationResponse,
+  buildCertificationsResponse,
+  buildContactResponse,
+  buildAvailabilityResponse,
+  buildProfileResponse,
+  detectIntent,
+};

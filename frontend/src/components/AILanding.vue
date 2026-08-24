@@ -11,29 +11,142 @@
     </div>
 
     <!-- Top bar -->
-    <header class="ai-topbar">
+    <header class="ai-topbar" :class="{ 'is-scrolled': isScrolled, 'is-hidden': isHidden }">
       <div class="ai-topbar-brand">
         <img src="../assets/images/my-avatar.png" alt="Anuj Khurana" class="ai-topbar-avatar" />
         <span class="ai-topbar-name">Anuj Khurana</span>
       </div>
-      <button class="ai-browse-btn" @click="$emit('browse-website')">
-        <ion-icon name="globe-outline"></ion-icon>
-        <span>Browse Website</span>
-      </button>
+      <!-- Phase 25 — Wrap the top-right chrome actions in a
+           .ai-topbar-actions flex container so the GitHub icon
+           button can sit SIDE-BY-SIDE with the Browse Website
+           button while keeping the brand pinned to the topbar's
+           left edge (.ai-topbar's justify-content: space-between
+           spreads the brand on the left + the new actions
+           cluster on the right). GitHub goes first (secondary
+           external action), Browse Website stays second
+           (primary portfolio-nav action) — matches the
+           secondary-then-primary button convention. -->
+      <div class="ai-topbar-actions">
+        <!-- GitHub anchor — icon-only, opens in new tab via
+             target="_blank" + rel="noopener" (security). Links
+             to the same profile URL shown in Card.vue's
+             sidebar info (https://github.com/aanujkhurana).
+             aria-label + title give screen readers + hover-
+             tooltip semantic context despite no visible text. -->
+        <a
+          class="ai-icon-btn"
+          href="https://github.com/aanujkhurana"
+          target="_blank"
+          rel="noopener"
+          aria-label="GitHub"
+          title="GitHub"
+        >
+          <ion-icon name="logo-github"></ion-icon>
+        </a>
+        <button class="ai-browse-btn" @click="$emit('browse-website')">
+          <ion-icon name="globe-outline"></ion-icon>
+          <span>Browse Website</span>
+        </button>
+        <ThemeToggle />
+      </div>
     </header>
 
     <!-- Main content -->
-    <div class="ai-main">
+    <div class="ai-main" @scroll.passive="onScroll">
       <!-- Welcome state -->
-      <div v-if="messages.length <= 1" class="ai-welcome">
-        <div class="ai-welcome-avatar-wrap ai-stagger" data-delay="2">
+      <div v-if="messages.length <= 1" class="ai-welcome">          <div class="ai-welcome-avatar-wrap">
           <div class="ai-welcome-avatar">
-            <img src="../assets/images/wave.gif" alt="Hello" />
+            <!-- Phase 22 — Phase 21 chalk-on-blackboard trimmed back:
+                 (a) the .chalk-board fill is removed so the chalk
+                 strokes now draw directly on the (theme-aware) bg
+                 of .ai-landing — the chalk reads as "doodle on the
+                 surface" rather than "drawing inside a board";
+                 (b) the avatar envelope is bumped from 80px to
+                 120px (still circular clip via border-radius:50%)
+                 so the chalk strokes render at gallery scale (the
+                 SVG viewBox stays 80x80 so geometry is unchanged
+                 and stroke-width ~3.5 visually thickens to ~5.25
+                 rendered px for chunkier chalk);
+                 (c) the whole envelope is tilted transform:
+                 rotate(-4deg) around its visual center so the
+                 smiley reads as a casual hand-drawn doodle rather
+                 than a stamped icon — the welcome-avatar-in
+                 keyframe still scales the WRAP from 0.85→1 so the
+                 rotation composes cleanly (independent transforms
+                 on different elements);
+                 (d) the .ai-hey-badge bubble is removed entirely
+                 so the chalk strokes are the only ornament in the
+                 welcome state (no orbit label, no pop animation,
+                 no light-theme box-shadow override). The chalk-
+                 draw choreography + stroke geometry + theme
+                 palette parity from Phase 21 stay intact (the
+                 smile still lands ~2.9s as the visual final
+                 beat). role="img" + aria-label preserve a11y. -->
+            <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hello">
+              <defs>
+                <!-- Chalk roughness: feTurbulence generates high-
+                     frequency fractal noise (sandy grain) used as
+                     a displacement map. feDisplacementMap bends
+                     each pixel of SourceGraphic by up to 2.5px in
+                     either direction using the noise's R/G as the
+                     offset vector. The combined effect: chalk
+                     strokes look dusty + irregular at the edge.
+                     The filter region (-20% / 140%) gives generous
+                     bleed room so displaced pixels at the stroke
+                     edges aren't clipped to invisible. -->
+                <filter id="chalk-texture" x="-20%" y="-20%" width="140%" height="140%">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" result="noise" />
+                  <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+                </filter>
+              </defs>
+
+              <!-- Stroked chalk drawing on the (theme-aware) bg of
+                   .ai-landing (no chalkboard fill beneath). fill=
+                   "none" on the group is required — if any element
+                   had a fill, the fill would pop in BEFORE the
+                   stroke finishes drawing (visually wrong for the
+                   chalk metaphor). stroke-linecap="round" softens
+                   the edges (chalk doesn't have sharp square
+                   ends). The filter is applied to the WHOLE GROUP
+                   so the four strokes share one chalk pass and
+                   stay visually unified. Coordinates/pathLength
+                   all unchanged from Phase 21 — only the
+                   surrounding envelope (size + tilt) and absence
+                   of board + orbit badge changed in this phase. -->
+              <g filter="url(#chalk-texture)" class="chalk-strokes" fill="none" stroke-linecap="round">
+                <circle cx="40" cy="40" r="35" class="chalk-face" pathLength="100" />
+                <circle cx="28" cy="34" r="3.5" class="chalk-eye-l" pathLength="100" />
+                <circle cx="52" cy="34" r="3.5" class="chalk-eye-r" pathLength="100" />
+                <path d="M 26 50 Q 40 62 54 50" class="chalk-smile" pathLength="100" />
+              </g>
+            </svg>
           </div>
-          <span class="ai-hey-badge">hey</span>
         </div>
-        <h1 class="ai-welcome-title ai-stagger" data-delay="3">Meet Anuj through conversation.</h1>
-        <p class="ai-welcome-subtitle ai-stagger" data-delay="4">Learn about my software engineering experience, projects, technical skills, and the products I've built through a natural conversation instead of browsing a traditional portfolio.</p>
+        <!-- Phase 23 — Hero copy rewrite. The old title "Meet Anuj
+             through conversation." + formal "Learn about my software
+             engineering experience, projects..." subtitle were
+             portfolio-polite but read as a static-website pitch on
+             an interactive assistant. The new copy + subtitle lean
+             into the assistant-as-interrogation framing: the title
+             explicitly tells visitors to skip small talk (the
+             AI's purpose is to be poked at for portfolio intel,
+             not greeted), and the subtitle broadly advertises the
+             AI's knowledge surface (projects, career journey,
+             tech stack, wins, commits, bugs fixed) and closes
+             with a soft invitation "Go ahead, ask it anything."
+             The self-deprecating "questionable commits, and even
+             the bugs I eventually fixed" beats the AI's tone:
+             it's the kind of thing the AI will ACTIVELY admit
+             when asked (matches the existing FAQ + system-prompt
+             honesty discipline). Length-wise the new title is 4
+             words (fits ~ one line at every breakpoint); the new
+             subtitle is ~190 chars (wraps to ~3 lines at desktop
+             max-width: 520px, fits comfortably inside the welcome
+             state). The .ai-stagger + data-delay entries stay
+             untouched so the entrance choreography + timing carry
+             over. -->
+        <h1 class="ai-welcome-title ai-stagger" data-delay="3">Skip the small talk.</h1>
+        <p class="ai-welcome-subtitle ai-stagger" data-delay="4">Interrogate my AI instead. It knows my projects, career journey, tech stack, biggest wins, questionable commits, and even the bugs I eventually fixed. Go ahead, ask it anything.</p>
       </div>
 
       <!-- Chat messages -->
@@ -96,7 +209,7 @@
 
     <!-- Input area -->
     <div class="ai-input-area">
-      <div v-if="messages.length <= 1" class="ai-chips ai-stagger" data-delay="6">
+      <div v-if="messages.length <= 1" class="ai-chips">
         <button
           v-for="q in defaultQuestions"
           :key="q.label"
@@ -138,6 +251,8 @@ import { routeQuery } from "../lib/knowledge/router.js";
 import { sendToGemini, getGeminiErrorMessage } from "../lib/gemini/service.js";
 import { defaultQuestions } from "../lib/config/defaultQuestions.js";
 import { resolveComponent } from "./ai/index.js";
+import { useScrollFlag } from "../composables/useScrollFlag.js";
+import ThemeToggle from "./ThemeToggle.vue";
 
 const emit = defineEmits(["browse-website"]);
 
@@ -149,7 +264,18 @@ const conversationHistory = ref([]);
 const messagesContainer = ref(null);
 const messageInput = ref(null);
 
-const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
+// Phase 16 — topbar scroll-state machine via useScrollFlag composable.
+// Tracks scroll direction (top/down/up) + threshold (isScrolled) so
+// the topbar gains its bg + blur when scrolled AND hides when the
+// user is moving their scroll position downward (Apple pattern:
+// content takes focus while scrolling down, chrome re-emerges when
+// the user scrolls up to navigate back). Composable owns the state
+// logic + reactive outputs; the @scroll.passive listener stays in
+// the template so Vue keeps the passive-scroll optimisation intact.
+// The composable is exported at src/composables/useScrollFlag.js so
+// a future Card.vue followup can adopt the same state machine for
+// the website's bottom .navbar.
+const { isScrolled, isHidden, onScroll } = useScrollFlag({ threshold: 10 });
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -230,7 +356,7 @@ const sendMessage = async (messageText) => {
         { role: "user", content: messageText },
       ];
 
-      const result = await sendToGemini(apiMessages, geminiApiKey);
+      const result = await sendToGemini(apiMessages);
 
       messages.push({
         id: `bot_${Date.now()}`,
@@ -308,6 +434,17 @@ const formatTime = (timestamp) => {
   background: linear-gradient(160deg, hsl(240, 3%, 10%) 0%, hsl(240, 2%, 13%) 40%, hsl(240, 4%, 8%) 100%);
   font-family: var(--ff-poppins);
   overflow: hidden;
+  /* Phase 14 — page-load entry beat 1 (0ms): the whole landing
+     fades in over 240ms so the transition from "blank" to
+     "structured" feels intentional, not abrupt. */
+  opacity: 0;
+  /* Phase 19 — smooth theme flip. background-image is
+     transitionable in modern browsers (Chrome 71+, Safari 16+);
+     the 240ms ease matches the topbar scroll-state machine
+     timing from Phase 14 so dark <-> light feel visually
+     cohesive with the rest of the surface choreography. */
+  transition: background-image 240ms ease;
+  animation: landing-in 0.24s linear forwards;
 }
 
 /* Background layers */
@@ -332,7 +469,11 @@ const formatTime = (timestamp) => {
   top: -15%;
   left: 50%;
   transform: translateX(-50%);
-  background: radial-gradient(circle, hsla(45, 54%, 58%, 0.08) 0%, transparent 70%);
+  /* Phase 14 — gold swapped for cool indigo/violet so the top
+     ambient glow reads as "studio lighting" rather than "gold
+     accent" when paired with the unchanged warm gold UI bits
+     (hey-badge, focus rings). */
+  background: radial-gradient(circle, hsla(245, 60%, 60%, 0.08) 0%, transparent 70%);
   animation-delay: 0.3s;
 }
 
@@ -350,7 +491,11 @@ const formatTime = (timestamp) => {
   height: 500px;
   bottom: -10%;
   left: -10%;
-  background: radial-gradient(circle, hsla(45, 100%, 72%, 0.05) 0%, transparent 70%);
+  /* Phase 14 — bright yellow swapped for cyan/teal so the bottom-
+     left ambient glow reads as "cool rising light" complementing
+     the indigo top glow, rather than competing with the warm UI
+     accent tokens. */
+  background: radial-gradient(circle, hsla(180, 50%, 55%, 0.05) 0%, transparent 70%);
   animation-delay: 0.9s;
 }
 
@@ -358,6 +503,103 @@ const formatTime = (timestamp) => {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ------------------------------------------------------------------ */
+/*  Phase 14 — Page-load choreography keyframes                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Layered entrance beats: whole page fades in (0.24s) → topbar
+ * slides down (0.5s @ 0.1s) → ambient layers (grid + glow + grain
+ * + vignette) cascade in at 0.3-0.5s → welcome avatar (0.7s) →
+ * hey-badge pop with back-out easing (0.8s) → welcome copy +
+ * input row → chips cascade in per-item at 1.25s+ (80ms stagger,
+ * up to 8 chips). All timings tuned to read as a unified "app is
+ * alive" sequence rather than disjointed entrance. Reduced-motion
+ * users get a single instant paint (all animations disabled in
+ * the @media block below).
+ */
+@keyframes landing-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes topbar-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes grid-in {
+  from {
+    opacity: 0;
+    transform: perspective(500px) rotateX(45deg) scale(1.05);
+  }
+  to {
+    opacity: 0.8;
+    transform: perspective(500px) rotateX(45deg) scale(1);
+  }
+}
+
+@keyframes grain-in {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  to {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+@keyframes vignette-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes welcome-avatar-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/**
+ * Per-chip entrance stagger. The defaultQuestions config surfaces
+ * 8 entries, so we stagger all 8 visible chips. :nth-child matches
+ * work cleanly with v-for because Vue preserves DOM order keyed by
+ * :key. Every chip must have a delay here — a chip that falls off
+ * the end of this list gets delay: 0 and pops in before its
+ * siblings (the "two chips appear early" regression).
+ */
+.ai-chips .ai-chip:nth-child(1) { animation-delay: 1.25s; }
+.ai-chips .ai-chip:nth-child(2) { animation-delay: 1.33s; }
+.ai-chips .ai-chip:nth-child(3) { animation-delay: 1.41s; }
+.ai-chips .ai-chip:nth-child(4) { animation-delay: 1.49s; }
+.ai-chips .ai-chip:nth-child(5) { animation-delay: 1.57s; }
+.ai-chips .ai-chip:nth-child(6) { animation-delay: 1.65s; }
+.ai-chips .ai-chip:nth-child(7) { animation-delay: 1.73s; }
+.ai-chips .ai-chip:nth-child(8) { animation-delay: 1.81s; }
 
 .ai-bg-grid {
   position: absolute;
@@ -370,7 +612,13 @@ const formatTime = (timestamp) => {
   transform-origin: center 80%;
   mask-image: linear-gradient(to top, black 0%, transparent 55%);
   -webkit-mask-image: linear-gradient(to top, black 0%, transparent 55%);
-  opacity: 0.8;
+  /* Phase 14 — opacity 0→0.8 + scale 1.05→1 entrance over 1.2s,
+     so the 3D grid "lowers into place" rather than being static
+     from page paint. The grid-in keyframe preserves the static
+     perspective + rotateX throughout so depth doesn't pop in late. */
+  opacity: 0;
+  animation: grid-in 1.2s 0.3s var(--ease) forwards;
+  will-change: transform, opacity;
 }
 
 .ai-bg-grain {
@@ -381,13 +629,25 @@ const formatTime = (timestamp) => {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 256px 256px;
-  opacity: 0.6;
+  /* Phase 14 — opacity bumped 0.6 → 0.85 so the noise reads
+     against the 3D grid (effective ~0.034 once you factor the
+     SVG inner 0.04 alpha). Scale 1.02→1 entrance over 1s gives
+     the noise a subtle organic "settle" effect rather than a
+     hard pop. */
+  opacity: 0;
+  animation: grain-in 1s 0.5s var(--ease) forwards;
+  will-change: transform, opacity;
 }
 
 .ai-bg-vignette {
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse at center, transparent 30%, hsla(240, 4%, 6%, 0.8) 100%);
+  /* Phase 14 — opacity 0→1 entrance so the radial vignette
+     frames the UI AFTER the ambient layers + welcome content
+     have settled, rather than competing with them from frame 1. */
+  opacity: 0;
+  animation: vignette-in 0.8s 0.4s linear forwards;
 }
 
 /* Top bar */
@@ -396,13 +656,45 @@ const formatTime = (timestamp) => {
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-bottom: 1px solid hsla(0, 0%, 17%, 0.5);
+  border-bottom: 1px solid transparent;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
+  opacity: 0;
+  background: transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  /* Phase 16 — transform baseline so the .is-hidden rule can
+     translate the topbar off-screen without snapping. The hide-
+     on-down transform uses the same --ease as everywhere else
+     for visual consistency with the page-load choreography. */
+  transform: translateY(0);
+  animation: topbar-in 0.5s 0.1s var(--ease) forwards;
+  transition: background 240ms ease, border-color 240ms ease,
+    backdrop-filter 240ms ease, -webkit-backdrop-filter 240ms ease,
+    transform 220ms var(--ease);
+  will-change: transform, background, border-color;
+}
+
+.ai-topbar.is-scrolled {
+  background: hsla(240, 2%, 13%, 0.6);
+  border-bottom-color: hsla(0, 0%, 17%, 0.5);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  background: hsla(240, 2%, 13%, 0.6);
+}
+
+/* Phase 16 — Apple-style hide-on-scroll-down. When the user is
+   scrolling downward AND past the threshold, the topbar slides
+   up out of view so the chat content takes focus. Scrolling up
+   re-emerges it (the up state leaves transform at translateY(0)).
+   The .is-hidden flag is bound from the useScrollFlag composable
+   (isHidden = scrollState === 'down' AND isScrolled). The
+   specificity (0,2,0) > base .ai-topbar (0,1,0), so the .is-hidden
+   transform wins in normal mode; the @media reduced-motion block
+   below lists .ai-topbar.is-hidden to neutralise it for vestibular
+   sensitivity. */
+.ai-topbar.is-hidden {
+  transform: translateY(-100%);
 }
 
 .ai-topbar-brand {
@@ -445,6 +737,73 @@ const formatTime = (timestamp) => {
   box-shadow: 0 2px 8px hsla(0, 0%, 0%, 0.15);
 }
 
+/* Phase 25 — Topbar actions container + GitHub icon-only
+   button. The .ai-topbar-actions flex wrapper lets the
+   GitHub icon button sit SIDE-BY-SIDE with the existing
+   Browse Website button while keeping the brand pinned
+   left via .ai-topbar's justify-content: space-between.
+   The .ai-icon-btn base style mirrors .ai-browse-btn's
+   hover/border/colour tokens exactly (var(--light-gray-70)
+   resting + var(--white-2) hover, var(--onyx) resting
+   border + hsla(45, 54%, 58%, 0.3) hover border) so both
+   buttons read as the same visual + interactive family.
+   width/height: 40x40 makes the GitHub button SQUARE
+   (icon-only vs the pill-shaped Browse Website); this
+   matches the same visual mass as the icon-only mobile
+   collapse (.ai-browse-btn @media max-width:580px already
+   squares up by hiding the span + 8px padding). Both
+   buttons share the gold-tone border accent on hover so
+   the topbar's right cluster reads as one cohesive action
+   group. Light theme is automatic — both buttons consume
+   var(--light-gray-70) + var(--onyx) + var(--white-2)
+   which flip via style.css's :root.light-theme blocks. */
+.ai-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ThemeToggle is reused from the static site; by default it is
+   absolutely positioned (floating at top:1rem for the sidebar view).
+   Inside the AI topbar it must sit inline with the GitHub + Browse
+   buttons, so we neutralise that absolute positioning here. The
+   toggle still drives the same shared `light-theme` class on <html>
+   via useTheme, so dark/light stays in sync between both views. */
+.ai-topbar-actions :deep(.theme-toggle-wrapper) {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
+  background-color: transparent;
+}
+
+.ai-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--light-gray-70);
+  font-size: 13px;
+  border: 1px solid var(--onyx);
+  transition: color 150ms ease, border-color 150ms ease, transform 200ms var(--ease), box-shadow 180ms ease;
+}
+
+.ai-icon-btn:hover {
+  color: var(--white-2);
+  border-color: hsla(45, 54%, 58%, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px hsla(0, 0%, 0%, 0.15);
+}
+
+.ai-icon-btn ion-icon {
+  font-size: 17px;
+  color: inherit;
+  display: inline;
+}
+
 .ai-browse-btn ion-icon {
   font-size: 15px;
   color: inherit;
@@ -475,35 +834,103 @@ const formatTime = (timestamp) => {
 
 .ai-welcome-avatar-wrap {
   position: relative;
-  margin-bottom: 28px;
+  /* Phase 23/22 polish — margin-bottom bumped from 28px to 34px
+     so the chalk envelope sits a touch further from the welcome
+     title; gives the welcome stack more breathing room on the
+     narrow vertical padding rhythm of .ai-welcome. */
+  margin-bottom: 34px;
+  /* Phase 14 — scale 0.85→1 + opacity entrance so the wave.gif
+     avatar feels alive. Replaces the older generic .ai-stagger
+     translateY-only animation which was harder to read against
+     the avatar's natural stillness. Phase 23 — wave.gif later
+     swapped for the chalk-stroke avatar; the entrance animation
+     itself is preserved unchanged. */
+  opacity: 0;
+  animation: welcome-avatar-in 0.6s 0.7s var(--ease) forwards;
 }
 
 .ai-welcome-avatar {
-  width: 80px;
-  height: 80px;
+  /* Phase 22 — envelope bumped from 80px to 120px so the chalk
+     strokes render at gallery scale (the SVG viewBox stays 80x80
+     so geometry is unchanged, and stroke-width ~3.5 visually
+     thickens to ~5.25 rendered px for chunkier chalk). border-
+     radius: 50% + overflow: hidden clip is preserved so the chalk
+     reads inside a soft circular frame, even though the chalk
+     strokes are now drawn over the (theme-aware) bg of
+     .ai-landing rather than over a chalkboard plate. */
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
 }
 
-.ai-welcome-avatar img {
+.ai-welcome-avatar svg {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: block;
+  /* Phase 22 — slight leftward tilt (rotate -4deg) so the smiley
+     reads as a casual hand-drawn doodle rather than a stamped
+     icon. transform-origin: center keeps the rotation pivot at
+     the visual center so the chalk strokes don't drift off
+     axis. The rotation composes cleanly with the wrap's
+     welcome-avatar-in scale (0.85->1) entrance transform:
+     SCALE is on the WRAP, ROTATE is on the SVG (different
+     elements, no transform stacking). The -4deg tilt is small
+     enough that the chalk strokes still fit inside the 120x120
+     circular clip even after rotation (the rotated bounding
+     box is well within the clip). */
+  transform: rotate(-4deg);
+  transform-origin: center;
 }
 
-.ai-hey-badge {
-  position: absolute;
-  top: -4px;
-  right: -8px;
-  background: hsl(0, 65%, 55%);
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 10px;
-  line-height: 1;
-  box-shadow: 0 2px 8px hsla(0, 65%, 55%, 0.4);
+/* Phase 22 — Chalk strokes now draw on the (theme-aware) bg of
+   .ai-landing directly, with no opaque chalkboard plate beneath
+   (the .chalk-board fill rule was removed in this phase). The
+   chalk-strokes group carries the shared stroke color + stroke-
+   width + linecap (set once on the group so the four child
+   elements stay uniform). The stroke value transitions on a
+   240ms ease so the palette FLIPS smoothly when the user
+   toggles to light theme (chalk turns deep slate over the near-
+   white bg, matching the existing Phase 19 light-theme
+   palette). The four stroked children share the same chalk-draw
+   keyframe (stroke-dashoffset 100 -> 0) and use pathLength="
+   100" so the dasharray math is identical across the three
+   circles and the smile path. animation-fill-mode: both keeps
+   each stroke hidden (offset 100) during its delay window so
+   nothing paints before its turn in the sequence. Sequencing:
+   face outline @ 1.3s (lands ~1.9s) -> left eye @ 1.9s ->
+   right eye @ 2.15s -> smile @ 2.4s (lands ~2.9s). Each
+   element starts AFTER the previous has fully drawn so the user
+   reads the sequence as deliberate chalk drawing rather than a
+   single simultaneous reveal. The chalk-draw choreography
+   timing itself is unchanged from Phase 21; only the visual
+   surroundings (no board, larger + tilted envelope, no hey-
+   badge) changed in this phase. */
+.chalk-strokes {
+  stroke: hsl(40, 15%, 92%);
+  stroke-width: 3.5;
+  transition: stroke 240ms ease;
 }
+
+.chalk-face,
+.chalk-eye-l,
+.chalk-eye-r,
+.chalk-smile {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: chalk-draw linear both;
+}
+
+.chalk-face  { animation-duration: 0.6s;  animation-delay: 1.0s;  }
+.chalk-eye-l { animation-duration: 0.25s; animation-delay: 1.6s;  }
+.chalk-eye-r { animation-duration: 0.25s; animation-delay: 1.85s; }
+.chalk-smile { animation-duration: 0.5s;  animation-delay: 2.1s;  }
+
+@keyframes chalk-draw {
+  from { stroke-dashoffset: 100; }
+  to   { stroke-dashoffset: 0;   }
+}
+
 
 .ai-welcome-title {
   color: var(--white-2);
@@ -569,6 +996,17 @@ const formatTime = (timestamp) => {
 
 .ai-msg.user {
   flex-direction: row-reverse;
+}
+
+/* Phase 14 fix — the user bubble's max-width is a percentage, so it
+   needs a definite parent width to resolve against. Without flex: 1
+   the content column is shrink-wrapped to the text itself, which
+   makes 80% of a short message even shorter (a 2-word message wraps
+   mid-phrase). Letting the user's content column fill the row gives
+   the bubble a stable width and lets margin-left: auto right-align
+   it like a normal chat bubble. Bot bubbles stay shrink-wrapped. */
+.ai-msg.user .ai-msg-content {
+  flex: 1;
 }
 
 .ai-msg-avatar img {
@@ -730,6 +1168,12 @@ const formatTime = (timestamp) => {
   transition: color 150ms ease, border-color 150ms ease, transform 180ms var(--ease), box-shadow 180ms ease, background 150ms ease;
   cursor: pointer;
   white-space: nowrap;
+  /* Phase 14 — chip-in keyframe is the shared per-item animation
+     (translateY 10→0 + scale 0.95→1 + opacity 0→1 over 350ms).
+     The per-:nth-child selectors below stagger the start times
+     80ms apart, starting at 1.25s. */
+  opacity: 0;
+  animation: chip-in 0.35s var(--ease) forwards;
 }
 
 .ai-chip:hover:not(:disabled) {
@@ -832,19 +1276,46 @@ const formatTime = (timestamp) => {
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .ai-stagger {
+  /* Phase 14 update — the same selector list now also covers the
+     new entrance animations (landing-in, topbar-in, grid-in,
+     grain-in, vignette-in, welcome-avatar-in, hey-badge-pop,
+     chip-in + staggered chip nth-child delays). Users with
+     vestibular sensitivity get a single instant paint instead
+     of the layered choreography. */
+  .ai-stagger,
+  .ai-landing,
+  .ai-topbar,
+  /* Phase 16 — same-selector listing + .ai-topbar.is-hidden so
+     reduced-motion's transform: none overrides the .is-hidden
+     translateY (which has higher specificity 0,2,0 > 0,1,0 and
+     would otherwise slide the topbar out of view for vestibular-
+     sensitive users). Listing it explicitly matches that
+     specificity so the reduce override actually wins. */
+  .ai-topbar.is-hidden,
+  .ai-bg-glow,
+  .ai-bg-grid,
+  .ai-bg-grain,
+  .ai-bg-vignette,
+  .ai-welcome-avatar-wrap,
+  /* Phase 22 .ai-hey-badge selector removed from this list —
+     the badge span was dropped from the template in this phase
+     so listing it here would have been dead CSS. */
+  .ai-chips .ai-chip,
+  /* Phase 21 — chalk-draw selectors. animation: none cancels the
+     draw-on reveal but the chalk strokes ALSO need stroke-dashoffset:
+     0 explicitly so the stroke is fully visible (otherwise the base
+     rule's offset:100 + animation-fill-mode: both would leave the
+     strokes blank for reduced-motion users). Without the explicit
+     stroke-dashoffset: 0 the chalk draw-on logic would STILL run as
+     an end-state attr, leaving the face invisible. */
+  .chalk-face,
+  .chalk-eye-l,
+  .chalk-eye-r,
+  .chalk-smile {
     opacity: 1;
     transform: none;
     animation: none;
-  }
-
-  .ai-bg-glow {
-    animation: none;
-    opacity: 1;
-  }
-
-  .ai-bg-grid {
-    transform: none;
+    stroke-dashoffset: 0;
   }
 
   .ai-msg {
@@ -860,6 +1331,11 @@ const formatTime = (timestamp) => {
   .ai-followup-chip,
   .ai-send,
   .ai-browse-btn,
+  /* Phase 25 — new GitHub icon button. Same hover transform/
+     border transition as .ai-browse-btn; needs the same
+     reduce override so vestibular-sensitive users see
+     instant state flips on hover/focus instead of slide. */
+  .ai-icon-btn,
   .ai-input-row {
     transition-duration: 0.01ms;
   }
@@ -881,6 +1357,18 @@ const formatTime = (timestamp) => {
 
   .ai-welcome {
     padding: 24px 16px 0;
+  }
+
+  /* Phase 22 mobile polish — shrink the chalk envelope from
+     120px to 96px on narrow phones so the avatar + title +
+     chips stack fits comfortably within ~640px viewports
+     without the title wrapping awkwardly mid-line. Overrides
+     the default .ai-welcome-avatar { width: 120px } only
+     under this breakpoint; the wrap and entrance animation
+     are unchanged. */
+  .ai-welcome-avatar {
+    width: 96px;
+    height: 96px;
   }
 
   .ai-welcome-title {
@@ -907,5 +1395,147 @@ const formatTime = (timestamp) => {
     padding: 6px 12px;
     font-size: 12px;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Phase 19 — :root.light-theme overrides                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Extend the AI landing's bg + ambient palette to obey the
+ * global light-theme so the AI assistant inherits the user's
+ * chosen theme like the static Card.vue side does. ThemeToggle
+ * toggles `document.documentElement.classList.light-theme`,
+ * so :root.light-theme is the right scope selector (the AI
+ * landing wrapper lives inside App.vue, but its <html>
+ * ancestor carries the light-theme class).
+ *
+ * WHAT'S ALREADY AUTO-FLIPPED (no override needed) — these
+ * selectors consume var(--eerie-black-2 / --onyx / --jet /
+ * --white-1 / --white-2 / --light-gray / --light-gray-70 /
+ * --vegas-gold) which style.css automatically redefines under
+ * :root.light-theme:
+ *  - ai-input-row, ai-chip, ai-msg.bot .ai-msg-text,
+ *    ai-msg.user .ai-msg-text, ai-typing, ai-followup-chip,
+ *    ai-send, ai-input, ai-welcome-title, ai-welcome-subtitle,
+ *    ai-footnote, ai-msg-time, ai-msg-text :deep(a),
+ *    ai-browse-btn, ai-topbar-name.
+ *
+ * WHAT NEEDS EXPLICIT :root.light-theme OVERRIDES — hard-coded
+ * tones that paint OVER base surfaces or are visible ambient
+ * structural layers (would otherwise stay dark when the user
+ * toggles to light):
+ *  1. .ai-landing bg gradient — the base surface layer. Light
+ *     version keeps the same 160deg 3-stop rhythm but on
+ *     near-white surfaces (L* 95-99%) with a faint cool tint
+ *     so the visual rhythm matches dark mode.
+ *  2. .ai-bg-glow--1/--2/--3 — ambient radial glows. Alpha
+ *     bumped slightly in light (0.08 -> 0.10 / 0.04 -> 0.08 /
+ *     0.05 -> 0.08) so the cool indigo/violet/cyan reads
+ *     above the near-white base. The indigo hue is consistent
+ *     with the static site's --vegas-gold light-mode accent
+ *     (hsl(247, 100%, 60%)) — no aestetic mismatch.
+ *  3. .ai-bg-grid — 3D grid line color swapped from
+ *     white-on-dark (hsla(0, 0%, 100%, 0.07)) to
+ *     dark-on-light (hsla(240, 10%, 30%, 0.08)) so the lines
+ *     remain visible against the new bg.
+ *  4. .ai-bg-vignette — radial frame. The dark-on-dark vignette
+ *     in dark mode fades the corners; in light mode the frame
+ *     is inverted to a light-on-light fade (L* 88%, alpha 0.4)
+ *     so the same "edge-frame" effect reads without going
+ *     darker than the bg. transparent 30% -> 50% gives the
+ *     light-mode vignette a softer interior since the page
+ *     is already high-key.
+ *  5. .ai-topbar.is-scrolled — glass-blur bg + border so the
+ *     topbar reads as a coherent surface in light mode
+ *     (hsla(0, 0%, 99%, 0.7) blur + hsla(0, 0%, 88%, 0.6)
+ *     hairline). The .ai-topbar rule already extends its
+ *     transition list with background + border-color +
+ *     backdrop-filter from Phase 14 so this flips smoothly.
+ *  6. .ai-hey-badge box-shadow — the red badge itself reads
+ *     in both themes (red hsl(0, 65%, 55%) on either bg); only
+ *     the halo alpha is tamed (0.4 -> 0.25) so it doesn't feel
+ *     blown-out against the near-white surface.
+ *
+ * NOTE: The 3 glows + grid + vignette rules don't carry
+ * transition properties for these per-property flips — they
+ * transition instantaneously on toggle. Acceptable: those are
+ * ambient layers, not affordances the user is interacting
+ * with, and the topbar + .ai-landing bg already smooth-flip
+ * via the transitions added in this phase + Phase 14.
+ */
+:root.light-theme .ai-landing {
+  background: linear-gradient(
+    160deg,
+    hsl(240, 8%, 97%) 0%,
+    hsl(240, 12%, 99%) 40%,
+    hsl(240, 6%, 95%) 100%
+  );
+}
+
+:root.light-theme .ai-bg-glow--1 {
+  background: radial-gradient(
+    circle,
+    hsla(245, 70%, 70%, 0.10) 0%,
+    transparent 70%
+  );
+}
+
+:root.light-theme .ai-bg-glow--2 {
+  background: radial-gradient(
+    circle,
+    hsla(220, 70%, 65%, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+:root.light-theme .ai-bg-glow--3 {
+  background: radial-gradient(
+    circle,
+    hsla(180, 60%, 60%, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+:root.light-theme .ai-bg-grid {
+  background-image:
+    linear-gradient(hsla(240, 10%, 30%, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(240, 10%, 30%, 0.08) 1px, transparent 1px);
+}
+
+:root.light-theme .ai-bg-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    hsla(240, 8%, 88%, 0.4) 100%
+  );
+}
+
+:root.light-theme .ai-topbar.is-scrolled {
+  background: hsla(0, 0%, 99%, 0.7);
+  border-bottom-color: hsla(0, 0%, 88%, 0.6);
+}
+
+/* Phase 21 — Chalk theme parity. The .chalk-board (dark mode:
+   slate blackboard) flips to a warm off-white parchment board in
+   light mode. The chalk stroke color flips from dusty off-white
+   to deep slate so the chalk-on-board metaphor reads in BOTH
+   themes (chalk reads as "the opposite color of the board").
+   The values chosen here match the existing Phase 19 bg palette
+   tones (light-mode bg ramp tops out at L* 99% so the board fill
+   of L* 96% sits just slightly below the envelope bg, giving
+   subtle contrast that suggests a small drawing surface rather
+   than a hard swatch). The chalk stroke sits at L* 28% which
+   reads as "dark ink" against the L* 96% board. The fill +
+   stroke carry their own 240ms transition (set on the base
+   .chalk-board + .chalk-strokes rules above) so they smooth-
+   flip alongside the bg + topbar surfaces when the user toggles
+   the theme. */
+:root.light-theme .chalk-board {
+  fill: hsl(35, 25%, 96%);
+}
+
+:root.light-theme .chalk-strokes {
+  stroke: hsl(220, 30%, 28%);
 }
 </style>

@@ -379,8 +379,49 @@ main {
 .avatar-box {
   background: var(--bg-gradient-onyx);
   border-radius: 20px;
+  /* Hover swap — an explicit square frame so the pixel art and the
+     real photo occupy the exact same box regardless of their
+     intrinsic sizes. overflow: hidden clips both to the rounded
+     corners. */
+  position: relative;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
   /* padding-bottom: 12px; */
   /* margin-bottom: 22px; */
+}
+
+/* Both images fill the same frame and crossfade on hover. object-fit:
+   cover makes the portrait profile.png (487x512) cover the square
+   frame the same way the square pixel art does — no size mismatch. */
+.avatar-box img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 250ms ease;
+}
+
+.avatar-box .avatar-real {
+  opacity: 0;
+  /* profile.png has ~16% empty padding around the subject (measured:
+     person is 408x429 inside a 487x512 canvas), so a plain cover-fit
+     makes the person read noticeably smaller than the full-bleed pixel
+     art. Zoom in to bring the subject up to the same visual scale; the
+     box's overflow: hidden crops the overflow. transform-origin is biased
+     slightly above center to keep the head (a top-heavy portrait) safely
+     inside the frame. */
+  transform: scale(1.3);
+  transform-origin: 50% 40%;
+}
+
+.avatar-box:hover .avatar-pixel {
+  opacity: 0;
+}
+
+.avatar-box:hover .avatar-real {
+  opacity: 1;
 }
 
 .info-content {
@@ -436,6 +477,26 @@ main {
   margin-right: 6px;
   height: 13px;
   width: 13px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Phase 12 — light-mode contrast fix for AI availability timestamp   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Light-mode WCAG AA override for the AI ContactCard timestamp
+ * (.ai-availability-timestamp in src/components/ai/ContactCard.vue).
+ * The element is rendered inside ContactCard.vue's <style scoped>,
+ * but this :root.light-theme rule in the global stylesheet still
+ * matches it because Vue's scoped attribute is additive to the
+ * class selector. The override swaps the timestamp to --white-2
+ * in light mode (hsl(0, 0%, 20%), L≈0.033) → ~13:1 contrast on
+ * the near-white badge surface, well past the 4.5:1 AA threshold
+ * for the 10px body text. Dark mode is unaffected because the
+ * base rule's --light-gray-70 is auto-theme-aware.
+ */
+:root.light-theme .ai-availability-timestamp {
+  color: var(--white-2);
 }
 
 .info_more-btn {
@@ -549,6 +610,33 @@ main {
   border-radius: 12px 12px 0 0;
   box-shadow: var(--shadow-2);
   z-index: 5;
+  /* Phase 24 — Apple-style hide-on-scroll-down choreography
+     composable-driven by useScrollFlag (bound in Card.vue's
+     <script setup> as :class="{ 'is-hidden': isHidden }"). The
+     .navbar base rule carries a transform: translateY(0)
+     baseline so the .is-hidden rule below can transition a
+     translateY without the bar snapping from "unset" to
+     "-100%"/"+100%". transition holds transform alone (background
+     and border-color already auto-flip through the var(--onyx)
+     color shift in light-mode theme, so they need no extra
+     transition). will-change: transform hints the compositor
+     to pre-allocate a layer so the slide doesn't stutter on
+     touch-scroll devices. */
+  transform: translateY(0);
+  transition: transform 220ms ease;
+  will-change: transform;
+}
+
+/* Phase 24 — hide-on-scroll-down. Mobile default (navbar is
+   bottom-fixed at <1024px per the base rule above): translate
+   DOWN by 100% of the navbar height so it slides off the
+   bottom of the viewport. The composable is symmetric — it
+   sets isHidden = true only when scrollState === 'down' AND
+   isScrolled (past the 20px threshold), so the bar always
+   stays visible at the top of page (state = 'top') and at all
+   non-scrolled frames. */
+.navbar.is-hidden {
+  transform: translateY(100%);
 }
 
 .navbar-list {
@@ -593,7 +681,7 @@ main {
 
 
 /**
- * #service 
+ * #service
  */
 
 .service { margin-bottom: 35px; }
@@ -1350,6 +1438,21 @@ textarea.form-input::-webkit-resizer { display: none; }
   #RESPONSIVE
 \*-----------------------------------*/
 
+/* Phase 24 — global reduced-motion neutralisation for the
+   static website's .navbar. The Phase 16/19 AILanding has its
+   own scoped <style> reduced-motion block, but the static
+   Card.vue lives in the global stylesheet, so the reduced-
+   motion override belongs here at the global level. Vestibular-
+   sensitive users see the navbar snap instantly between visible
+   and hidden states with no transform animation. The composable
+   still FLIPS isHidden via reactivity (so the bar still hides
+   on scroll-down), just without the sliding motion. */
+@media (prefers-reduced-motion: reduce) {
+  .navbar {
+    transition-duration: 0.01ms;
+  }
+}
+
 /**
  * responsive larger than 450px screen
  */
@@ -1458,9 +1561,7 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .sidebar-info { gap: 25px; }
 
-  .avatar-box { border-radius: 30px; }
-
-  .avatar-box img { width: 120px; }
+  .avatar-box { border-radius: 30px; width: 120px; height: 120px; }
 
   .info-content .name { margin-bottom: 15px; }
 
@@ -1831,6 +1932,19 @@ textarea.form-input::-webkit-resizer { display: none; }
     box-shadow: none;
   }
 
+  /* Phase 24 — desktop hide-direction override. At >=1024px the
+     navbar is at top-right (position: absolute; top: 0; right:
+     0), so when hiding on scroll-down it should slide UP (off
+     the top of the viewport) rather than DOWN. The -100%
+     translate keeps the navbar off any descendants below it
+     and matches the direction of the AI landing's topbar
+     (Phase 16 used translateY(-100%) for its top-positioned
+     topbar). The same composable drives both viewports — only
+     the @media-conditional transform value changes. */
+  .navbar.is-hidden {
+    transform: translateY(-100%);
+  }
+
   .navbar-list {
     gap: 30px;
     padding: 0 20px;
@@ -1956,7 +2070,7 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .sidebar-info { flex-direction: column; }
 
-  .avatar-box img { width: 150px; }
+  .avatar-box { width: 150px; height: 150px; }
 
   .info-content .name {
     white-space: nowrap;

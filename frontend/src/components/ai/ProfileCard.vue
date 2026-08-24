@@ -1,3 +1,21 @@
+<!--
+  ProfileCard — renders the structured profile data delivered by
+  the `profile` intent in src/lib/knowledge/router.js.
+
+  Phase 4 update: surfaces the new `headline` and `narrative` fields
+  added to src/lib/knowledge/profile.js. Headline sits above the
+  metadata block as a 1-line elevator pitch; narrative replaces the
+  previous single-sentence summary. The currentFocus + techStack
+  chips stay.
+
+  Phase 7 update: surfaces `visaStatus` as a discreet green pill in
+  the header block, just below the location. Uses a
+  shield-checkmark-outline icon and the full visaStatus string; a
+  `title` attribute shows the same text on hover for users who want
+  to confirm the validity window. Green color signals "ready to
+  work" without overpowering the rest of the card.
+-->
+
 <template>
   <div class="ai-section">
     <h4 class="ai-section-title">
@@ -5,11 +23,23 @@
       Profile
     </h4>
 
+    <p v-if="data.headline" class="ai-profile-headline">{{ data.headline }}</p>
+
     <div class="ai-profile-header">
       <h5 class="ai-profile-name">{{ data.name }}</h5>
       <p class="ai-profile-title">{{ data.title }}</p>
       <p class="ai-profile-location">{{ data.location }}</p>
+      <div
+        v-if="data.visaStatus"
+        class="ai-profile-visa"
+        :title="data.visaStatus"
+      >
+        <ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>
+        <span>{{ data.visaStatus }}</span>
+      </div>
     </div>
+
+    <p v-if="data.narrative" class="ai-profile-narrative">{{ data.narrative }}</p>
 
     <div v-if="data.currentFocus?.length" class="ai-profile-focus">
       <h6 class="ai-label">Current Focus</h6>
@@ -56,8 +86,19 @@ defineProps({ data: { type: Object, required: true } });
   display: inline;
 }
 
+.ai-profile-headline {
+  margin: 0 0 14px;
+  color: var(--white-2);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--onyx);
+}
+
 .ai-profile-header {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .ai-profile-name {
@@ -74,6 +115,38 @@ defineProps({ data: { type: Object, required: true } });
 .ai-profile-location {
   color: var(--light-gray-70);
   font-size: 12px;
+}
+
+.ai-profile-visa {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: 999px;
+  color: #4ade80;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 6px;
+  align-self: flex-start;
+  max-width: 100%;
+  line-height: 1.3;
+  cursor: help;
+}
+
+.ai-profile-visa ion-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+  display: inline;
+}
+
+.ai-profile-narrative {
+  margin: 0 0 12px;
+  color: var(--light-gray);
+  font-size: 13px;
+  line-height: 1.65;
+  letter-spacing: -0.005em;
 }
 
 .ai-label {

@@ -2,7 +2,19 @@
   <aside class="sidebar" data-sidebar>
     <div class="sidebar-info">
       <figure class="avatar-box">
-        <img src="../assets/images/my-avatar.png" alt="AnujKhurana" width="100" />
+        <img
+          src="../assets/images/my-avatar.png"
+          alt="AnujKhurana"
+          width="100"
+          class="avatar-pixel"
+        />
+        <img
+          src="/profile.png"
+          alt=""
+          width="100"
+          class="avatar-real"
+          aria-hidden="true"
+        />
       </figure>
 
       <div class="info-content">
@@ -102,7 +114,7 @@
     </div>
   </aside>
   <div class="main-content">
-    <nav class="navbar">
+    <nav class="navbar" :class="{ 'is-hidden': isHidden }">
       <ul class="navbar-list">
         <li class="navbar-item">
           <button class="navbar-link active" data-nav-link>About</button>
@@ -131,22 +143,31 @@
         <h2 class="h2 article-title">About me</h2>
       </header>
 
+      <!-- ⚠️  Keep this <section class="about-text"> in sync with
+           src/lib/knowledge/profile.js (narrative + summary). They are
+           intentionally separate text sources for layout reasons. -->
       <section class="about-text">
         <p>
-          Hi, I’m Anuj Khurana — I build products, not just features. As a Full Stack
-          Software Engineer, I combine modern web technologies, cloud infrastructure, and
-          AI to rapidly transform ideas into production-ready applications. I enjoy
-          solving difficult engineering challenges, improving developer workflows, and
-          building software that is fast, scalable, and genuinely useful
+          Three years of shipping production web and AI applications across Vue 3,
+          TypeScript, and Node.js. At GoDesta I led the Vue 2 → Vue 3 migration
+          end-to-end — hardening the build, fixing reactivity regressions, and
+          validating a measured 15% performance gain against Lighthouse and Core
+          Web Vitals. I’ve shipped FindMyLease end-to-end, an interactive D3 OrgChart
+          UI, a one-click URL summarizer built on the OpenAI API, and this very
+          portfolio — a server-side Gemini proxy that keeps the API key off the
+          browser and a local-knowledge intent router that handles most queries
+          without a Gemini round-trip.
         </p>
 
-        <!-- <p>
-          I’ve led frontend migrations, boosted performance, and crafted interfaces that
-          feel as good as they look. I hold a Master’s in Software Development, love
-          system design and clean architecture, and I’m always up for a new challenge —
-          especially if it means learning something cool along the way.
-        </p> -->
-        <p>🚀 Let’s build something amazing.</p>
+        <p>
+          I’m comfortable across the stack — frontend, API design, Postgres,
+          serverless — and equally comfortable on the product side. I’d rather
+          ship a smaller thing that someone uses than a larger thing that ships late.
+          Currently deepening real-time systems (WebRTC) and AI/LLM engineering,
+          and looking for a team that values craft and shipping measured impact.
+        </p>
+
+        <p>🚀 Let’s build something measurable.</p>
       </section>
       <!-- SERVICES -->
       <section class="service">
@@ -437,6 +458,7 @@ import Experiences from "./Experiences.vue";
 import Skills from "./Skills.vue";
 import Contact from "./Contact.vue";
 import ThemeToggle from "./ThemeToggle.vue";
+import { useScrollFlag } from "../composables/useScrollFlag.js";
 
 // Reactive refs for state management
 const isLoading = ref(true);
@@ -450,6 +472,25 @@ const formData = ref({
 
 // DOM element refs
 const sidebar = ref(null);
+
+// Phase 24 — adopt useScrollFlag (created in Phase 16 for the AI
+// landing's topbar) for the static website's bottom/top navbar.
+// The composable was extended in this phase to handle BOTH
+// element-level scroll events (e.target is a DOM element with
+// .scrollTop) AND window-level scroll events (e.target is window
+// or document — composable reads window.scrollY in that case).
+// Card.vue scrolls at the WINDOW level (the body itself scrolls,
+// not a sub-div), so we attach a window scroll listener via the
+// existing addEventListenerSafe utility in onMounted and remove it
+// in onBeforeUnmount through the existing eventListeners cleanup
+// pattern. threshold: 20 (vs the AI landing's 10) sits a tiny bit
+// higher on window scroll because mouse-wheel notches are larger
+// (~100px) and we want the navbar to wait for a deliberate scroll
+// pulse before hiding. The composable returns isHidden directly;
+// scrollState / isScrolled aren't needed for the navbar UX (no
+// background or border state change for the navbar — only the
+// direction-driven translateY hide).
+const { isHidden, onScroll } = useScrollFlag({ threshold: 20 });
 const modalContainer = ref(null);
 const overlay = ref(null);
 const form = ref(null);
@@ -559,6 +600,25 @@ const navigateToPage = (pageName) => {
   });
 };
 
+// Support the AI project card's "View website" link, which uses a
+// "#projects"-style hash to jump straight to a static-site section.
+// The hash maps 1:1 to the data-page names used by navigateToPage.
+const hashToPage = (hash) => {
+  const page = (hash || "").replace(/^#\/?/, "").trim().toLowerCase();
+  const valid = ["about", "projects", "experience", "contact"];
+  return valid.includes(page) ? page : null;
+};
+
+const handleHashChange = () => {
+  const page = hashToPage(window.location.hash);
+  if (page) navigateToPage(page);
+};
+
+const setupHashNavigation = () => {
+  addEventListenerSafe(window, "hashchange", handleHashChange);
+  handleHashChange();
+};
+
 // Setup testimonials modal
 const setupTestimonialsModal = () => {
   const testimonialsItems = safeQuerySelectorAll("[data-testimonials-item]");
@@ -665,6 +725,18 @@ const setupNavigation = () => {
       navigateToPage(clickedPage);
     });
   });
+};
+
+// Phase 24 — window scroll listener (drives the navbar's hide-on-
+// scroll-down / show-on-scroll-up motion). Attached with
+// passive: true so the browser can keep its scroll-optimisation
+// pipeline (no event.preventDefault path). The composable's
+// onScroll handler reads window.scrollY when called from this
+// listener (vs e.target.scrollTop when called from an element
+// @scroll binding). The existing eventListeners array + cleanup()
+// removes this listener on unmount.
+const setupScrollListener = () => {
+  addEventListenerSafe(window, "scroll", onScroll, { passive: true });
 };
 
 // Setup sidebar toggle
@@ -783,7 +855,9 @@ const initializePortfolio = async () => {
     setupFormValidation();
     setupFormSubmission();
     setupNavigation();
+    setupHashNavigation();
     setupIntersectionObserver();
+    setupScrollListener();
 
     // Initial form validation
     validateForm();

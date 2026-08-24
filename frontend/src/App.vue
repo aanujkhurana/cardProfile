@@ -8,12 +8,10 @@
     <!-- EXISTING WEBSITE (always mounted, just hidden) -->
     <div v-show="!showAI" class="website-wrapper">
       <ThemeToggle />
-      <v-spacer></v-spacer>
-      <Chatbox openai-api-key="" model="gpt-3.5-turbo" />
       <Card></Card>
 
       <!-- Back to AI floating button -->
-      <button class="back-to-ai-btn" @click="showAI = true" aria-label="Back to AI assistant">
+      <button class="back-to-ai-btn" @click="backToAI" aria-label="Back to AI assistant">
         <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
       </button>
     </div>
@@ -23,12 +21,38 @@
 <script setup>
 import Card from "./components/Card.vue";
 import ThemeToggle from "./components/ThemeToggle.vue";
-import Chatbox from "./components/Chatbox.vue";
 import AILanding from "./components/AILanding.vue";
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 // AI is the default view
 const showAI = ref(true);
+
+// A "#<section>" hash (e.g. the AI project card's "View website" link)
+// means the visitor wants the static site, not the AI overlay.
+const handleHashChange = () => {
+  if (window.location.hash) {
+    showAI.value = false;
+  }
+};
+
+onMounted(() => {
+  window.addEventListener("hashchange", handleHashChange);
+  handleHashChange(); // support deep links on first load
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("hashchange", handleHashChange);
+});
+
+// Return to the AI overlay and clear any section hash so a subsequent
+// "View website" click re-triggers hashchange (same-hash clicks are
+// otherwise no-ops).
+const backToAI = () => {
+  showAI.value = true;
+  if (window.location.hash) {
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+};
 </script>
 
 <style>

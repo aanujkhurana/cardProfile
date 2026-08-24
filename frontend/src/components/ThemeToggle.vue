@@ -1,28 +1,18 @@
 <template>
   <div class="theme-toggle-wrapper">
     <label class="theme-toggle">
-      <input type="checkbox" v-model="isLight" @change="toggleTheme" />
+      <input type="checkbox" :checked="isLight" @change="toggleTheme" />
       <span class="slider"></span>
     </label>
-        <ion-icon v-if="isIcon"  name="contrast-outline"></ion-icon>
-        <ion-icon v-else name="sunny-outline"></ion-icon>
+    <ion-icon v-if="isLight" name="contrast-outline"></ion-icon>
+    <ion-icon v-else name="sunny-outline"></ion-icon>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { useTheme } from "../composables/useTheme.js";
 
-const isLight = ref(false);
-const isIcon = ref(false);
-
-onMounted(() => {
-  isLight.value = document.documentElement.classList.contains("light-theme");
-});
-
-const toggleTheme = () => {
-  isIcon.value = !isIcon.value;
-  document.documentElement.classList.toggle("light-theme");
-};
+const { isLight, toggleTheme } = useTheme();
 </script>
 
 <style scoped>
