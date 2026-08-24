@@ -1,36 +1,39 @@
 import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import handler, { buildModelChain } from "../api/gemini.js";
+import handler, { buildModelChain, resetModelMemory } from "../api/gemini.js";
 
 /* ------------------------------------------------------------------ */
 /*  buildModelChain unit tests                                         */
 /* ------------------------------------------------------------------ */
 
 test("buildModelChain: primary first, then the ordered fallbacks", () => {
-  assert.deepEqual(buildModelChain("gemini-3.7-flash"), [
-    "gemini-3.7-flash",
-    "gemini-3.6-flash",
+  resetModelMemory();
+  assert.deepEqual(buildModelChain("gemini-3.5-flash"), [
     "gemini-3.5-flash",
+    "gemini-3.6-flash",
     "gemini-flash-latest",
+    "gemini-3.7-flash",
   ]);
 });
 
 test("buildModelChain: dedupes when the primary is already a fallback", () => {
+  resetModelMemory();
   assert.deepEqual(buildModelChain("gemini-flash-latest"), [
     "gemini-flash-latest",
-    "gemini-3.7-flash",
-    "gemini-3.6-flash",
     "gemini-3.5-flash",
+    "gemini-3.6-flash",
+    "gemini-3.7-flash",
   ]);
 });
 
 test("buildModelChain: prepends a custom primary not in the fallback list", () => {
+  resetModelMemory();
   assert.deepEqual(buildModelChain("gemini-custom-model"), [
     "gemini-custom-model",
-    "gemini-3.7-flash",
-    "gemini-3.6-flash",
     "gemini-3.5-flash",
+    "gemini-3.6-flash",
     "gemini-flash-latest",
+    "gemini-3.7-flash",
   ]);
 });
 
@@ -41,12 +44,14 @@ test("buildModelChain: prepends a custom primary not in the fallback list", () =
 const realFetch = globalThis.fetch;
 
 beforeEach(() => {
+  resetModelMemory();
   process.env.GEMINI_API_KEY = "test-key";
-  delete process.env.GEMINI_MODEL; // exercise DEFAULT_MODEL = gemini-3.7-flash
+  delete process.env.GEMINI_MODEL; // exercise DEFAULT_MODEL = gemini-3.5-flash
 });
 
 afterEach(() => {
   globalThis.fetch = realFetch;
+  resetModelMemory();
   delete process.env.GEMINI_MODEL;
   delete process.env.GEMINI_API_KEY;
 });
@@ -120,7 +125,7 @@ async function invokeHandler() {
 
 test("falls back to the next model when the primary returns 404", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => errorResponse(404),
+    "gemini-3.5-flash": () => errorResponse(404),
     "gemini-3.6-flash": () => okResponse("hello from 3.6"),
   });
   globalThis.fetch = fetch;
@@ -130,12 +135,12 @@ test("falls back to the next model when the primary returns 404", async () => {
   assert.equal(res.statusCode, 200);
   assert.equal(res.jsonBody.text, "hello from 3.6");
   assert.equal(res.jsonBody.model, "gemini-3.6-flash");
-  assert.deepEqual(fetch.calls, ["gemini-3.7-flash", "gemini-3.6-flash"]);
+  assert.deepEqual(fetch.calls, ["gemini-3.5-flash", "gemini-3.6-flash"]);
 });
 
 test("falls back to the next model when the primary returns 503", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => errorResponse(503),
+    "gemini-3.5-flash": () => errorResponse(503),
     "gemini-3.6-flash": () => okResponse("hello from 3.6"),
   });
   globalThis.fetch = fetch;
@@ -144,34 +149,34 @@ test("falls back to the next model when the primary returns 503", async () => {
 
   assert.equal(res.statusCode, 200);
   assert.equal(res.jsonBody.model, "gemini-3.6-flash");
-  assert.deepEqual(fetch.calls, ["gemini-3.7-flash", "gemini-3.6-flash"]);
+  assert.deepEqual(fetch.calls, ["gemini-3.5-flash", "gemini-3.6-flash"]);
 });
 
 test("keeps walking the chain through mixed 404/503 until a model succeeds", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => errorResponse(404),
+    "gemini-3.5-flash": () => errorResponse(404),
     "gemini-3.6-flash": () => errorResponse(503),
-    "gemini-3.5-flash": () => okResponse("hello from 3.5"),
+    "gemini-flash-latest": () => okResponse("hello from flash-latest"),
   });
   globalThis.fetch = fetch;
 
   const res = await invokeHandler();
 
   assert.equal(res.statusCode, 200);
-  assert.equal(res.jsonBody.model, "gemini-3.5-flash");
+  assert.equal(res.jsonBody.model, "gemini-flash-latest");
   assert.deepEqual(fetch.calls, [
-    "gemini-3.7-flash",
-    "gemini-3.6-flash",
     "gemini-3.5-flash",
+    "gemini-3.6-flash",
+    "gemini-flash-latest",
   ]);
 });
 
 test("surfaces the last error when every model returns 404/503", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => errorResponse(404),
-    "gemini-3.6-flash": () => errorResponse(503),
     "gemini-3.5-flash": () => errorResponse(404),
-    "gemini-flash-latest": () => errorResponse(503),
+    "gemini-3.6-flash": () => errorResponse(503),
+    "gemini-flash-latest": () => errorResponse(404),
+    "gemini-3.7-flash": () => errorResponse(503),
   });
   globalThis.fetch = fetch;
 
@@ -184,10 +189,10 @@ test("surfaces the last error when every model returns 404/503", async () => {
 
 test("surfaces MODEL_NOT_FOUND when every model returns 404", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => errorResponse(404),
-    "gemini-3.6-flash": () => errorResponse(404),
     "gemini-3.5-flash": () => errorResponse(404),
+    "gemini-3.6-flash": () => errorResponse(404),
     "gemini-flash-latest": () => errorResponse(404),
+    "gemini-3.7-flash": () => errorResponse(404),
   });
   globalThis.fetch = fetch;
 
@@ -199,7 +204,7 @@ test("surfaces MODEL_NOT_FOUND when every model returns 404", async () => {
 
 test("does not fall back on a fatal 403 — surfaces it immediately", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => errorResponse(403),
+    "gemini-3.5-flash": () => errorResponse(403),
     "gemini-3.6-flash": () => okResponse("should never be called"),
   });
   globalThis.fetch = fetch;
@@ -208,12 +213,12 @@ test("does not fall back on a fatal 403 — surfaces it immediately", async () =
 
   assert.equal(res.statusCode, 403);
   assert.equal(res.jsonBody.errorCode, "INVALID_API_KEY");
-  assert.deepEqual(fetch.calls, ["gemini-3.7-flash"]);
+  assert.deepEqual(fetch.calls, ["gemini-3.5-flash"]);
 });
 
 test("does not fall back on rate limiting (429)", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => errorResponse(429),
+    "gemini-3.5-flash": () => errorResponse(429),
   });
   globalThis.fetch = fetch;
 
@@ -221,12 +226,12 @@ test("does not fall back on rate limiting (429)", async () => {
 
   assert.equal(res.statusCode, 429);
   assert.equal(res.jsonBody.errorCode, "RATE_LIMITED");
-  assert.deepEqual(fetch.calls, ["gemini-3.7-flash"]);
+  assert.deepEqual(fetch.calls, ["gemini-3.5-flash"]);
 });
 
 test("falls back to the next model when the primary times out", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => {
+    "gemini-3.5-flash": () => {
       throw abortError();
     },
     "gemini-3.6-flash": () => okResponse("hello from 3.6"),
@@ -237,21 +242,21 @@ test("falls back to the next model when the primary times out", async () => {
 
   assert.equal(res.statusCode, 200);
   assert.equal(res.jsonBody.model, "gemini-3.6-flash");
-  assert.deepEqual(fetch.calls, ["gemini-3.7-flash", "gemini-3.6-flash"]);
+  assert.deepEqual(fetch.calls, ["gemini-3.5-flash", "gemini-3.6-flash"]);
 });
 
 test("surfaces a timeout when every model times out", async () => {
   const fetch = makeFetch({
-    "gemini-3.7-flash": () => {
+    "gemini-3.5-flash": () => {
       throw abortError();
     },
     "gemini-3.6-flash": () => {
       throw abortError();
     },
-    "gemini-3.5-flash": () => {
+    "gemini-flash-latest": () => {
       throw abortError();
     },
-    "gemini-flash-latest": () => {
+    "gemini-3.7-flash": () => {
       throw abortError();
     },
   });
@@ -262,4 +267,31 @@ test("surfaces a timeout when every model times out", async () => {
   assert.equal(res.statusCode, 504);
   assert.equal(res.jsonBody.errorCode, "SERVER_ERROR");
   assert.equal(fetch.calls.length, 4);
+});
+
+test("remembers the last working model and tries it first on the next request", async () => {
+  // First request: primary times out, 3.6 succeeds — and is remembered.
+  let fetch = makeFetch({
+    "gemini-3.5-flash": () => {
+      throw abortError();
+    },
+    "gemini-3.6-flash": () => okResponse("hello from 3.6"),
+  });
+  globalThis.fetch = fetch;
+
+  let res = await invokeHandler();
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.jsonBody.model, "gemini-3.6-flash");
+  assert.deepEqual(fetch.calls, ["gemini-3.5-flash", "gemini-3.6-flash"]);
+
+  // Second request: the remembered 3.6 leads, skipping the flaky primary.
+  fetch = makeFetch({
+    "gemini-3.6-flash": () => okResponse("hello again"),
+  });
+  globalThis.fetch = fetch;
+
+  res = await invokeHandler();
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.jsonBody.model, "gemini-3.6-flash");
+  assert.deepEqual(fetch.calls, ["gemini-3.6-flash"]);
 });
