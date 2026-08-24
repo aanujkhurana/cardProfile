@@ -18,7 +18,11 @@
 
 import { buildSystemPrompt } from "../chatbox/systemPrompt.js";
 
-const ENDPOINT = "/api/gemini";
+// On Vercel / local dev, the API routes are co-located (relative path works).
+// On GitHub Pages (static-only), set VITE_API_BASE to the Vercel alias so
+// /api/gemini calls hit the serverless functions there:
+//   .env.production: VITE_API_BASE=https://frontend-anuj-khuranas-projects.vercel.app
+const ENDPOINT = `${import.meta.env.VITE_API_BASE || ""}/api/gemini`;
 
 /* ------------------------------------------------------------------ */
 /*  Response cache — avoid redundant network calls                    */

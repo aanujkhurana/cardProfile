@@ -41,7 +41,8 @@ export function fetchSanity(resource) {
  * serverless functions, e.g. Vercel — it will not work on a pure static host).
  */
 export async function createContact({ name, email, message }) {
-  const response = await fetch('/api/sanity', {
+  const apiBase = import.meta.env.VITE_API_BASE || "";
+  const response = await fetch(`${apiBase}/api/sanity`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

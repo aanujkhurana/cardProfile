@@ -57,7 +57,32 @@ function getClient() {
   });
 }
 
+/**
+ * Cross-origin support: the frontend is served from GitHub Pages (static-only,
+ * no serverless functions), so the browser calls this function from a different
+ * origin. Answer the OPTIONS preflight and stamp every response with CORS
+ * headers. No cookies/credentials are used, so a wildcard origin is safe;
+ * set CORS_ORIGIN to restrict it to a specific origin.
+ */
+const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
+
+function applyCorsHeaders(res) {
+  res.setHeader("Access-Control-Allow-Origin", CORS_ORIGIN);
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (CORS_ORIGIN !== "*") {
+    res.setHeader("Vary", "Origin");
+  }
+}
+
 export default async function handler(req, res) {
+  applyCorsHeaders(res);
+
+  // Preflight: browsers send OPTIONS first for the application/json POST.
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
